@@ -1,5 +1,6 @@
 package;
 
+import states.PlayState;
 import states.SplashScreenState;
 import misc.Macros;
 import states.MainMenuState;
@@ -19,6 +20,7 @@ class Main extends Sprite {
 		Configure.initAnalytics(false);
 
 		var startingState:Class<FlxState> = SplashScreenState;
+
 		#if play
 		startingState = PlayState;
 		#else
