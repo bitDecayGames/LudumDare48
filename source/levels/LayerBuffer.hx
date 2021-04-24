@@ -18,11 +18,21 @@ class LayerBuffer extends FlxTilemap {
 	// NOTE: This array is indexed as [y][x] due to how FlxTilemap loads them
 	var local:Array<Array<Int>> = new Array<Array<Int>>();
 
-	public function new(width:Int, height:Int) {
+	/**
+	 * @param width	main buffer width
+	 * @param height main buffer height
+	 * @param padding number of cells on each side as padding
+	**/
+	public function new(width:Int, height:Int, padding:Int) {
 		super();
-		bufWidth = width;
-		bufHeight = height;
-		local = [for(i in 0...height) [for(k in 0...width) 1]];
+		bufWidth = width + 2*padding;
+		bufHeight = height + 2*padding;
+
+		// we added padding, so the world coords of our top left need to take padding into account
+		worldX = -padding;
+		worldY = -padding;
+
+		local = [for(i in 0...bufHeight) [for(k in 0...bufWidth) 1]];
 		tilemap = new FlxTilemap();
 		trace('width: ${local.length}   height: ${local[0].length}');
 		reload();

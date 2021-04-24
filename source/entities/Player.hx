@@ -19,7 +19,7 @@ class Player extends FlxSprite {
 	var moving:Bool;
 
 	private static var NO_TARGET = FlxPoint.get(-999, -999);
-	var target:FlxPoint = FlxPoint.get();
+	var target:FlxPoint = FlxPoint.get().copyFrom(NO_TARGET);
 
 	var temp:FlxVector = FlxVector.get();
 

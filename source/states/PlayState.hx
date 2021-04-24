@@ -1,9 +1,9 @@
 package states;
 
+import flixel.math.FlxPoint;
 import helpers.Constants;
 import spacial.Cardinal;
 import levels.LayerBuffer;
-import input.SimpleController;
 import flixel.addons.transition.FlxTransitionableState;
 import signals.Lifecycle;
 import entities.Player;
@@ -25,13 +25,18 @@ class PlayState extends FlxTransitionableState {
 		FlxG.camera.pixelPerfectRender = true;
 
 		// Buffer is 2 tiles wider and taller than the play field on purpose
-		buffer = new LayerBuffer(16, 24);
+		buffer = new LayerBuffer(14, 22, 2);
 		buffer.tilemap.x = -32;
 		buffer.tilemap.y = -32;
 		add(buffer);
 
 		player = new Player();
+		player.x = Constants.TILE_SIZE * 7;
+		player.y = Constants.TILE_SIZE * 11;
 		add(player);
+
+		camera.follow(player);
+		// camera.setScrollBounds(-10000, 10000, 0, 10000);
 	}
 
 	override public function update(elapsed:Float) {
@@ -39,30 +44,29 @@ class PlayState extends FlxTransitionableState {
 
 		var dir = player.getIntention();
 		if (dir != Cardinal.NONE) {
-			var target = player.getPosition();
-			target.addPoint(dir.asVector().scale(Constants.TILE_SIZE));
-			var targetTile = buffer.get_index_from_point(target);
+			var tileMovement = dir.asVector().scale(Constants.TILE_SIZE);
+
+			// figure out the world coordinates of where the player wants to be
+			var worldTarget = player.getPosition();
+			worldTarget.addPoint(tileMovement);
+
+			// figure out the tilemap coordinates within the buffer
+			var bufferTarget = FlxPoint.get().copyFrom(worldTarget);
+			bufferTarget.subtract(buffer.worldX * Constants.TILE_SIZE, buffer.worldY * Constants.TILE_SIZE);
+
+			var targetTile = buffer.get_index_from_point(bufferTarget);
 
 			// 2 is rocks for now... can't move into those
 			if (targetTile < 2) {
-				player.setTarget(target);
+				player.setTarget(worldTarget);
 				if (targetTile == 1) {
-					buffer.setTile((target.x / buffer.get_tile_width()).floor(), (target.y / buffer.get_tile_height()).floor(), 0);
+					buffer.setTile((bufferTarget.x / buffer.get_tile_width()).floor(), (bufferTarget.y / buffer.get_tile_height()).floor(), 0);
 				}
 				buffer.pushData(dir, getNextLevelData(dir));
 			}
-
-			// reference for how to move the buffer around
-			// if (SimpleController.just_pressed(Button.UP)) {
-			// 	buffer.pushOntoBottom([for(i in 0...16) 1]);
-			// } else if (SimpleController.just_pressed(Button.DOWN)) {
-			// 	buffer.pushOntoTop([for(i in 0...16) 1]);
-			// } else if (SimpleController.just_pressed(Button.LEFT)) {
-			// 	buffer.pushOntoRight([for(i in 0...24) 2]);
-			// } else if (SimpleController.just_pressed(Button.RIGHT)) {
-			// 	buffer.pushOntoLeft([for(i in 0...24) 2]);
-			// }
 		}
+		// buffer is slightly bigger than screen, so we position it so it's centered correctly
+		buffer.setPosition(player.x - 8 * Constants.TILE_SIZE, player.y - 12 * Constants.TILE_SIZE);
 	}
 
 	public function getNextLevelData(dir:Cardinal):Array<Int> {
@@ -72,9 +76,9 @@ class PlayState extends FlxTransitionableState {
 			case S:
 				getWorldDataRow(buffer.worldX, buffer.worldY + buffer.bufHeight + 1, buffer.bufWidth);
 			case E:
-				getWorldDataRow(buffer.worldX + buffer.bufWidth + 1, buffer.worldY, buffer.bufHeight);
+				getWorldDataColumn(buffer.worldX + buffer.bufWidth + 1, buffer.worldY, buffer.bufHeight);
 			case W:
-				getWorldDataRow(buffer.worldX - 1, buffer.worldY, buffer.bufHeight);
+				getWorldDataColumn(buffer.worldX - 1, buffer.worldY, buffer.bufHeight);
 			default:
 				throw('cannot request level data for direction ${dir}');
 		}
