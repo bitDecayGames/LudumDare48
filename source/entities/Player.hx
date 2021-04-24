@@ -15,7 +15,7 @@ import helpers.Constants;
 using extensions.FlxPointExt;
 
 class Player extends FlxSprite {
-	var speed:Float = 30;
+	var speed:Float = 60;
 	var moving:Bool;
 
 	var target:FlxPoint = FlxPoint.get();
@@ -41,7 +41,7 @@ class Player extends FlxSprite {
 
 			// Check if the player has now reached the next block
 			// TODO: This may be causing slight jitter. Not sure if it matters once animations are in place
-			if (getPosition(temp).distanceTo(target) < 0.1) {
+			if (getPosition(temp).distanceTo(target) < 1) {
 				setPosition(target.x, target.y);
 				moving = false;
 			}
