@@ -19,12 +19,12 @@ class Player extends FlxSprite {
 
 	var temp:FlxVector = FlxVector.get();
 
-	var TILE_SIZE = 32;
+	var TILE_SIZE:Int;
 
-	public function new() {
+	public function new(tileSize:Int = 32) {
 		super();
-		makeGraphic(32, 32, FlxColor.BLUE);
-
+		TILE_SIZE = tileSize;
+		makeGraphic(tileSize, tileSize, FlxColor.BLUE);
 	}
 
 	override public function update(delta:Float) {
@@ -32,30 +32,29 @@ class Player extends FlxSprite {
 
 		// Move the player to the next block
 		if (moving) {
-			temp.copyFrom(target).subtractPoint(getPosition());
+			getPosition(temp).subtractPoint(target);
 			temp.normalize();
-			x += temp.x * speed * delta;
-			y += temp.y * speed * delta;
+			x -= temp.x * speed * delta;
+			y -= temp.y * speed * delta;
 
 			// Check if the player has now reached the next block
-			getPosition(temp);
-			if (temp.distanceTo(target) < 0.1) {
+			// TODO: This may be causing slight jitter. Not sure if it matters once animations are in place
+			if (getPosition(temp).distanceTo(target) < 0.1) {
 				setPosition(target.x, target.y);
 				moving = false;
 			}
 		} else {
 			moving = true;
-			switch (InputCalcuator.getInputCardinal()) {
-				case N:
-					target.set(x, y - TILE_SIZE);
-				case S:
-					target.set(x, y + TILE_SIZE);
-				case E:
-					target.set(x + TILE_SIZE, y);
-				case W:
-					target.set(x - TILE_SIZE, y);
-				default:
-					moving = false;
+			if (SimpleController.pressed(Button.UP)) {
+				target.set(x, y - TILE_SIZE);
+			} else if (SimpleController.pressed(Button.DOWN)) {
+				target.set(x, y + TILE_SIZE);
+			} else if (SimpleController.pressed(Button.LEFT)) {
+				target.set(x - TILE_SIZE, y);
+			} else if (SimpleController.pressed(Button.RIGHT)) {
+				target.set(x + TILE_SIZE, y);
+			} else {
+				moving = false;
 			}
 		}
 	}

@@ -12,11 +12,11 @@
 		"allowClickToSkip": true
 	},
 	"mouse": {
-		"cursorVisible": true,
+		"cursorVisible": false,
 		"useSystemCursor": true
 	},
 	"menus": {
-		"mouseNavigation": true,
+		"mouseNavigation": false,
 		"keyboardNavigation": true,
 		"controllerNavigation": true
 	},
@@ -38,7 +38,10 @@
 				"sectionName": "Programming",
 				"names": [
 					"Logan Moore",
-					"Mike Wingfield"
+					"Mike Wingfield",
+					"Tristan Havelick",
+					"Jake Caban-Tomski",
+					"Jake Fisher"
 				]
 			}
 		]
