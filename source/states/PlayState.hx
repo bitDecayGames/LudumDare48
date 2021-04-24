@@ -58,6 +58,8 @@ class PlayState extends FlxTransitionableState {
 			// figure out the tilemap coordinates within the buffer
 			var bufferTarget = FlxPoint.get().copyFrom(worldTarget);
 			bufferTarget.subtract(buffer.worldX * Constants.TILE_SIZE, buffer.worldY * Constants.TILE_SIZE);
+			bufferTarget.x -= 10;
+			bufferTarget.y -= 10;
 
 			var targetTile = buffer.get_index_from_point(bufferTarget);
 
@@ -68,7 +70,7 @@ class PlayState extends FlxTransitionableState {
 					var x = (bufferTarget.x / buffer.get_tile_width()).floor();
 					var y = (bufferTarget.y / buffer.get_tile_height()).floor();
 					buffer.setTile(x, y, 0);
-					calculator.set((worldTarget.x / Constants.TILE_SIZE).floor(), (worldTarget.y / Constants.TILE_SIZE).floor(), 0, 0);
+					calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), 0, 0);
 				}
 				buffer.pushData(dir, getNextLevelData(dir));
 			}
