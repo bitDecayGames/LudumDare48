@@ -18,6 +18,8 @@ import states.PlayState;
 import states.teststates.MikesNoisyState;
 #elseif jakect
 import states.JakeCTState;
+#elseif fish
+import states.teststates.FishState;
 #end
 
 class Main extends Sprite {
@@ -33,6 +35,8 @@ class Main extends Sprite {
 		startingState = MikesNoiseyState;
 		#elseif jakect
 		startingState = JakeCTState;
+		#elseif fish
+		startingState = FishState;
 		#else
 		if (Macros.isDefined("SKIP_SPLASH")) {
 			startingState = MainMenuState;

@@ -1,5 +1,6 @@
 package entities;
 
+import haxe.macro.Expr.Constant;
 import flixel.math.FlxVector;
 import input.SimpleController;
 import flixel.math.FlxPoint;
@@ -8,6 +9,8 @@ import spacial.Cardinal;
 import input.InputCalcuator;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
+
+import helpers.Constants;
 
 using extensions.FlxPointExt;
 
@@ -19,12 +22,11 @@ class Player extends FlxSprite {
 
 	var temp:FlxVector = FlxVector.get();
 
-	var TILE_SIZE:Int;
+	var moleFollowingMe:FlxSprite;
 
-	public function new(tileSize:Int = 32) {
+	public function new() {
 		super();
-		TILE_SIZE = tileSize;
-		makeGraphic(tileSize, tileSize, FlxColor.BLUE);
+		makeGraphic(Constants.TILE_SIZE, Constants.TILE_SIZE, FlxColor.BLUE);
 	}
 
 	override public function update(delta:Float) {
@@ -46,16 +48,21 @@ class Player extends FlxSprite {
 		} else {
 			moving = true;
 			if (SimpleController.pressed(Button.UP)) {
-				target.set(x, y - TILE_SIZE);
+				target.set(x, y - Constants.TILE_SIZE);
 			} else if (SimpleController.pressed(Button.DOWN)) {
-				target.set(x, y + TILE_SIZE);
+				target.set(x, y + Constants.TILE_SIZE);
 			} else if (SimpleController.pressed(Button.LEFT)) {
-				target.set(x - TILE_SIZE, y);
+				target.set(x - Constants.TILE_SIZE, y);
 			} else if (SimpleController.pressed(Button.RIGHT)) {
-				target.set(x + TILE_SIZE, y);
+				target.set(x + Constants.TILE_SIZE, y);
 			} else {
 				moving = false;
 			}
 		}
+	}
+
+	public function follow(_moleFollowingMe)
+	{
+		moleFollowingMe = _moleFollowingMe;
 	}
 }
