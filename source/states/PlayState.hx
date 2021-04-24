@@ -3,6 +3,7 @@ package states;
 import helpers.Constants;
 import spacial.Cardinal;
 import levels.LayerBuffer;
+import levels.VoxelCalculator;
 import input.SimpleController;
 import flixel.addons.transition.FlxTransitionableState;
 import signals.Lifecycle;
@@ -17,12 +18,15 @@ class PlayState extends FlxTransitionableState {
 	var player:Player;
 
 	var buffer:LayerBuffer;
+	var calculator:VoxelCalculator;
 
 	override public function create() {
 		super.create();
 		Lifecycle.startup.dispatch();
 
 		FlxG.camera.pixelPerfectRender = true;
+
+		calculator = new VoxelCalculator();
 
 		// Buffer is 2 tiles wider and taller than the play field on purpose
 		buffer = new LayerBuffer(16, 24);
@@ -66,30 +70,34 @@ class PlayState extends FlxTransitionableState {
 	}
 
 	public function getNextLevelData(dir:Cardinal):Array<Int> {
-		return switch(dir) {
+		return switch (dir) {
 			case N:
-				getWorldDataRow(buffer.worldX, buffer.worldY-1, buffer.bufWidth);
+				getWorldDataRow(buffer.worldX, buffer.worldY - 1, 0, buffer.bufWidth);
 			case S:
-				getWorldDataRow(buffer.worldX, buffer.worldY + buffer.bufHeight + 1, buffer.bufWidth);
+				getWorldDataRow(buffer.worldX, buffer.worldY + buffer.bufHeight + 1, 0, buffer.bufWidth);
 			case E:
-				getWorldDataRow(buffer.worldX + buffer.bufWidth + 1, buffer.worldY, buffer.bufHeight);
+				getWorldDataRow(buffer.worldX + buffer.bufWidth + 1, buffer.worldY, 0, buffer.bufHeight);
 			case W:
-				getWorldDataRow(buffer.worldX - 1, buffer.worldY, buffer.bufHeight);
+				getWorldDataRow(buffer.worldX - 1, buffer.worldY, 0, buffer.bufHeight);
 			default:
 				throw('cannot request level data for direction ${dir}');
 		}
 	}
 
-	public function getWorldDataRow(x:Int, y:Int, num:Int):Array<Int> {
-		// TODO: Pull from perlin noise function
-		var tile = FlxG.random.int(1, 2);
-		return [for(i in 0...num) tile];
+	public function getWorldDataRow(x:Int, y:Int, z:Int, num:Int):Array<Int> {
+		var tiles:Array<Int> = [];
+		for (i in 0...num) {
+			tiles.push(calculator.get(x + i, y, z));
+		}
+		return tiles;
 	}
 
-	public function getWorldDataColumn(x:Int, y:Int, num:Int):Array<Int> {
-		// TODO: Pull from perlin noise function
-		var tile = FlxG.random.int(1, 2);
-		return [for(i in 0...num) tile];
+	public function getWorldDataColumn(x:Int, y:Int, z:Int, num:Int):Array<Int> {
+		var tiles:Array<Int> = [];
+		for (i in 0...num) {
+			tiles.push(calculator.get(x, y + i, z));
+		}
+		return tiles;
 	}
 
 	override public function onFocusLost() {
