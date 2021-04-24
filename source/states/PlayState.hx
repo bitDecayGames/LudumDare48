@@ -1,5 +1,6 @@
 package states;
 
+import flixel.FlxCamera;
 import flixel.math.FlxPoint;
 import helpers.Constants;
 import spacial.Cardinal;
@@ -34,8 +35,9 @@ class PlayState extends FlxTransitionableState {
 		player.y = Constants.TILE_SIZE * 11;
 		add(player);
 
-		camera.follow(player);
-		// camera.setScrollBounds(-10000, 10000, 0, 10000);
+		player.setTarget(player.getPosition());
+
+		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
 	}
 
 	override public function update(elapsed:Float) {
