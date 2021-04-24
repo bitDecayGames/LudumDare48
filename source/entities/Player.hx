@@ -45,7 +45,7 @@ class Player extends FlxSprite {
 			if (getPosition(temp).distanceTo(target) < 1) {
 				setPosition(target.x, target.y);
 				target.copyFrom(NO_TARGET);
-			
+			}
 		}
 	}
 
