@@ -9,16 +9,16 @@ import flixel.FlxG;
 import spacial.Cardinal;
 import flixel.util.FlxColor;
 import flixel.FlxSprite;
-
 import helpers.Constants;
 
 using extensions.FlxPointExt;
 
 class Player extends FlxSprite {
-	var speed:Float = 60;
+	var speed:Float = 240;
 	var moving:Bool;
 
 	private static var NO_TARGET = FlxPoint.get(-999, -999);
+
 	var target:FlxPoint = FlxPoint.get().copyFrom(NO_TARGET);
 
 	var temp:FlxVector = FlxVector.get();
@@ -67,8 +67,7 @@ class Player extends FlxSprite {
 		return !target.equals(NO_TARGET);
 	}
 
-	public function follow(_moleFollowingMe)
-	{
+	public function follow(_moleFollowingMe) {
 		moleFollowingMe = _moleFollowingMe;
 	}
 }
