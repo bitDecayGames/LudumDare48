@@ -1,8 +1,6 @@
 package states;
 
-import flixel.util.FlxColor;
 import flixel.addons.transition.FlxTransitionableState;
-import signals.Lifecycle;
 import flixel.FlxG;
 import entities.snake.SnakeSegment;
 
@@ -10,15 +8,15 @@ using extensions.FlxStateExt;
 
 class JakeCTState extends FlxTransitionableState {
 	var snakeSegments:Array<SnakeSegment> = [];
-	
+
 	override public function create() {
 		super.create();
-		Lifecycle.startup.dispatch();
 
 		FlxG.camera.pixelPerfectRender = true;
 
-		var seg = new SnakeSegment(FlxColor.BLUE);
-		seg.x = 200;
+		var seg = new SnakeSegment();
+		seg.x = 0;
+		seg.y = 200;
 		snakeSegments.push(seg);
 		add(seg);
 	}
