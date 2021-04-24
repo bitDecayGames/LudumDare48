@@ -1,7 +1,6 @@
 package entities.snake;
 
 import flixel.addons.display.FlxTiledSprite;
-import flixel.util.FlxColor;
 import flixel.math.FlxVector;
 
 using extensions.FlxObjectExt;
