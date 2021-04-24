@@ -76,9 +76,9 @@ class PlayState extends FlxTransitionableState {
 			case S:
 				getWorldDataRow(buffer.worldX, buffer.worldY + buffer.bufHeight + 1, 0, buffer.bufWidth);
 			case E:
-				getWorldDataRow(buffer.worldX + buffer.bufWidth + 1, buffer.worldY, 0, buffer.bufHeight);
+				getWorldDataColumn(buffer.worldX + buffer.bufWidth + 1, buffer.worldY, 0, buffer.bufHeight);
 			case W:
-				getWorldDataRow(buffer.worldX - 1, buffer.worldY, 0, buffer.bufHeight);
+				getWorldDataColumn(buffer.worldX - 1, buffer.worldY, 0, buffer.bufHeight);
 			default:
 				throw('cannot request level data for direction ${dir}');
 		}
