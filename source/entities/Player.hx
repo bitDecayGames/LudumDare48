@@ -1,5 +1,6 @@
 package entities;
 
+import input.InputCalcuator;
 import haxe.macro.Expr.Constant;
 import flixel.math.FlxVector;
 import input.SimpleController;
@@ -49,23 +50,13 @@ class Player extends FlxSprite {
 		}
 	}
 
-	var intent = FlxPoint.get();
-	public function getIntention():FlxPoint {
+	public function getIntention():Cardinal {
 		if (!target.equals(NO_TARGET)) {
 			// still chasing our target
-			intent.copyFrom(target);
+			return Cardinal.NONE;
 		} else {
-			if (SimpleController.pressed(Button.UP)) {
-				intent.set(x, y - Constants.TILE_SIZE);
-			} else if (SimpleController.pressed(Button.DOWN)) {
-				intent.set(x, y + Constants.TILE_SIZE);
-			} else if (SimpleController.pressed(Button.LEFT)) {
-				intent.set(x - Constants.TILE_SIZE, y);
-			} else if (SimpleController.pressed(Button.RIGHT)) {
-				intent.set(x + Constants.TILE_SIZE, y);
-			}
+			return InputCalcuator.getInputCardinal();
 		}
-		return intent;
 	}
 
 	public function setTarget(t:FlxPoint) {
