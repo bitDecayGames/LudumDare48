@@ -12,6 +12,9 @@ import flixel.addons.transition.TransitionData;
 import flixel.util.FlxColor;
 import misc.FlxTextFactory;
 import openfl.display.Sprite;
+#if mike
+import states.teststates.MikesNoisyState;
+#end
 
 class Main extends Sprite {
 	public function new() {
@@ -21,6 +24,8 @@ class Main extends Sprite {
 		var startingState:Class<FlxState> = SplashScreenState;
 		#if play
 		startingState = PlayState;
+		#elseif mike
+		startingState = MikesNoiseyState;
 		#else
 		if (Macros.isDefined("SKIP_SPLASH")) {
 			startingState = MainMenuState;
