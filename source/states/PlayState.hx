@@ -1,5 +1,6 @@
 package states;
 
+import flixel.FlxCamera;
 import flixel.math.FlxPoint;
 import helpers.Constants;
 import spacial.Cardinal;
@@ -40,8 +41,11 @@ class PlayState extends FlxTransitionableState {
 		player.y = Constants.TILE_SIZE * 11;
 		add(player);
 
-		camera.follow(player);
-		// camera.setScrollBounds(-10000, 10000, 0, 10000);
+		player.setTarget(player.getPosition());
+
+		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
+
+		updateBufferPosition();
 	}
 
 	override public function update(elapsed:Float) {
@@ -76,7 +80,13 @@ class PlayState extends FlxTransitionableState {
 			}
 		}
 		// buffer is slightly bigger than screen, so we position it so it's centered correctly
-		buffer.setPosition(player.x - 8 * Constants.TILE_SIZE, player.y - 12 * Constants.TILE_SIZE);
+		if (player.targetValid()) {
+			updateBufferPosition();
+		}
+	}
+
+	private function updateBufferPosition() {
+		buffer.setPosition(player.target.x - 8 * Constants.TILE_SIZE, player.target.y - 12 * Constants.TILE_SIZE);
 	}
 
 	public function getNextLevelData(dir:Cardinal):Array<Int> {
