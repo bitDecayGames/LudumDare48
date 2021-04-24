@@ -48,24 +48,6 @@ class StraightSnakeSegment extends FlxTiledSprite {
         this.direction = direction;
     }
 
-    public function setSpriteOffset(o:Float) {
-		spriteOffset = o;
-	}
-
-	public function getSpriteOffsetAmount():Float {
-		var length = 0.0;
-        var modulo = 0;
-        if (direction.equals(UP) || direction.equals(DOWN)) {
-            length = height;
-            modulo = HEIGHT;
-        } else if (direction.equals(LEFT) || direction.equals(RIGHT)) {
-            length = width;
-            modulo = WIDTH;
-        }
-
-        return length % modulo;
-	}
-
     public function stop() {
         stopMovement = true;
     }
@@ -74,15 +56,22 @@ class StraightSnakeSegment extends FlxTiledSprite {
         super.update(delta);
 
         if (direction.x != 0) {
-            if (!stopMovement) {
-                width += direction.x * SPEED * delta;
+            var dx = direction.x * SPEED * delta;
+            if (stopMovement) {
+                scrollX += dx;
+            } else {
+                width += dx;
+                scrollX = width % WIDTH;
             }
-            scrollX = width % WIDTH;
+
         } else if (direction.y != 0) {
-            if (!stopMovement) {
-                height += direction.y * SPEED * delta;
+            var dy = direction.y * SPEED * delta;
+            if (stopMovement) {
+                scrollY += dy;
+            } else {
+                height += dy;
+                scrollY = height % HEIGHT;
             }
-            scrollY = height % HEIGHT;
         }
     }
 }

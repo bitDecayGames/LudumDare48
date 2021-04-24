@@ -34,13 +34,5 @@ class Snake extends FlxGroup {
         if (FlxG.keys.justPressed.SPACE) {
             addSegment(StraightSnakeSegment.random());
         }
-
-        var offset = 0.0;
-		var i = segments.length - 1;
-        while (i >= 0) {
-			offset += segments[i].getSpriteOffsetAmount();
-			segments[i].setSpriteOffset(offset);
-			i--;
-		}
 	}
 }
