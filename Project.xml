@@ -15,7 +15,8 @@
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
-	<window width="640" height="480" fps="60" background="#000000" hardware="true" vsync="false" />
+	<!-- Screen is 14x22 tiles at 32x32 each -->
+	<window width="448" height="704" fps="60" background="#222222" hardware="true" vsync="false" />
 
 	<!--HTML5-specific-->
 	<window if="html5" resizable="true" />

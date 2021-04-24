@@ -129,12 +129,18 @@ class SplashImage extends FlxSprite {
 		loadGraphic(gfx, animated, width, height);
 		animation.add(SplashScreenState.PLAY_ANIMATION, [for (i in startFrame...endFrame) i], rate, false);
 
+		var ratio = 1.0;
+
 		if (animated) {
-			scale.set(FlxG.width / width, FlxG.height / height);
+			ratio = FlxG.width / width;
 		} else {
-			scale.set(FlxG.width / frameWidth, FlxG.height / frameHeight);
+			ratio = FlxG.width / frameWidth;
 		}
 
+		scale.set(ratio, ratio);
+
 		updateHitbox();
+
+		screenCenter();
 	}
 }
