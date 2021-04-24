@@ -68,7 +68,7 @@ class PlayState extends FlxTransitionableState {
 					var x = (bufferTarget.x / buffer.get_tile_width()).floor();
 					var y = (bufferTarget.y / buffer.get_tile_height()).floor();
 					buffer.setTile(x, y, 0);
-					calculator.set(x, y, 0, 0);
+					calculator.set((worldTarget.x / Constants.TILE_SIZE).floor(), (worldTarget.y / Constants.TILE_SIZE).floor(), 0, 0);
 				}
 				buffer.pushData(dir, getNextLevelData(dir));
 			}

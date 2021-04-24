@@ -26,6 +26,7 @@ class VoxelCalculator {
 		}
 		var key = getKey(x, y, z);
 		if (modified.exists(key)) {
+			trace("Get back modified voxel at " + key);
 			return modified.get(key);
 		}
 		var density = perlin.perlin(x * scale, y * scale, z * scale);
@@ -48,6 +49,7 @@ class VoxelCalculator {
 	 */
 	public function set(x:Int, y:Int, z:Int, value:Int):VoxelCalculator {
 		modified.set(getKey(x, y, z), value);
+		trace("Set calc " + getKey(x, y, z));
 		return this;
 	}
 
