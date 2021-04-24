@@ -1,29 +1,46 @@
 package entities.snake;
 
+import flixel.FlxG;
 import flixel.math.FlxVector;
 import flixel.group.FlxGroup;
 
 class Snake extends FlxGroup {
-    var activeSegment:SnakeSegment;
+    var segments:Array<StraightSnakeSegment>;
+    var activeSegment:StraightSnakeSegment;
     var startPos:FlxVector;
 
     public function new(startPos:FlxVector) {
         super();
+        segments = [];
 
-        addSegment();
+        addSegment(StraightSnakeSegment.right());
         activeSegment.setPosition(startPos.x, startPos.y);
     }
 
-    private function addSegment() {
-        var newSeg = new SnakeSegment();  
-        
+    private function addSegment(seg: StraightSnakeSegment) {
         if (activeSegment != null) {
-            activeSegment.alive = false;
+            activeSegment.stop();
             var activePos = activeSegment.getPosition();
-            newSeg.setPosition(activePos.x, activePos.x);
+            seg.setPosition(activePos.x, activePos.x);
         }
 
-        activeSegment = newSeg;
-		add(newSeg);
+        activeSegment = seg;
+		add(seg);
     }
+
+    override public function update(elapsed:Float) {
+		super.update(elapsed);
+
+        if (FlxG.keys.justPressed.SPACE) {
+            addSegment(StraightSnakeSegment.random());
+        }
+
+        var offset = 0.0;
+		var i = segments.length - 1;
+        while (i >= 0) {
+			offset += segments[i].getSpriteOffsetAmount();
+			segments[i].setSpriteOffset(offset);
+			i--;
+		}
+	}
 }
