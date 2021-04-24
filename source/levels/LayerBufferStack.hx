@@ -1,5 +1,6 @@
 package levels;
 
+import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import helpers.Constants;
@@ -19,11 +20,17 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		super();
 		calculator = new VoxelCalculator();
 		for (i in 0...3) {
-			var l = new LayerBuffer(width, height, padding);
+			var l = new LayerBuffer(width, height, padding + (2 * i));
 			l.worldZ = i;
+			var scale = 1.0 - i * 0.1;
+			l.scale.set(scale, scale);
+			var tint = (255 * (1 - i * 0.1)).floor();
+			l.color = FlxColor.fromRGB(tint, tint, tint);
 			setEntireBufferTileTypes(l);
 			layers.push(l);
-			add(l);
+		}
+		for (i in 0...3) {
+			add(layers[layers.length - 1 - i]);
 		}
 	}
 
@@ -48,7 +55,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			if (targetTile == 1) {
 				var x = (bufferTarget.x / main.get_tile_width()).floor();
 				var y = (bufferTarget.y / main.get_tile_height()).floor();
-				main.setTile(x, y, 0);
+				main.setTile(x, y, 3);
 				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ, 0);
 			}
 			for (i in 0...layers.length) {
