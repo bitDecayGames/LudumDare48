@@ -4,6 +4,7 @@ import states.PlayState;
 import states.SplashScreenState;
 import misc.Macros;
 import states.MainMenuState;
+import states.JakeCTState;
 import flixel.FlxState;
 import config.Configure;
 import flixel.FlxG;
@@ -23,6 +24,8 @@ class Main extends Sprite {
 
 		#if play
 		startingState = PlayState;
+		#elseif jakect
+		startingState = JakeCTState;
 		#else
 		if (Macros.isDefined("SKIP_SPLASH")) {
 			startingState = MainMenuState;
