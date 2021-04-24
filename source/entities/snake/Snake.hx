@@ -20,8 +20,7 @@ class Snake extends FlxGroup {
     private function addSegment(seg: StraightSnakeSegment) {
         if (activeSegment != null) {
             activeSegment.stop();
-            var activePos = activeSegment.getPosition();
-            seg.setPosition(activePos.x, activePos.x);
+            seg.setPosition(activeSegment.x + activeSegment.width, activeSegment.y + activeSegment.height);
         }
 
         activeSegment = seg;

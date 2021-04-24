@@ -12,6 +12,9 @@ class LayerBuffer extends FlxTilemap {
 	// the world y of the top-left corner of the buffer
 	public var worldY:Int;
 
+	// the world z of the buffer
+	public var worldZ:Int;
+
 	public var bufWidth:Int;
 	public var bufHeight:Int;
 
@@ -25,17 +28,20 @@ class LayerBuffer extends FlxTilemap {
 	**/
 	public function new(width:Int, height:Int, padding:Int) {
 		super();
-		bufWidth = width + 2*padding;
-		bufHeight = height + 2*padding;
+		bufWidth = width + 2 * padding;
+		bufHeight = height + 2 * padding;
 
 		// we added padding, so the world coords of our top left need to take padding into account
 		worldX = -padding;
 		worldY = -padding;
 
-		local = [for(i in 0...bufHeight) [for(k in 0...bufWidth) 1]];
+		local = [for (i in 0...bufHeight) [for (k in 0...bufWidth) 1]];
 		tilemap = new FlxTilemap();
 		trace('width: ${local.length}   height: ${local[0].length}');
 		reload();
+
+		tilemap.x = -32;
+		tilemap.y = -32;
 	}
 
 	public override function setTile(X:Int, Y:Int, Tile:Int, UpdateGraphics:Bool = true):Bool {

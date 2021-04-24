@@ -1,5 +1,6 @@
 package entities.snake;
 
+import spacial.Cardinal;
 import flixel.math.FlxRandom;
 import flixel.addons.display.FlxTiledSprite;
 import flixel.math.FlxVector;
@@ -7,27 +8,23 @@ import flixel.math.FlxVector;
 using extensions.FlxObjectExt;
 
 class StraightSnakeSegment extends FlxTiledSprite {
-    public static final UP = FlxVector.get(0, 1);
-    public static final DOWN = FlxVector.get(0, -1);
-    public static final LEFT = FlxVector.get(-1, 0);
-    public static final RIGHT = FlxVector.get(1, 0);
-    public static final ALL_DIRECTIONS = [UP, DOWN, LEFT, RIGHT];
+    public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
     private static final rand = new FlxRandom();
 
     public static function up() {
-        return new StraightSnakeSegment(UP);
+        return new StraightSnakeSegment(Cardinal.N);
     }
 
     public static function down() {
-        return new StraightSnakeSegment(DOWN);
+        return new StraightSnakeSegment(Cardinal.S);
     }
 
     public static function left() {
-        return new StraightSnakeSegment(LEFT);
+        return new StraightSnakeSegment(Cardinal.W);
     }
 
     public static function right() {
-        return new StraightSnakeSegment(RIGHT);
+        return new StraightSnakeSegment(Cardinal.E);
     }
 
     public static function random() {
@@ -36,16 +33,37 @@ class StraightSnakeSegment extends FlxTiledSprite {
 
     private static final WIDTH = 32;
     private static final HEIGHT = 32;
-    private static final SPEED = 15;
+    private static final SPEED = 20;
 
-    public final direction:FlxVector;
+    public final direction:Cardinal;
+    public final directionVector:FlxVector;
 
     private var spriteOffset:Float = 0;
     private var stopMovement = false;
 
-    public function new(direction:FlxVector) {
-        super(AssetPaths.snake_1__png, WIDTH, HEIGHT, direction.x != 0, direction.y != 0);
+    public function new(direction:Cardinal) {
+        super(
+            AssetPaths.straight__png, WIDTH, HEIGHT,
+            horizontal(direction),
+            vertical(direction)
+        );
+        if (direction == Cardinal.W) {
+            flipY = true;
+        } else if (direction == Cardinal.N) {
+            angle = 90;
+        } else if (direction == Cardinal.S) {
+            angle = 270;
+        }
         this.direction = direction;
+        this.directionVector = direction.asVector();
+    }
+
+    private function vertical(dir: Cardinal): Bool {
+        return dir == Cardinal.N || dir == Cardinal.S;
+    }
+
+    private function horizontal(dir: Cardinal): Bool {
+        return dir == Cardinal.W || dir == Cardinal.E;
     }
 
     public function stop() {
@@ -55,8 +73,8 @@ class StraightSnakeSegment extends FlxTiledSprite {
     override public function update(delta:Float) {
         super.update(delta);
 
-        if (direction.x != 0) {
-            var dx = direction.x * SPEED * delta;
+        if (horizontal(direction)) {
+            var dx = directionVector.x * SPEED * delta;
             if (stopMovement) {
                 scrollX += dx;
             } else {
@@ -64,8 +82,8 @@ class StraightSnakeSegment extends FlxTiledSprite {
                 scrollX = width % WIDTH;
             }
 
-        } else if (direction.y != 0) {
-            var dy = direction.y * SPEED * delta;
+        } else if (vertical(direction)) {
+            var dy = directionVector.y * SPEED * delta;
             if (stopMovement) {
                 scrollY += dy;
             } else {
