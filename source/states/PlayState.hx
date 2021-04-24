@@ -2,8 +2,6 @@ package states;
 
 import levels.LayerBuffer;
 import input.SimpleController;
-import levels.LevelBuffer;
-import flixel.tile.FlxTilemap;
 import flixel.addons.transition.FlxTransitionableState;
 import signals.Lifecycle;
 import entities.Player;
