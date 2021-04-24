@@ -20,8 +20,7 @@ class Snake extends FlxGroup {
     private function addSegment(seg: StraightSnakeSegment) {
         if (activeSegment != null) {
             activeSegment.stop();
-            var activePos = activeSegment.getPosition();
-            seg.setPosition(activePos.x, activePos.x);
+            seg.setPosition(activeSegment.x + activeSegment.width, activeSegment.y + activeSegment.height);
         }
 
         activeSegment = seg;
@@ -34,13 +33,5 @@ class Snake extends FlxGroup {
         if (FlxG.keys.justPressed.SPACE) {
             addSegment(StraightSnakeSegment.random());
         }
-
-        var offset = 0.0;
-		var i = segments.length - 1;
-        while (i >= 0) {
-			offset += segments[i].getSpriteOffsetAmount();
-			segments[i].setSpriteOffset(offset);
-			i--;
-		}
 	}
 }

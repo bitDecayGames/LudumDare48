@@ -14,6 +14,8 @@ class JakeCTState extends FlxTransitionableState {
 	override public function create() {
 		super.create();
 
+		FlxG.debugger.visible = true;
+
 		FlxG.camera.bgColor = FlxColor.WHITE;
 		FlxG.camera.pixelPerfectRender = true;
 
