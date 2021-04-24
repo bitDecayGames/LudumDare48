@@ -8,6 +8,7 @@ import flixel.math.FlxVector;
 /**
  * Cardinal direction handling. Directly usable as their integer value in degrees
 **/
+// TODO: This should work as from Float and to Float, also
 enum abstract Cardinal(Int) from Int to Int {
 	private static var upZeroAngle = new FlxVector(0, -1);
 	private static inline var halfAngle = 22.5;
@@ -63,7 +64,7 @@ enum abstract Cardinal(Int) from Int to Int {
 	/**
 	 * Finds the closest cardinal for the given vector
 	**/
-	public static function closest(vec:FlxVector):Cardinal {
+	public static function closest(vec:FlxVector, fourDirection:Bool = false):Cardinal {
 		// degrees: 0 is straight right, we want it to be straight up
 		var angle = vec.degrees + 90;
 		while (angle < 0) {
@@ -73,24 +74,38 @@ enum abstract Cardinal(Int) from Int to Int {
 			angle -= 360;
 		}
 
-		if (angle < N + halfAngle) {
-			return N;
-		} else if (angle < NE + halfAngle) {
-			return NE;
-		} else if (angle < E + halfAngle) {
-			return E;
-		} else if (angle < SE + halfAngle) {
-			return SE;
-		} else if (angle < S + halfAngle) {
-			return S;
-		} else if (angle < SW + halfAngle) {
-			return SW;
-		} else if (angle < W + halfAngle) {
-			return W;
-		} else if (angle < NW + halfAngle) {
-			return NW;
+		if (fourDirection) {
+			if (angle < 0 + NE) {
+				return N;
+			} else if (angle < 0 + SE) {
+				return E;
+			} else if (angle < 0 + SW) {
+				return S;
+			} else if (angle < 0 + NW) {
+				return W;
+			} else {
+				return N;
+			}
 		} else {
-			return N;
+			if (angle < N + halfAngle) {
+				return N;
+			} else if (angle < NE + halfAngle) {
+				return NE;
+			} else if (angle < E + halfAngle) {
+				return E;
+			} else if (angle < SE + halfAngle) {
+				return SE;
+			} else if (angle < S + halfAngle) {
+				return S;
+			} else if (angle < SW + halfAngle) {
+				return SW;
+			} else if (angle < W + halfAngle) {
+				return W;
+			} else if (angle < NW + halfAngle) {
+				return NW;
+			} else {
+				return N;
+			}
 		}
 	}
 }
