@@ -33,6 +33,7 @@ class PlayState extends FlxTransitionableState {
 		buffer.tilemap.x = -32;
 		buffer.tilemap.y = -32;
 		add(buffer);
+		setEntireBufferTileTypes(buffer, 0);
 
 		player = new Player();
 		add(player);
@@ -51,7 +52,10 @@ class PlayState extends FlxTransitionableState {
 			if (targetTile < 2) {
 				player.setTarget(target);
 				if (targetTile == 1) {
-					buffer.setTile((target.x / buffer.get_tile_width()).floor(), (target.y / buffer.get_tile_height()).floor(), 0);
+					var x = (target.x / buffer.get_tile_width()).floor();
+					var y = (target.y / buffer.get_tile_height()).floor();
+					buffer.setTile(x, y, 0);
+					calculator.set(x, y, 0, 0);
 				}
 				buffer.pushData(dir, getNextLevelData(dir));
 			}
@@ -81,6 +85,14 @@ class PlayState extends FlxTransitionableState {
 				getWorldDataColumn(buffer.worldX - 1, buffer.worldY, 0, buffer.bufHeight);
 			default:
 				throw('cannot request level data for direction ${dir}');
+		}
+	}
+
+	public function setEntireBufferTileTypes(buffer:LayerBuffer, z:Int) {
+		for (y in 0...buffer.bufHeight) {
+			for (x in 0...buffer.bufWidth) {
+				buffer.setTile(x, y, calculator.get(buffer.worldX + x, buffer.worldY + y, z));
+			}
 		}
 	}
 

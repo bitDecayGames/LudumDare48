@@ -22,14 +22,19 @@ class LayerBuffer extends FlxTilemap {
 		super();
 		bufWidth = width;
 		bufHeight = height;
-		local = [for(i in 0...height) [for(k in 0...width) 1]];
+		local = [for (i in 0...height) [for (k in 0...width) 1]];
 		tilemap = new FlxTilemap();
 		trace('width: ${local.length}   height: ${local[0].length}');
 		reload();
 	}
 
+	public override function setTile(X:Int, Y:Int, Tile:Int, UpdateGraphics:Bool = true):Bool {
+		local[Y][X] = Tile;
+		return super.setTile(X, Y, Tile, UpdateGraphics);
+	}
+
 	public function pushData(dir:Cardinal, data:Array<Int>) {
-		switch(dir) {
+		switch (dir) {
 			case N:
 				pushOntoTop(data);
 			case S:
@@ -45,7 +50,7 @@ class LayerBuffer extends FlxTilemap {
 
 	public function pushOntoLeft(column:Array<Int>) {
 		worldX--;
-		for(i in 0...local.length) {
+		for (i in 0...local.length) {
 			local[i].pop();
 			local[i].unshift(column[i]);
 		}
@@ -54,7 +59,7 @@ class LayerBuffer extends FlxTilemap {
 
 	public function pushOntoRight(column:Array<Int>) {
 		worldX++;
-		for(i in 0...local.length) {
+		for (i in 0...local.length) {
 			local[i].shift();
 			local[i].push(column[i]);
 		}

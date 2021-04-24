@@ -24,7 +24,7 @@ class VoxelCalculator {
 			// return air if y is less than 0 since that means we are at ground level
 			return 0;
 		}
-		var key = "" + x + "," + y + "," + z;
+		var key = getKey(x, y, z);
 		if (modified.exists(key)) {
 			return modified.get(key);
 		}
@@ -47,8 +47,11 @@ class VoxelCalculator {
 	 * @return VoxelCalculator
 	 */
 	public function set(x:Int, y:Int, z:Int, value:Int):VoxelCalculator {
-		var key = "" + x + "," + y + "," + z;
-		modified.set(key, value);
+		modified.set(getKey(x, y, z), value);
 		return this;
+	}
+
+	private function getKey(x:Int, y:Int, z:Int):String {
+		return "" + x + "," + y + "," + z;
 	}
 }
