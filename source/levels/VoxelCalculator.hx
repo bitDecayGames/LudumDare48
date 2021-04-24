@@ -32,7 +32,7 @@ class VoxelCalculator {
 		var density = perlin.perlin(x * scale, y * scale, z * scale);
 		if (density < 0.25) { // increase this number for more rocks
 			return 2;
-		} else if (density > 0.6) { // decrease this number for more caves
+		} else if (density > 0.7) { // decrease this number for more caves
 			return 0;
 		} else {
 			return 1;
