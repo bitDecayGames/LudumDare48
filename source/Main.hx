@@ -37,6 +37,8 @@ class Main extends Sprite {
 		startingState = JakeCTState;
 		#elseif fish
 		startingState = FishState;
+		#elseif tanner
+		startingState = MainMenuState;
 		#else
 		if (Macros.isDefined("SKIP_SPLASH")) {
 			startingState = MainMenuState;

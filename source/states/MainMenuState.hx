@@ -1,5 +1,6 @@
 package states;
 
+import haxe.Timer;
 import states.transitions.Trans;
 import states.transitions.SwirlTransition;
 import com.bitdecay.analytics.Bitlytics;
@@ -24,7 +25,7 @@ class MainMenuState extends FlxUIState {
 	var _btnCredits:FlxButton;
 	var _btnExit:FlxButton;
 
-	var _txtTitle:FlxText;
+	var _txtTitle:FlxText;	
 
 	override public function create():Void {
 		_xml_id = "main_menu";
@@ -33,6 +34,16 @@ class MainMenuState extends FlxUIState {
 		}
 
 		super.create();
+
+		camera.scroll.y = camera.scroll.y-camera.height;
+
+        _txtTitle = new FlxText();
+        _txtTitle.setPosition(0, camera.height-20);
+        _txtTitle.size = 20;
+        _txtTitle.alignment = FlxTextAlign.CENTER;
+        _txtTitle.text = "Text";
+        
+        add(_txtTitle);
 
 		if (_makeCursor) {
 			cursor.loadGraphic(AssetPaths.pointer__png, true, 32, 32);
@@ -91,6 +102,10 @@ class MainMenuState extends FlxUIState {
 		super.update(elapsed);
 		FmodManager.Update();
 
+		if (camera.scroll.y <= 0) {
+			camera.scroll.set(FlxG.camera.scroll.x, FlxG.camera.scroll.y+10);
+		}
+
 		if (FlxG.keys.pressed.D && FlxG.keys.justPressed.M) {
 			// Keys D.M. for Disable Metrics
 			Bitlytics.Instance().EndSession(false);
@@ -101,12 +116,24 @@ class MainMenuState extends FlxUIState {
 
 	function clickPlay():Void {
 		FmodManager.StopSong();
-		var swirlOut = new SwirlTransition(Trans.OUT, () -> {
-			// make sure our music is stopped;
-			FmodManager.StopSongImmediately();
-			FlxG.switchState(new PlayState());
-		}, FlxColor.GRAY);
-		openSubState(swirlOut);
+		FmodManager.PlaySoundOneShot(FmodSFX.MenuSelect);
+
+		var test2 = _ui.getAsset("play_button");
+		test2.visible = false;
+		
+		var test3 = _ui.getAsset("credits_button");
+		test3.visible = false;
+
+		cursor.visible = false;
+
+		Timer.delay(() -> {
+			var swirlOut = new SwirlTransition(Trans.OUT, () -> {
+				// make sure our music is stopped;
+				FmodManager.StopSongImmediately();
+				FlxG.switchState(new PlayState());
+			}, FlxColor.GRAY);
+			openSubState(swirlOut);
+		}, 500);
 	}
 
 	function clickCredits():Void {
