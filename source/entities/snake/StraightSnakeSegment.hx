@@ -54,13 +54,21 @@ class StraightSnakeSegment extends FlxTiledSprite {
 
         if (direction.horizontal()) {
             width = prevCrv.x - nextCrv.x - Constants.TILE_SIZE;
-            width = width.snap_to_grid(Constants.TILE_SIZE);
+            snapWidth();
         } else if (direction.vertical()) {
             height = prevCrv.y - nextCrv.y - Constants.TILE_SIZE;
-            height = height.snap_to_grid(Constants.TILE_SIZE);
+            snapHeight();
         }
 
         setPosition(x, y);
+    }
+
+    private function snapWidth() {
+        width = width.snap_to_grid(Constants.TILE_SIZE);
+    }
+
+    private function snapHeight() {
+        height = height.snap_to_grid(Constants.TILE_SIZE);
     }
 
     public override function setPosition(X:Float = 0, Y:Float = 0) {
