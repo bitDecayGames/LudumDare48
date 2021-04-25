@@ -13,9 +13,11 @@ import flixel.FlxG;
 using extensions.FlxStateExt;
 using zero.flixel.extensions.FlxTilemapExt;
 using Math;
+import entities.MoleFriend;
 
 class PlayState extends FlxTransitionableState {
 	var player:Player;
+	var moleFriends:Array<MoleFriend>;
 
 	var buffer:LayerBufferStack;
 
@@ -39,6 +41,18 @@ class PlayState extends FlxTransitionableState {
 		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE, false));
 
 		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
+
+		moleFriends = new Array<MoleFriend>();
+		addMoleFriend(0, 0);
+		addMoleFriend(3 * Constants.TILE_SIZE, 0);
+	}
+
+	public function addMoleFriend(x:Int, y:Int) {
+		var moleFriend = new MoleFriend();
+		moleFriend.x = x;
+		moleFriend.y = y;
+		moleFriends.push(moleFriend);
+		add(moleFriend);
 	}
 
 	override public function update(elapsed:Float) {
@@ -66,6 +80,18 @@ class PlayState extends FlxTransitionableState {
 				player.isTransitioningBetweenLayers = buffer.switchLayer(depthDir, player.getPosition(), () -> {
 					player.isTransitioningBetweenLayers = false;
 				});
+			}
+
+
+			// check if there are in friends around that should follow us
+			makeFriendsFollowPlayer();
+		}
+	}
+
+	public function makeFriendsFollowPlayer() {
+		for (moleFriend in moleFriends) {
+			if (player.x == moleFriend.x && player.y == moleFriend.y && moleFriend.moleIdLikeToFollow == null) {
+				player.setFollower(moleFriend);
 			}
 		}
 	}
