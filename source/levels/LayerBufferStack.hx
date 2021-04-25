@@ -15,6 +15,7 @@ using Math;
 
 class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public var layers:Array<LayerBuffer> = new Array<LayerBuffer>();
+	public var invisibleForeLayer:LayerBuffer;
 
 	public var calculator:VoxelCalculator;
 
@@ -22,18 +23,23 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		super();
 		calculator = new VoxelCalculator();
 		for (i in 0...3) {
-			var l = new LayerBuffer(width, height, padding + (2 * i));
+			var l = new LayerBuffer(width, height, padding);
 			l.worldZ = i;
-			var scale = 1.0 - i * 0.1;
-			l.scale.set(scale, scale);
-			var tint = (255 * (1 - i * 0.3)).floor();
-			l.color = FlxColor.fromRGB(tint, tint, tint);
+			l.setTarget(1.0 - i * 0.05, // target scale
+				1 - i * 0.3, // target tint
+				1.0); // target alpha
 			setEntireBufferTileTypes(l);
 			layers.push(l);
 		}
 		for (i in 0...3) {
 			add(layers[layers.length - 1 - i]);
 		}
+		var i = -1;
+		invisibleForeLayer = new LayerBuffer(width, height, padding);
+		invisibleForeLayer.alpha = 0.0;
+		invisibleForeLayer.worldZ = -1;
+		setEntireBufferTileTypes(invisibleForeLayer);
+		add(invisibleForeLayer);
 	}
 
 	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):MoveResult {
@@ -62,17 +68,17 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 					Constants.AFTER_DIG);
 				// TODO: SFX dug through dirt here
 			}
-			for (i in 0...layers.length) {
-				layers[i].pushData(dir, getNextLevelData(dir, layers[i]));
-			}
 
 			// buffer is slightly bigger than screen, so we position it so it's centered correctly
 			var x = worldTarget.x - 8 * Constants.TILE_SIZE;
 			var y = worldTarget.y - 12 * Constants.TILE_SIZE;
 			for (i in 0...layers.length) {
-				// TODO: MW instead of setting position, if we lerp to this new xy it will smooth out the snappy tilemap
+				layers[i].pushData(dir, getNextLevelData(dir, layers[i]));
 				layers[i].setPosition(x, y);
 			}
+			invisibleForeLayer.pushData(dir, getNextLevelData(dir, invisibleForeLayer));
+			invisibleForeLayer.setPosition(x, y);
+
 			return new MoveResult(worldTarget, targetTile);
 		} else {
 			// TODO: SFX tried to dig through rock here
@@ -116,14 +122,36 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		}
 
 		var main = layers[0];
-		var allowableDig = isDiggable(calculator.get(((playerPos.x - 10) / Constants.TILE_SIZE).floor(), ((playerPos.y - 10) / Constants.TILE_SIZE).floor(),
-			main.worldZ + dir));
+		var cellToDigInto = [
+			((playerPos.x - 10) / Constants.TILE_SIZE)
+			.floor(),
+			((playerPos.y - 10) / Constants.TILE_SIZE)
+			.floor(),
+			main.worldZ + dir,
+		];
+		var allowableDig = isDiggable(calculator.get(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2]));
 
 		if (allowableDig) {
-			for (i in 0...3) {
-				layers[i].worldZ += dir;
+			calculator.set(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2], Constants.AFTER_DIG);
+			for (i in 0...layers.length) {
+				var l = layers[i];
+				l.worldZ += dir;
+
+				var startAlpha = 1.0;
+				if (dir < 0 && i == 0) {
+					startAlpha = 0.0;
+				}
+				l.setCurrent(1.0 - (i + dir) * 0.1, 1 - (i + dir) * 0.3, startAlpha);
+				l.setTarget(1.0 - i * 0.1, 1 - i * 0.3, 1.0);
 				setEntireBufferTileTypes(layers[i]);
 			}
+			invisibleForeLayer.worldZ += dir;
+			if (dir > 0) {
+				var i = -1.0;
+				invisibleForeLayer.setCurrent(1.0 - (i + dir) * 0.1, 1 - (i + dir) * 0.3, 1.0);
+				invisibleForeLayer.setTarget(1.0 - i * 0.1, 1 - i * 0.3, 0.0);
+			}
+			setEntireBufferTileTypes(invisibleForeLayer);
 		} else {
 			// TODO: SFX tried to dig through rock here
 		}

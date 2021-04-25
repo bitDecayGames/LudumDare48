@@ -33,6 +33,7 @@ class PlayState extends FlxTransitionableState {
 		player.x = Constants.TILE_SIZE * 7;
 		player.y = Constants.TILE_SIZE * 11;
 		add(player);
+		add(player.tail);
 
 		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE));
 
@@ -58,7 +59,7 @@ class PlayState extends FlxTransitionableState {
 				}
 			}
 
-			// now check if they
+			// now check if they want to go deeper
 			var depthDir = player.getDepthIntention();
 			if (depthDir != 0) {
 				buffer.switchLayer(depthDir, player.getPosition());

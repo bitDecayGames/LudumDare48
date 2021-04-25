@@ -1,31 +1,16 @@
 package entities.snake;
 
-import entities.RotatingTileSprite.RotatingTiledSprite;
+import flixel.addons.display.FlxTiledSprite;
+import helpers.Constants;
 import spacial.Cardinal;
 import flixel.math.FlxRandom;
 import flixel.math.FlxVector;
 
 using extensions.FlxObjectExt;
 
-class StraightSnakeSegment extends RotatingTiledSprite {
+class StraightSnakeSegment extends FlxTiledSprite {
     public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
     private static final rand = new FlxRandom();
-
-    public static function up() {
-        return new StraightSnakeSegment(Cardinal.N);
-    }
-
-    public static function down() {
-        return new StraightSnakeSegment(Cardinal.S);
-    }
-
-    public static function left() {
-        return new StraightSnakeSegment(Cardinal.W);
-    }
-
-    public static function right() {
-        return new StraightSnakeSegment(Cardinal.E);
-    }
 
     public static function randomDir(curDir: Cardinal) {
         var arrCpy = ALL_DIRECTIONS.copy();
@@ -34,30 +19,31 @@ class StraightSnakeSegment extends RotatingTiledSprite {
         return rand.getObject(arrCpy);
     }
 
-    private static final WIDTH = 32;
-    private static final HEIGHT = 32;
-    private static final SPEED = 20;
-
     public final direction:Cardinal;
     public final directionVector:FlxVector;
 
     private var stopMovement = false;
 
-    public function new(direction:Cardinal) {
+    public function new(dir:Cardinal) {
         super(
-            AssetPaths.straight__png, WIDTH, HEIGHT,
-            horizontal(direction),
-            vertical(direction)
+            getAssetsPath(dir),
+            0,
+            0,
+            horizontal(dir),
+            vertical(dir)
         );
-        if (direction == Cardinal.W) {
-            flipY = true;
-        } else if (direction == Cardinal.N) {
-            angle = 90;
-        } else if (direction == Cardinal.S) {
-            angle = 270;
+
+        direction = dir;
+        directionVector = dir.asVector();
+    }
+
+    private function getAssetsPath(dir: Cardinal) {
+        if (horizontal(dir)) {
+            return AssetPaths.straight__png;
+        } else if (vertical(dir)) {
+            return AssetPaths.straightUD__png;
         }
-        this.direction = direction;
-        this.directionVector = direction.asVector();
+        throw "dir " + dir + " not supported";
     }
 
     private function vertical(dir: Cardinal): Bool {
@@ -75,22 +61,36 @@ class StraightSnakeSegment extends RotatingTiledSprite {
     override public function update(delta:Float) {
         super.update(delta);
 
+        var deltaDir = Constants.SNAKE_SPEED * delta;
         if (horizontal(direction)) {
-            var dx = directionVector.x * SPEED * delta;
             if (stopMovement) {
-                scrollX += dx;
+                if (direction == Cardinal.W) {
+                    scrollX -= deltaDir;
+                } else {
+                    scrollX += deltaDir;
+                }
             } else {
-                width += dx;
-                scrollX = width % WIDTH;
+                if (direction == Cardinal.W) {
+                    x -= deltaDir;
+                } else {
+                    scrollX = width % Constants.TILE_SIZE;
+                }
+                width += deltaDir;
             }
-
         } else if (vertical(direction)) {
-            var dy = directionVector.y * SPEED * delta;
             if (stopMovement) {
-                scrollY += dy;
+                if (direction == Cardinal.N) {
+                    scrollY -= deltaDir;
+                } else {
+                    scrollY += deltaDir;
+                }
             } else {
-                height += dy;
-                scrollY = height % HEIGHT;
+                if (direction == Cardinal.N) {
+                    y -= deltaDir;
+                } else {
+                    scrollY = height % Constants.TILE_SIZE;
+                }
+                height += deltaDir;
             }
         }
     }
