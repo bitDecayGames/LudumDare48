@@ -156,9 +156,13 @@ class Player extends Moleness {
 	override public function update(delta:Float) {
 		super.update(delta);
 
+		innerUpdate(delta);
+
 		updateTail(delta);
 		updateEmitter(delta);
+	}
 
+	private function innerUpdate(delta:Float) {
 		if (inTransition) {
 			if (animation.finished) {
 				inTransition = false;
