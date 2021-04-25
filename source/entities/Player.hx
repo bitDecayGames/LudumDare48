@@ -52,10 +52,20 @@ class Player extends Moleness {
 	private static inline var TAIL_DOWN = "tailDown";
 
 	var speed:Float = 60;
+	public var secondsToMoveOneEmptyBlock:Float = 0.1;
+	public var secondsToDigOneDirtBlock:Float = 0.2;
+	public var secondsToFallOneBlock:Float = 0.05;
+
+	private var totalSecondsToTarget:Float = 0.0;
+	private var curTime:Float = 0.0;
 	var framerate:Int = 10;
 	var moving:Bool = false;
 
 	public var target:FlxPoint = FlxPoint.get().copyFrom(Constants.NO_TARGET);
+
+	private var travelDir:Cardinal = Cardinal.NONE;
+	private var originalPosition:FlxPoint = FlxPoint.get(0, 0);
+
 	var targetType:TileType = EMPTY_SPACE;
 
 	var temp:FlxVector = FlxVector.get();
@@ -131,15 +141,24 @@ class Player extends Moleness {
 
 		// Move the player to the next block
 		if (targetValid()) {
-			getPosition(temp).subtractPoint(target);
-			temp.normalize();
+			if (curTime >= 0.0) {
+				var percentToTarget = 1.0 - curTime / totalSecondsToTarget;
+				var diffToTarget = FlxPoint.get(target.x - originalPosition.x, target.y - originalPosition.y);
+				diffToTarget = diffToTarget.scale(percentToTarget);
+				setPosition(diffToTarget.x + originalPosition.x, diffToTarget.y + originalPosition.y);
 
-			var travelDir = Cardinal.closest(temp, true).opposite();
+				curTime -= delta;
+				if (curTime < 0.0) {
+					// snap to the target, probably jumps a bit here, but meh...
+					setPosition(target.x, target.y);
+				}
+			}
+
 			if (travelDir != lastDirection) {
 				// need to play animation and wait for it to finish
-				switch(lastDirection) {
+				switch (lastDirection) {
 					case N:
-						switch(travelDir) {
+						switch (travelDir) {
 							case E:
 								animation.play(TURN_UP_TO_RIGHT);
 							case S:
@@ -149,7 +168,7 @@ class Player extends Moleness {
 							default:
 						}
 					case E:
-						switch(travelDir) {
+						switch (travelDir) {
 							case S:
 								animation.play(TURN_RIGHT_TO_DOWN);
 							case W:
@@ -159,7 +178,7 @@ class Player extends Moleness {
 							default:
 						}
 					case S:
-						switch(travelDir) {
+						switch (travelDir) {
 							case W:
 								animation.play(TURN_DOWN_TO_LEFT);
 							case N:
@@ -169,10 +188,10 @@ class Player extends Moleness {
 							default:
 						}
 					case W:
-						switch(travelDir) {
+						switch (travelDir) {
 							case N:
 								animation.play(TURN_LEFT_TO_UP);
-								case E:
+							case E:
 								animation.play(TURN_LEFT_TO_RIGHT);
 							case S:
 								animation.play(TURN_LEFT_TO_DOWN);
@@ -186,15 +205,7 @@ class Player extends Moleness {
 				return;
 			}
 
-			var moveSpeed = speed;
-			if (targetType == DIRT) {
-				moveSpeed *= 0.7;
-			}
-
-			x -= temp.x * moveSpeed * delta;
-			y -= temp.y * moveSpeed * delta;
-
-			switch(lastDirection) {
+			switch (lastDirection) {
 				case N:
 					animation.play(targetType == DIRT ? CHOMP_UP : WALK_UP);
 				case S:
@@ -217,7 +228,7 @@ class Player extends Moleness {
 			// Player isn't giving input, so lets check animation stuff
 			if (stopped) {
 				if (!StringExt.contains(animation.name, "idle")) {
-					switch(lastDirection) {
+					switch (lastDirection) {
 						case N:
 							animation.play(IDLE_UP);
 						case S:
@@ -290,7 +301,25 @@ class Player extends Moleness {
 
 	public function setTarget(t:MoveResult) {
 		target.copyFrom(t.target);
+		originalPosition = getPosition();
+
+		var tmp = FlxVector.get();
+		getPosition(tmp).subtractPoint(target);
+		tmp.normalize();
+
+		travelDir = Cardinal.closest(tmp, true).opposite();
 		targetType = t.moveIntoType;
+
+		if (targetType == DIRT) {
+			// trying to dig through dirt
+			totalSecondsToTarget = secondsToDigOneDirtBlock;
+		} else {
+			// just trying to move normally
+			totalSecondsToTarget = secondsToMoveOneEmptyBlock;
+		}
+		// TODO: MW need to account for falling speed difference
+		curTime = totalSecondsToTarget;
+
 		moveFollower(new FlxPoint(x, y));
 	}
 

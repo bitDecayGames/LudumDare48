@@ -1,7 +1,10 @@
 package levels;
 
+import flixel.util.FlxColor;
 import spacial.Cardinal;
 import flixel.tile.FlxTilemap;
+
+using Math;
 
 class LayerBuffer extends FlxTilemap {
 	public var tilemap:FlxTilemap;
@@ -17,6 +20,22 @@ class LayerBuffer extends FlxTilemap {
 
 	public var bufWidth:Int;
 	public var bufHeight:Int;
+
+	public var targetScale:Float = 1.0;
+
+	private var originalScale:Float = 1.0;
+
+	public var targetTint:Float = 1.0;
+
+	private var originalTint:Float = 1.0;
+
+	public var targetAlpha:Float = 1.0;
+
+	private var originalAlpha:Float = 1.0;
+
+	public var secondsToTarget:Float = 0.25;
+
+	private var curSeconds:Float = 0.0;
 
 	// NOTE: This array is indexed as [y][x] due to how FlxTilemap loads them
 	var local:Array<Array<Int>> = new Array<Array<Int>>();
@@ -42,6 +61,46 @@ class LayerBuffer extends FlxTilemap {
 
 		tilemap.x = -32;
 		tilemap.y = -32;
+	}
+
+	public override function update(elapsed:Float) {
+		super.update(elapsed);
+
+		if (curSeconds > 0) {
+			var percent = 1.0 - (curSeconds / secondsToTarget);
+
+			var newScale = ((targetScale - originalScale) * percent) + originalScale;
+			scale.set(newScale, newScale);
+
+			var newTint = ((((targetTint - originalTint) * percent) + originalTint) * 255).floor();
+			color = FlxColor.fromRGB(newTint, newTint, newTint);
+
+			var newAlpha = ((targetAlpha - originalAlpha) * percent) + originalAlpha;
+			alpha = newAlpha;
+
+			curSeconds -= elapsed;
+
+			if (curSeconds <= 0) {
+				setCurrent(targetScale, targetTint, targetAlpha);
+			}
+		}
+	}
+
+	public function setCurrent(scale:Float, tint:Float, alpha:Float) {
+		this.scale.set(scale, scale);
+		var targetTint255 = (tint * 255).floor();
+		color = FlxColor.fromRGB(targetTint255, targetTint255, targetTint255);
+		this.alpha = alpha;
+	}
+
+	public function setTarget(scale:Float, tint:Float, alpha:Float) {
+		this.targetScale = scale;
+		this.originalScale = this.scale.x;
+		this.targetTint = tint;
+		this.originalTint = this.color.blue / 255.0;
+		this.targetAlpha = alpha;
+		this.originalAlpha = this.alpha;
+		this.curSeconds = this.secondsToTarget;
 	}
 
 	public override function setTile(X:Int, Y:Int, Tile:Int, UpdateGraphics:Bool = true):Bool {
