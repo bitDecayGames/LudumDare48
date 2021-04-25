@@ -1,5 +1,6 @@
 package states;
 
+import flixel.tile.FlxBaseTilemap.FlxTilemapDiagonalPolicy;
 import helpers.Constants;
 import flixel.math.FlxPoint;
 import flixel.util.FlxPath;
@@ -51,7 +52,10 @@ class JakeCTState extends FlxTransitionableState {
 
 		var pathPoints:Array<FlxPoint> = map.findPath(
 			FlxPoint.get(boi.x + boi.width / 2, boi.y + boi.height / 2),
-			FlxPoint.get(goal.x + goal.width / 2, goal.y + goal.height / 2)
+			FlxPoint.get(goal.x + goal.width / 2, goal.y + goal.height / 2),
+			true,
+			false,
+			FlxTilemapDiagonalPolicy.NONE
 		);
 
 		if (pathPoints == null) {
@@ -81,7 +85,6 @@ class JakeCTState extends FlxTransitionableState {
 		super.onFocus();
 		this.handleFocus();
 	}
-
 
 	override public function draw():Void
 	{
