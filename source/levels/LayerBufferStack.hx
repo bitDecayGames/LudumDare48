@@ -15,6 +15,7 @@ using Math;
 
 class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public var layers:Array<LayerBuffer> = new Array<LayerBuffer>();
+	public var invisibleForeLayer:LayerBuffer;
 
 	public var calculator:VoxelCalculator;
 
@@ -24,10 +25,9 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		for (i in 0...3) {
 			var l = new LayerBuffer(width, height, padding + (2 * i));
 			l.worldZ = i;
-			var scale = 1.0 - i * 0.1;
-			l.scale.set(scale, scale);
-			var tint = (255 * (1 - i * 0.3)).floor();
-			l.color = FlxColor.fromRGB(tint, tint, tint);
+			l.setTarget(1.0 - i * 0.1, // target scale
+				1 - i * 0.3, // target tint
+				1.0); // target alpha
 			setEntireBufferTileTypes(l);
 			layers.push(l);
 		}
@@ -120,8 +120,12 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			main.worldZ + dir));
 
 		if (allowableDig) {
-			for (i in 0...3) {
-				layers[i].worldZ += dir;
+			for (i in 0...layers.length) {
+				var l = layers[i];
+				l.worldZ += dir;
+				l.setTarget(1.0 - l.worldZ * 0.1, // target scale
+					1 - l.worldZ * 0.3, // target tint
+					1.0); // target alpha
 				setEntireBufferTileTypes(layers[i]);
 			}
 		} else {
