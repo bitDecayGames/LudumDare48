@@ -2,6 +2,7 @@ package entities;
 
 import flixel.FlxG;
 import input.SimpleController;
+import particles.DirtEmitter;
 import flixel.FlxSprite;
 import zero.extensions.StringExt;
 import helpers.TileType;
@@ -76,6 +77,7 @@ class Player extends Moleness {
 
 	var temp:FlxVector = FlxVector.get();
 
+	var justStopped:Bool = false;
 	var stopped:Bool = true;
 	var lastDirection:Cardinal = NONE;
 	var inTransition:Bool = false;
@@ -83,6 +85,8 @@ class Player extends Moleness {
 	var molesFollowingMe:Int = 0;
 
 	public var tail:FlxSprite;
+	public var emitter:DirtEmitter;
+	public var emitterStarted = false;
 
 	public function new() {
 		super();
@@ -140,12 +144,15 @@ class Player extends Moleness {
 		tail.animation.add(TAIL_UP+SLOW, [for(i in 9*row...9*row+8) i], framerate / 5);
 		tail.animation.add(TAIL_DOWN, [for(i in 4*row...4*row+8) i], framerate);
 		tail.animation.add(TAIL_DOWN+SLOW, [for(i in 4*row...4*row+8) i], framerate / 5);
+
+		emitter = new DirtEmitter();
 	}
 
 	override public function update(delta:Float) {
 		super.update(delta);
 
 		updateTail(delta);
+		updateEmitter(delta);
 
 		if (inTransition) {
 			if (animation.finished) {
@@ -153,6 +160,10 @@ class Player extends Moleness {
 			} else {
 				return;
 			}
+		}
+
+		if (justStopped && stopped) {
+			justStopped = false;
 		}
 
 		molesFollowingMe = numMolesFollowingMe();
@@ -252,6 +263,14 @@ class Player extends Moleness {
 						animation.play(targetType == DIRT ? CHOMP_LEFT : WALK_LEFT);
 					default:
 				}
+				if (targetType == DIRT) {
+					if (!emitterStarted) {
+						emitterStarted = true;
+						emitter.start(false);
+					} else {
+						emitter.emitting = true;
+					}
+				}
 			}
 
 			// Check if the player has now reached the next block
@@ -259,7 +278,9 @@ class Player extends Moleness {
 			if (getPosition(temp).distanceTo(target) < 1) {
 				setPosition(Math.round(target.x), Math.round(target.y));
 				target.copyFrom(Constants.NO_TARGET);
+				justStopped = !stopped;
 				stopped = true;
+				emitter.emitting = false;
 			}
 		} else {
 			// Player isn't giving input, so lets check animation stuff
@@ -281,15 +302,26 @@ class Player extends Moleness {
 		}
 	}
 
-	private function updateTail(delta:Float) {
-		tail.update(delta);
+	private function updateEmitter(delta:Float) {
+		var emitterOffsets = [
+			N => FlxPoint.get(16,4),
+			S => FlxPoint.get(16,31),
+			E => FlxPoint.get(30,16),
+			W => FlxPoint.get(0,16),
+			NONE => FlxPoint.get(0,0),
+		];
 
+		emitter.x = x + emitterOffsets.get(lastDirection).x;
+		emitter.y = y + emitterOffsets.get(lastDirection).y;
+
+		emitter.setDigDirection(lastDirection);
+	}
+
+	private function updateTail(delta:Float) {
 		if (animation.name != null && animation.name.contains("turn")) {
 			tail.visible = false;
 			return;
 		}
-
-		tail.visible = true;
 
 		// Using 32, there are tiny gaps between rat and tail
 		var tailOffsets = [
@@ -299,6 +331,10 @@ class Player extends Moleness {
 			W => FlxPoint.get(30,0),
 			NONE => FlxPoint.get(0,0),
 		];
+
+		tail.visible = true;
+		tail.x = x + tailOffsets.get(lastDirection).x;
+		tail.y = y + tailOffsets.get(lastDirection).y;
 
 		var tailAnim:String = "";
 
@@ -313,17 +349,15 @@ class Player extends Moleness {
 				tailAnim = TAIL_LEFT;
 			default:
 				// set it to something so we don't explode
-				tailAnim = TAIL_UP;
+				return;
 		}
 
-		if (stopped) {
+		if (stopped && !justStopped) {
 			tailAnim += SLOW;
 		}
 
-		tail.animation.play(tailAnim);
-
-		tail.x = x + tailOffsets.get(lastDirection).x;
-		tail.y = y + tailOffsets.get(lastDirection).y;
+		trace('starting new tail anim on frame: ${tail.animation.frameIndex}');
+		tail.animation.play(tailAnim, false, false, tail.animation.frameIndex % 8);
 	}
 
 	public function getIntention():Cardinal {
