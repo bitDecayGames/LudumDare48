@@ -62,7 +62,7 @@ enum abstract Cardinal(Int) from Int to Int {
 	}
 
 	/**
-	 * Converts the given cardinal direction to its opposite
+	 * Converts the cardinal direction to its opposite
 	**/
 	public function reverse():Cardinal {
 		var vec = asVector().rotate(FlxPoint.weak(), 180);
