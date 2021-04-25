@@ -22,18 +22,13 @@ class LayerBuffer extends FlxTilemap {
 	public var bufHeight:Int;
 
 	public var targetScale:Float = 1.0;
+	public var targetTint:Float = 1.0;
+	public var targetAlpha:Float = 1.0;
+	public var secondsToTarget:Float = 1.25;
 
 	private var originalScale:Float = 1.0;
-
-	public var targetTint:Float = 1.0;
-
 	private var originalTint:Float = 1.0;
-
-	public var targetAlpha:Float = 1.0;
-
 	private var originalAlpha:Float = 1.0;
-
-	public var secondsToTarget:Float = 0.25;
 
 	private var curSeconds:Float = 0.0;
 
