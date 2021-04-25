@@ -30,15 +30,15 @@ class Snake extends FlxGroup {
         if (activeStraightSegment != null) {
             activeStraightSegment.stop();
 
-            var x = activeStraightSegment.x + activeStraightSegment.width;
-            var y = activeStraightSegment.y;
-            var strSegVec = dir.asVector().scale(Constants.TILE_SIZE).add(x, y);
-            strSeg.setPosition(strSegVec.x, strSegVec.y);
+            var crvPos = activeStraightSegment.direction.asVector().scale(activeStraightSegment.width).add(activeStraightSegment.x, activeStraightSegment.y);
 
             var crvSeg = CurvedSnakeSegment.create(activeStraightSegment.direction, strSeg.direction);
-            crvSeg.setPosition(x, y);
+            crvSeg.setPosition(crvPos.x, crvPos.y);
             curvedSegments.push(crvSeg);
             add(crvSeg);
+
+            var strSegVec = dir.asVector().scale(Constants.TILE_SIZE).add(crvSeg.x, crvSeg.y);
+            strSeg.setPosition(strSegVec.x, strSegVec.y);
         }
 
         activeStraightSegment = strSeg;

@@ -12,24 +12,21 @@ class SnakeHead extends FlxSprite {
 
     public function setSegment(seg: StraightSnakeSegment) {
         strSeg = seg;
+
+        flipX = seg.direction == Cardinal.E;
+        if (seg.direction == Cardinal.N) {
+            angle = 90;
+        } else if (seg.direction == Cardinal.S) {
+            angle = 270;
+        } else {
+            angle = 0;
+        }
     }
 
     override public function update(delta: Float) {
         super.update(delta);
 
-        var x = strSeg.x + strSeg.width;
-        var y = strSeg.y;
-        setPosition(x, y);
-
-        if (strSeg == null) {
-            return;
-        }
-
-        if (strSeg.direction == Cardinal.E) {
-            flipX = true;
-        } else {
-            flipX = false;
-            angle = strSeg.direction;
-        }
+        var newPos = strSeg.direction.asVector().scale(strSeg.width).add(strSeg.x, strSeg.y);
+        setPosition(newPos.x, newPos.y);
     }
 }
