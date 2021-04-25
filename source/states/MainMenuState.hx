@@ -130,14 +130,14 @@ class MainMenuState extends FlxUIState {
 			var swirlOut = new SwirlTransition(Trans.OUT, () -> {
 				// make sure our music is stopped;
 				FmodManager.StopSongImmediately();
-				FlxG.switchState(new PlayState());
+				FlxG.switchState(new MoleFactsState(new PlayState()));
 			}, FlxColor.GRAY);
 			openSubState(swirlOut);
 		}, 500);
 	}
 
 	function clickCredits():Void {
-		FmodFlxUtilities.TransitionToState(new CreditsState());
+		FmodFlxUtilities.TransitionToState(new MoleFactsState(new CreditsState()));
 	}
 
 	#if windows

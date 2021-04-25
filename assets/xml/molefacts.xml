@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data>
-	<sprite x="0" y="0" width="100%" height="100%" name="background_image" src="title_image.png"/>
+	<sprite x="0" y="0" width="100%" height="100%" name="background_image" src="mole_rat_fact.png"/>
 
 	<button x="-100" name="next" label="Next" align="center">
 		<anchor x="right"/>

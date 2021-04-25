@@ -56,7 +56,7 @@ class MoleFactsState extends FlxUIState {
 		transOut = null;
 
 		text = new FlxText();
-		text.setPosition(5, 15);
+		text.setPosition(15, 35);
 		text.size = 20;
 		text.alignment = FlxTextAlign.LEFT;
 		text.color = FlxColor.BLACK;
