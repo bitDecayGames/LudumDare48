@@ -1,5 +1,6 @@
 package entities.snake;
 
+import helpers.Constants;
 import flixel.util.FlxPath;
 import flixel.FlxG;
 import flixel.math.FlxPoint;
@@ -14,7 +15,8 @@ class SnakeHead extends FlxSprite {
     var target: FlxSprite;
 
     public function new() {
-        super(0, 0, AssetPaths.head__png);
+        super();
+        loadGraphic(AssetPaths.head__png, true, Constants.TILE_SIZE, Constants.TILE_SIZE);
         path = new FlxPath();
     }
 
