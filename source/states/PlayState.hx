@@ -36,7 +36,7 @@ class PlayState extends FlxTransitionableState {
 		add(player.tail);
 		add(player.emitter);
 
-		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE));
+		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE, false));
 
 		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
 	}
@@ -44,8 +44,8 @@ class PlayState extends FlxTransitionableState {
 	override public function update(elapsed:Float) {
 		super.update(elapsed);
 
-		if (!player.hasTarget()) {
-			// check if the player should be falling first
+		if (!player.hasTarget() && !player.isTransitioningBetweenLayers) {
+			// check if the player should be falling first (only if not currently transitioning between layers)
 			var result = buffer.fallPlayer(player.getPosition());
 			if (result != null) {
 				player.setTarget(result);
@@ -63,7 +63,9 @@ class PlayState extends FlxTransitionableState {
 			// now check if they want to go deeper
 			var depthDir = player.getDepthIntention();
 			if (depthDir != 0) {
-				buffer.switchLayer(depthDir, player.getPosition());
+				player.isTransitioningBetweenLayers = buffer.switchLayer(depthDir, player.getPosition(), () -> {
+					player.isTransitioningBetweenLayers = false;
+				});
 			}
 		}
 	}

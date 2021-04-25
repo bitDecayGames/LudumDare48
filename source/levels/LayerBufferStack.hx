@@ -23,7 +23,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		super();
 		calculator = new VoxelCalculator();
 		for (i in 0...3) {
-			var l = new LayerBuffer(width, height, padding);
+			var l = new LayerBuffer(width, height, padding, calculator);
 			l.worldZ = i;
 			l.setTarget(1.0 - i * 0.05, // target scale
 				1 - i * 0.3, // target tint
@@ -35,7 +35,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			add(layers[layers.length - 1 - i]);
 		}
 		var i = -1;
-		invisibleForeLayer = new LayerBuffer(width, height, padding);
+		invisibleForeLayer = new LayerBuffer(width, height, padding, calculator);
 		invisibleForeLayer.alpha = 0.0;
 		invisibleForeLayer.worldZ = -1;
 		setEntireBufferTileTypes(invisibleForeLayer);
@@ -56,7 +56,8 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		bufferTarget.x -= 10;
 		bufferTarget.y -= 10;
 
-		var targetTile = main.get_index_from_point(bufferTarget);
+		var targetTile = main.getTileTypeFromPoint(bufferTarget);
+		trace("targetTile: ", targetTile);
 
 		// 2 is rocks for now... can't move into those
 		if (targetTile != TileType.ROCK) {
@@ -79,7 +80,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			invisibleForeLayer.pushData(dir, getNextLevelData(dir, invisibleForeLayer));
 			invisibleForeLayer.setPosition(x, y);
 
-			return new MoveResult(worldTarget, targetTile);
+			return new MoveResult(worldTarget, targetTile, false);
 		} else {
 			// TODO: SFX tried to dig through rock here
 		}
@@ -94,15 +95,17 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		bufferTarget.x -= 10;
 		bufferTarget.y -= 10;
 
-		var leftHand = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.W.asVector().scale(Constants.TILE_SIZE))));
-		var leftFoot = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SW.asVector().scale(Constants.TILE_SIZE))));
-		var rightHand = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.E.asVector().scale(Constants.TILE_SIZE))));
-		var rightFoot = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SE.asVector().scale(Constants.TILE_SIZE))));
-		var peen = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.S.asVector().scale(Constants.TILE_SIZE))));
+		var leftHand = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.W.asVector().scale(Constants.TILE_SIZE))));
+		var leftFoot = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SW.asVector().scale(Constants.TILE_SIZE))));
+		var rightHand = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.E.asVector().scale(Constants.TILE_SIZE))));
+		var rightFoot = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SE.asVector().scale(Constants.TILE_SIZE))));
+		var peen = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.S.asVector().scale(Constants.TILE_SIZE))));
 
 		var shouldFall = !(leftHand && rightHand) && !(leftFoot && rightFoot) && !peen;
 		if (shouldFall) {
-			return movePlayer(Cardinal.S, playerPos);
+			var result = movePlayer(Cardinal.S, playerPos);
+			result.isFalling = true;
+			return result;
 		}
 		return null;
 	}
@@ -115,10 +118,10 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		return tileType != Constants.ROCK;
 	}
 
-	public function switchLayer(dir:Int, playerPos:FlxPoint) {
+	public function switchLayer(dir:Int, playerPos:FlxPoint, onFinish:Void->Void):Bool {
 		if (dir != -1 && dir != 1) {
 			trace("You are not allowed to move more than one layer at a time");
-			return;
+			return false;
 		}
 
 		var main = layers[0];
@@ -143,7 +146,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				}
 				l.setCurrent(1.0 - (i + dir) * 0.1, 1 - (i + dir) * 0.3, startAlpha);
 				l.setTarget(1.0 - i * 0.1, 1 - i * 0.3, 1.0);
-				setEntireBufferTileTypes(layers[i]);
+				setEntireBufferTileTypes(l);
+
+				if (i == 0) {
+					l.onReachedTarget = onFinish;
+				}
 			}
 			invisibleForeLayer.worldZ += dir;
 			if (dir > 0) {
@@ -152,9 +159,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				invisibleForeLayer.setTarget(1.0 - i * 0.1, 1 - i * 0.3, 0.0);
 			}
 			setEntireBufferTileTypes(invisibleForeLayer);
+			return true;
 		} else {
 			// TODO: SFX tried to dig through rock here
 		}
+		return false;
 	}
 
 	public function getNextLevelData(dir:Cardinal, buffer:LayerBuffer):Array<Int> {
@@ -173,11 +182,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	}
 
 	public function setEntireBufferTileTypes(buffer:LayerBuffer) {
-		for (y in 0...buffer.bufHeight) {
-			for (x in 0...buffer.bufWidth) {
-				buffer.setTile(x, y, calculator.get(buffer.worldX + x, buffer.worldY + y, buffer.worldZ));
-			}
-		}
+		buffer.setEntireBufferTileTypes();
 	}
 
 	public function getWorldDataRow(x:Int, y:Int, z:Int, num:Int):Array<Int> {
