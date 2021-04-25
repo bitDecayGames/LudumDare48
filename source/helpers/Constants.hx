@@ -15,5 +15,5 @@ class Constants {
 	// this is the tile type that replaces the DIRT tile when you dig it out (either DUG_DIRT or EMPTY_SPACE)
 	public static var AFTER_DIG:Int = DUG_DIRT;
 
-    public static var NO_TARGET:FlxPoint = FlxPoint.get(-999, -999);
+	public static var NO_TARGET:FlxPoint = FlxPoint.get(-999, -999);
 }

@@ -61,7 +61,7 @@ class PlayState extends FlxTransitionableState {
 			// now check if they
 			var depthDir = player.getDepthIntention();
 			if (depthDir != 0) {
-				buffer.switchLayer(depthDir);
+				buffer.switchLayer(depthDir, player.getPosition());
 			}
 		}
 	}

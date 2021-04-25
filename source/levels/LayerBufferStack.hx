@@ -60,6 +60,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				main.setTile(x, y, TileType.DUG_DIRT);
 				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
 					Constants.AFTER_DIG);
+				// TODO: SFX dug through dirt here
 			}
 			for (i in 0...layers.length) {
 				layers[i].pushData(dir, getNextLevelData(dir, layers[i]));
@@ -73,6 +74,8 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				layers[i].setPosition(x, y);
 			}
 			return new MoveResult(worldTarget, targetTile);
+		} else {
+			// TODO: SFX tried to dig through rock here
 		}
 		return null;
 	}
@@ -102,14 +105,27 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		return tileType == Constants.EMPTY_SPACE || tileType == Constants.DUG_DIRT;
 	}
 
-	public function switchLayer(dir:Int) {
+	private function isDiggable(tileType:Int):Bool {
+		return tileType != Constants.ROCK;
+	}
+
+	public function switchLayer(dir:Int, playerPos:FlxPoint) {
 		if (dir != -1 && dir != 1) {
 			trace("You are not allowed to move more than one layer at a time");
 			return;
 		}
-		for (i in 0...3) {
-			layers[i].worldZ += dir;
-			setEntireBufferTileTypes(layers[i]);
+
+		var main = layers[0];
+		var allowableDig = isDiggable(calculator.get(((playerPos.x - 10) / Constants.TILE_SIZE).floor(), ((playerPos.y - 10) / Constants.TILE_SIZE).floor(),
+			main.worldZ + dir));
+
+		if (allowableDig) {
+			for (i in 0...3) {
+				layers[i].worldZ += dir;
+				setEntireBufferTileTypes(layers[i]);
+			}
+		} else {
+			// TODO: SFX tried to dig through rock here
 		}
 	}
 
