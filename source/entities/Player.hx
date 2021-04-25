@@ -41,10 +41,10 @@ class Player extends Moleness {
 
 	var speed:Float = 240;
 	var framerate:Int = 10;
-	var moving:Bool;
+	var moving:Bool = false;
 
 	public var target:FlxPoint = FlxPoint.get().copyFrom(Constants.NO_TARGET);
-	var targetType:TileType;
+	var targetType:TileType = EMPTY_SPACE;
 
 	var temp:FlxVector = FlxVector.get();
 
@@ -52,7 +52,7 @@ class Player extends Moleness {
 	var lastDirection:Cardinal = NONE;
 	var inTransition:Bool = false;
 
-	var molesFollowingMe:Int;
+	var molesFollowingMe:Int = 0;
 
 	public function new() {
 		super();
