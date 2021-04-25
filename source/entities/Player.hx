@@ -86,6 +86,12 @@ class Player extends Moleness {
 
 	public function new() {
 		super();
+
+		#if fast
+		secondsToMoveOneEmptyBlock = 0.1;
+		secondsToDigOneDirtBlock = 0.2;
+		secondsToFallOneBlock = 0.05;
+		#end
 		makeGraphic(Constants.TILE_SIZE, Constants.TILE_SIZE, FlxColor.BLUE);
 		updateHitbox();
 
@@ -93,8 +99,8 @@ class Player extends Moleness {
 		var row = 12;
 		animation.add(IDLE_RIGHT, [for(i in 0...8) i], framerate);
 		animation.add(IDLE_LEFT, [for(i in 0...8) i], framerate, true, true);
-		animation.add(IDLE_UP, [7*row], framerate, true, true);
-		animation.add(IDLE_DOWN, [5*row], framerate, true, true);
+		animation.add(IDLE_UP, [for(i in 9*row+9...10*row) i], framerate, true, true);
+		animation.add(IDLE_DOWN, [for(i in 4*row+9...5*row) i], framerate, true, true);
 
 		animation.add(WALK_RIGHT, [for(i in row...row+8) i], framerate);
 		animation.add(WALK_LEFT, [for(i in row...row+8) i], framerate, true, true);
