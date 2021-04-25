@@ -44,34 +44,34 @@ class Snake extends FlxGroup {
         if (activeStraightSegment != null) {
             activeStraightSegment.stop();
 
-            var crvPos = activeStraightSegment.getPosition();
-            switch(activeStraightSegment.direction) {
-                case N:
-                    crvPos.y -= Constants.TILE_SIZE;
-                case S:
-                    crvPos.y += activeStraightSegment.height;
-                case E:
-                    crvPos.x += activeStraightSegment.width;
-                case W:
-                    crvPos.x -= Constants.TILE_SIZE;
-                default:
-                    throw 'direction ${activeStraightSegment.direction} unsupported';
-            }
+            // var crvPos: FlxVector = head.getPosition();
+            // switch(activeStraightSegment.direction) {
+            //     case N:
+            //         crvPos.y -= Constants.TILE_SIZE;
+            //     case S:
+            //         crvPos.y += activeStraightSegment.height;
+            //     case E:
+            //         crvPos.x += activeStraightSegment.width;
+            //     case W:
+            //         crvPos.x -= Constants.TILE_SIZE;
+            //     default:
+            //         throw 'direction ${activeStraightSegment.direction} unsupported';
+            // }
             var crvSeg = CurvedSnakeSegment.create(activeStraightSegment.direction, strSeg.direction);
-            crvSeg.setPosition(crvPos.x, crvPos.y);
+            crvSeg.setPosition(head.x, head.y);
             curvedSegments.push(crvSeg);
             add(crvSeg);
 
             var strSegVec = crvSeg.getPosition();
             switch(dir) {
                 case N:
-                    strSegVec.y -= strSeg.height;
+                    // no-op, N already in right spot
                 case S:
                     strSegVec.y += crvSeg.height;
                 case E:
                     strSegVec.x += crvSeg.width;
                 case W:
-                    strSegVec.x -= strSeg.width;
+                    // no-op, W already in right spot
                 default:
                     throw 'direction ${strSeg.direction} unsupported';
             }

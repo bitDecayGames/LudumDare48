@@ -31,7 +31,6 @@ class SnakeHead extends FlxSprite {
         animation.play(ANIMATION_IDLE);
 
         path = new FlxPath();
-        maxVelocity.x = maxVelocity.y = Constants.SNAKE_SPEED / 4;
 
         newSegmentCallback = function(prevDir: Cardinal, newDir: Cardinal) {};
 
@@ -86,7 +85,7 @@ class SnakeHead extends FlxSprite {
 
         // if pathPoints null, cannot find path
 		if (pathPoints != null) {
-			path.start(pathPoints);
+			path.start(pathPoints, Constants.SNAKE_SPEED);
 		} else {
             #if debug
             trace("could not generate path");
