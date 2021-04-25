@@ -1,11 +1,10 @@
 package states;
 
+import entities.MoveResult;
 import flixel.FlxCamera;
-import flixel.math.FlxPoint;
 import helpers.Constants;
 import spacial.Cardinal;
 import levels.LayerBufferStack;
-import levels.VoxelCalculator;
 import flixel.addons.transition.FlxTransitionableState;
 import signals.Lifecycle;
 import entities.Player;
@@ -35,7 +34,7 @@ class PlayState extends FlxTransitionableState {
 		player.y = Constants.TILE_SIZE * 11;
 		add(player);
 
-		player.setTarget(player.getPosition());
+		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE));
 
 		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
 	}
@@ -45,9 +44,9 @@ class PlayState extends FlxTransitionableState {
 
 		var dir = player.getIntention();
 		if (dir != Cardinal.NONE) {
-			var newPlayerTarget = buffer.movePlayer(dir, player.getPosition());
-			if (newPlayerTarget != null) {
-				player.setTarget(newPlayerTarget);
+			var result = buffer.movePlayer(dir, player.getPosition());
+			if (result.target != null) {
+				player.setTarget(result);
 			}
 		}
 		var depthDir = player.getDepthIntention();

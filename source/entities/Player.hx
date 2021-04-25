@@ -1,5 +1,6 @@
 package entities;
 
+import helpers.TileType;
 import input.InputCalcuator;
 import haxe.macro.Expr.Constant;
 import flixel.math.FlxVector;
@@ -37,6 +38,11 @@ class Player extends FlxSprite {
 	private static inline var TURN_RIGHT_TO_UP = "turnRightUp";
 	private static inline var TURN_RIGHT_TO_DOWN = "turnRightDown";
 
+	private static inline var CHOMP_UP = "chompUp";
+	private static inline var CHOMP_DOWN = "chompDown";
+	private static inline var CHOMP_LEFT = "chompLeft";
+	private static inline var CHOMP_RIGHT = "chompRight";
+
 	var speed:Float = 240;
 	var framerate:Int = 10;
 	var moving:Bool;
@@ -44,6 +50,7 @@ class Player extends FlxSprite {
 	private static var NO_TARGET = FlxPoint.get(-999, -999);
 
 	public var target:FlxPoint = FlxPoint.get().copyFrom(NO_TARGET);
+	var targetType:TileType;
 
 	var temp:FlxVector = FlxVector.get();
 
@@ -82,6 +89,11 @@ class Player extends FlxSprite {
 		animation.add(TURN_UP_TO_LEFT, [0], framerate, false);
 		animation.add(TURN_UP_TO_DOWN, [for(i in 7*row+8...8*row) i], framerate, false);
 		animation.add(TURN_UP_TO_RIGHT, [0], framerate, false);
+
+		animation.add(CHOMP_UP, [for(i in 8*row...8*row+8) i], framerate);
+		animation.add(CHOMP_DOWN, [for(i in 6*row...6*row+8) i], framerate);
+		animation.add(CHOMP_RIGHT, [for(i in 2*row...2*row+8) i], framerate);
+		animation.add(CHOMP_LEFT, [for(i in 2*row...2*row+8) i], framerate, true, true);
 	}
 
 	override public function update(delta:Float) {
@@ -153,19 +165,24 @@ class Player extends FlxSprite {
 				return;
 			}
 
-			x -= temp.x * speed * delta;
-			y -= temp.y * speed * delta;
+			var moveSpeed = speed;
+			if (targetType == DIRT) {
+				moveSpeed *= 0.7;
+			}
+
+			x -= temp.x * moveSpeed * delta;
+			y -= temp.y * moveSpeed * delta;
 
 			switch(lastDirection) {
 				case N:
 					trace("playing up");
-					animation.play(WALK_UP);
+					animation.play(targetType == DIRT ? CHOMP_UP : WALK_UP);
 				case S:
-					animation.play(WALK_DOWN);
+					animation.play(targetType == DIRT ? CHOMP_DOWN : WALK_DOWN);
 				case E:
-					animation.play(WALK_RIGHT);
+					animation.play(targetType == DIRT ? CHOMP_RIGHT : WALK_RIGHT);
 				case W:
-					animation.play(WALK_LEFT);
+					animation.play(targetType == DIRT ? CHOMP_LEFT : WALK_LEFT);
 				default:
 			}
 
@@ -200,8 +217,9 @@ class Player extends FlxSprite {
 		return InputCalcuator.getDepthInput();
 	}
 
-	public function setTarget(t:FlxPoint) {
-		target.copyFrom(t);
+	public function setTarget(t:MoveResult) {
+		target.copyFrom(t.target);
+		targetType = t.moveIntoType;
 	}
 
 	public function targetValid():Bool {

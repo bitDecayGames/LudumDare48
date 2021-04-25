@@ -1,5 +1,7 @@
 package levels;
 
+import helpers.TileType;
+import entities.MoveResult;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -34,7 +36,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		}
 	}
 
-	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):FlxPoint {
+	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):MoveResult {
 		var main = layers[0];
 		var tileMovement = dir.asVector().scale(Constants.TILE_SIZE);
 
@@ -51,11 +53,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		var targetTile = main.get_index_from_point(bufferTarget);
 
 		// 2 is rocks for now... can't move into those
-		if (targetTile != Constants.ROCK) {
-			if (targetTile == Constants.DIRT) {
+		if (targetTile != TileType.ROCK) {
+			if (targetTile == TileType.DIRT) {
 				var x = (bufferTarget.x / main.get_tile_width()).floor();
 				var y = (bufferTarget.y / main.get_tile_height()).floor();
-				main.setTile(x, y, Constants.AFTER_DIG);
+				main.setTile(x, y, TileType.DUG_DIRT);
 				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
 					Constants.AFTER_DIG);
 			}
@@ -70,7 +72,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				// TODO: MW instead of setting position, if we lerp to this new xy it will smooth out the snappy tilemap
 				layers[i].setPosition(x, y);
 			}
-			return worldTarget;
+			return new MoveResult(worldTarget, targetTile);
 		}
 		return null;
 	}
