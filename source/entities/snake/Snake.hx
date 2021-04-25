@@ -8,9 +8,8 @@ import flixel.group.FlxGroup;
 class Snake extends FlxGroup {
     var straightSegments:Array<StraightSnakeSegment>;
     var activeStraightSegment:StraightSnakeSegment;
-    
     var curvedSegments:Array<CurvedSnakeSegment>;
-    // TODO Add head
+    var head:SnakeHead;
 
     public function new(startPos:FlxVector) {
         super();
@@ -19,6 +18,9 @@ class Snake extends FlxGroup {
 
         addSegment(Cardinal.E);
         activeStraightSegment.setPosition(startPos.x, startPos.y);
+
+        head = new SnakeHead();
+        add(head);
     }
 
     private function addSegment(dir: Cardinal) {
@@ -45,9 +47,16 @@ class Snake extends FlxGroup {
     override public function update(elapsed:Float) {
 		super.update(elapsed);
 
+        #if debug
         if (FlxG.keys.justPressed.SPACE) {
             var dir = StraightSnakeSegment.randomDir(activeStraightSegment.direction);
             addSegment(dir);
         }
+        #end
+
+        var x = activeStraightSegment.x + activeStraightSegment.width;
+        var y = activeStraightSegment.y + activeStraightSegment.height;
+        head.setPosition(x, y);
+        head.angle = activeStraightSegment.direction;
 	}
 }

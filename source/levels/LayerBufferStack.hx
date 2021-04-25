@@ -1,5 +1,7 @@
 package levels;
 
+import helpers.TileType;
+import entities.MoveResult;
 import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -34,7 +36,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		}
 	}
 
-	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):FlxPoint {
+	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):MoveResult {
 		var main = layers[0];
 		var tileMovement = dir.asVector().scale(Constants.TILE_SIZE);
 
@@ -51,13 +53,14 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		var targetTile = main.get_index_from_point(bufferTarget);
 
 		// 2 is rocks for now... can't move into those
-		if (targetTile != Constants.ROCK) {
-			if (targetTile == Constants.DIRT) {
+		if (targetTile != TileType.ROCK) {
+			if (targetTile == TileType.DIRT) {
 				var x = (bufferTarget.x / main.get_tile_width()).floor();
 				var y = (bufferTarget.y / main.get_tile_height()).floor();
-				main.setTile(x, y, Constants.AFTER_DIG);
+				main.setTile(x, y, TileType.DUG_DIRT);
 				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
 					Constants.AFTER_DIG);
+				// TODO: SFX dug through dirt here
 			}
 			for (i in 0...layers.length) {
 				layers[i].pushData(dir, getNextLevelData(dir, layers[i]));
@@ -70,19 +73,59 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				// TODO: MW instead of setting position, if we lerp to this new xy it will smooth out the snappy tilemap
 				layers[i].setPosition(x, y);
 			}
-			return worldTarget;
+			return new MoveResult(worldTarget, targetTile);
+		} else {
+			// TODO: SFX tried to dig through rock here
 		}
 		return null;
 	}
 
-	public function switchLayer(dir:Int) {
+	public function fallPlayer(playerPos:FlxPoint):MoveResult {
+		var main = layers[0];
+
+		var bufferTarget = FlxPoint.get().copyFrom(playerPos);
+		bufferTarget.subtract(main.worldX * Constants.TILE_SIZE, main.worldY * Constants.TILE_SIZE);
+		bufferTarget.x -= 10;
+		bufferTarget.y -= 10;
+
+		var leftHand = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.W.asVector().scale(Constants.TILE_SIZE))));
+		var leftFoot = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SW.asVector().scale(Constants.TILE_SIZE))));
+		var rightHand = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.E.asVector().scale(Constants.TILE_SIZE))));
+		var rightFoot = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SE.asVector().scale(Constants.TILE_SIZE))));
+		var peen = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.S.asVector().scale(Constants.TILE_SIZE))));
+
+		var shouldFall = !(leftHand && rightHand) && !(leftFoot && rightFoot) && !peen;
+		if (shouldFall) {
+			return movePlayer(Cardinal.S, playerPos);
+		}
+		return null;
+	}
+
+	private function isEmpty(tileType:Int):Bool {
+		return tileType == Constants.EMPTY_SPACE || tileType == Constants.DUG_DIRT;
+	}
+
+	private function isDiggable(tileType:Int):Bool {
+		return tileType != Constants.ROCK;
+	}
+
+	public function switchLayer(dir:Int, playerPos:FlxPoint) {
 		if (dir != -1 && dir != 1) {
 			trace("You are not allowed to move more than one layer at a time");
 			return;
 		}
-		for (i in 0...3) {
-			layers[i].worldZ += dir;
-			setEntireBufferTileTypes(layers[i]);
+
+		var main = layers[0];
+		var allowableDig = isDiggable(calculator.get(((playerPos.x - 10) / Constants.TILE_SIZE).floor(), ((playerPos.y - 10) / Constants.TILE_SIZE).floor(),
+			main.worldZ + dir));
+
+		if (allowableDig) {
+			for (i in 0...3) {
+				layers[i].worldZ += dir;
+				setEntireBufferTileTypes(layers[i]);
+			}
+		} else {
+			// TODO: SFX tried to dig through rock here
 		}
 	}
 
