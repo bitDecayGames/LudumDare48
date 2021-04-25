@@ -51,12 +51,13 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		var targetTile = main.get_index_from_point(bufferTarget);
 
 		// 2 is rocks for now... can't move into those
-		if (targetTile != 2) {
-			if (targetTile == 1) {
+		if (targetTile != Constants.ROCK) {
+			if (targetTile == Constants.DIRT) {
 				var x = (bufferTarget.x / main.get_tile_width()).floor();
 				var y = (bufferTarget.y / main.get_tile_height()).floor();
-				main.setTile(x, y, 3);
-				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ, 0);
+				main.setTile(x, y, Constants.AFTER_DIG);
+				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
+					Constants.AFTER_DIG);
 			}
 			for (i in 0...layers.length) {
 				layers[i].pushData(dir, getNextLevelData(dir, layers[i]));
