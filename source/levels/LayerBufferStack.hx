@@ -56,7 +56,8 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		bufferTarget.x -= 10;
 		bufferTarget.y -= 10;
 
-		var targetTile = main.get_index_from_point(bufferTarget);
+		var targetTile = main.getTileTypeFromPoint(bufferTarget);
+		trace("targetTile: ", targetTile);
 
 		// 2 is rocks for now... can't move into those
 		if (targetTile != TileType.ROCK) {
@@ -94,11 +95,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		bufferTarget.x -= 10;
 		bufferTarget.y -= 10;
 
-		var leftHand = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.W.asVector().scale(Constants.TILE_SIZE))));
-		var leftFoot = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SW.asVector().scale(Constants.TILE_SIZE))));
-		var rightHand = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.E.asVector().scale(Constants.TILE_SIZE))));
-		var rightFoot = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SE.asVector().scale(Constants.TILE_SIZE))));
-		var peen = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.S.asVector().scale(Constants.TILE_SIZE))));
+		var leftHand = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.W.asVector().scale(Constants.TILE_SIZE))));
+		var leftFoot = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SW.asVector().scale(Constants.TILE_SIZE))));
+		var rightHand = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.E.asVector().scale(Constants.TILE_SIZE))));
+		var rightFoot = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SE.asVector().scale(Constants.TILE_SIZE))));
+		var peen = !isEmpty(main.getTileTypeFromPoint(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.S.asVector().scale(Constants.TILE_SIZE))));
 
 		var shouldFall = !(leftHand && rightHand) && !(leftFoot && rightFoot) && !peen;
 		if (shouldFall) {

@@ -4,6 +4,8 @@ import flixel.util.FlxColor;
 import spacial.Cardinal;
 import flixel.tile.FlxTilemap;
 import helpers.TileType;
+import flixel.math.FlxPoint;
+import helpers.Constants;
 
 using Math;
 
@@ -110,9 +112,6 @@ class LayerBuffer extends FlxTilemap {
 	}
 
 	public function tileIsType(X:Int, Y:Int, tileType:TileType):Bool {
-		trace("x, y: ",x, y);
-		trace("worldX, worldY: ", worldX, worldY);
-
 		return calculator.get(worldX + X, worldY + Y, worldZ) == tileType;
 	}
 
@@ -210,5 +209,9 @@ class LayerBuffer extends FlxTilemap {
 				setTile(x, y, calculator.get(worldX + x, worldY + y, worldZ));
 			}
 		}
+	}
+
+	public function getTileTypeFromPoint(p:FlxPoint):Int {
+		return calculator.get(worldX + (p.x / Constants.TILE_SIZE).floor(), worldY + (p.y / Constants.TILE_SIZE).floor(), worldZ);
 	}
 }
