@@ -27,8 +27,11 @@ class StraightSnakeSegment extends FlxTiledSprite {
         return new StraightSnakeSegment(Cardinal.E);
     }
 
-    public static function random() {
-        return new StraightSnakeSegment(rand.getObject(ALL_DIRECTIONS));
+    public static function randomDir(curDir: Cardinal) {
+        var arrCpy = ALL_DIRECTIONS.copy();
+        arrCpy.remove(curDir);
+        arrCpy.remove(curDir.reverse());
+        return rand.getObject(arrCpy);
     }
 
     private static final WIDTH = 32;
