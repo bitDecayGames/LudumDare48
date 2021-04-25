@@ -44,39 +44,25 @@ class Snake extends FlxSpriteGroup {
         var strSeg = new StraightSnakeSegment(dir);
 
         if (activeStraightSegment != null) {
-            // var crvPos: FlxVector = head.getPosition();
-            // switch(activeStraightSegment.direction) {
-            //     case N:
-            //         crvPos.y -= Constants.TILE_SIZE;
-            //     case S:
-            //         crvPos.y += activeStraightSegment.height;
-            //     case E:
-            //         crvPos.x += activeStraightSegment.width;
-            //     case W:
-            //         crvPos.x -= Constants.TILE_SIZE;
-            //     default:
-            //         throw 'direction ${activeStraightSegment.direction} unsupported';
-            // }
             var crvSeg = CurvedSnakeSegment.create(activeStraightSegment.direction, strSeg.direction);
             crvSeg.setPosition(head.x, head.y);
             curvedSegments.push(crvSeg);
             add(crvSeg);
 
-            activeStraightSegment.stop(curvedSegments[curvedSegments.length - 2].getPosition(), crvSeg.getPosition());
+            activeStraightSegment.stop(
+                curvedSegments[curvedSegments.length - 2],
+                crvSeg
+            );
 
             var strSegVec = crvSeg.getPosition();
-            switch(dir) {
-                case N:
-                    // no-op, N already in right spot
-                case S:
-                    strSegVec.y += crvSeg.height;
-                case E:
-                    strSegVec.x += crvSeg.width;
-                case W:
-                    // no-op, W already in right spot
-                default:
-                    throw 'direction ${strSeg.direction} unsupported';
+            if (dir.horizontal()) {
+                strSegVec.x += crvSeg.width;
+            } else if (dir.vertical()) {
+                strSegVec.y += crvSeg.height;
+            } else {
+                throw 'direction ${strSeg.direction} unsupported';
             }
+
             strSeg.setPosition(strSegVec.x, strSegVec.y);
         }
 
@@ -90,20 +76,5 @@ class Snake extends FlxSpriteGroup {
 
         // TODO Get snake head sorting above rest of snake body
         // sort(SnakeHeadSorter.sort, FlxSort.ASCENDING);
-
-        #if debug
-        if (FlxG.keys.justPressed.SPACE) {
-            var dir = StraightSnakeSegment.randomDir(activeStraightSegment.direction);
-            addSegment(dir);
-        } else if (FlxG.keys.justPressed.UP) {
-            addSegment(Cardinal.N);
-        } else if (FlxG.keys.justPressed.DOWN) {
-            addSegment(Cardinal.S);
-        } else if (FlxG.keys.justPressed.LEFT) {
-            addSegment(Cardinal.W);
-        } else if (FlxG.keys.justPressed.RIGHT) {
-            addSegment(Cardinal.E);
-        }
-        #end
 	}
 }
