@@ -1,13 +1,13 @@
 package entities.snake;
 
+import entities.RotatingTileSprite.RotatingTiledSprite;
 import spacial.Cardinal;
 import flixel.math.FlxRandom;
-import flixel.addons.display.FlxTiledSprite;
 import flixel.math.FlxVector;
 
 using extensions.FlxObjectExt;
 
-class StraightSnakeSegment extends FlxTiledSprite {
+class StraightSnakeSegment extends RotatingTiledSprite {
     public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
     private static final rand = new FlxRandom();
 
@@ -27,8 +27,11 @@ class StraightSnakeSegment extends FlxTiledSprite {
         return new StraightSnakeSegment(Cardinal.E);
     }
 
-    public static function random() {
-        return new StraightSnakeSegment(rand.getObject(ALL_DIRECTIONS));
+    public static function randomDir(curDir: Cardinal) {
+        var arrCpy = ALL_DIRECTIONS.copy();
+        arrCpy.remove(curDir);
+        arrCpy.remove(curDir.reverse());
+        return rand.getObject(arrCpy);
     }
 
     private static final WIDTH = 32;
@@ -38,7 +41,6 @@ class StraightSnakeSegment extends FlxTiledSprite {
     public final direction:Cardinal;
     public final directionVector:FlxVector;
 
-    private var spriteOffset:Float = 0;
     private var stopMovement = false;
 
     public function new(direction:Cardinal) {

@@ -50,6 +50,10 @@ class PlayState extends FlxTransitionableState {
 				player.setTarget(newPlayerTarget);
 			}
 		}
+		var depthDir = player.getDepthIntention();
+		if (depthDir != 0) {
+			buffer.switchLayer(depthDir);
+		}
 	}
 
 	override public function onFocusLost() {
