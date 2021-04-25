@@ -177,8 +177,8 @@ class Player extends Moleness {
 				}
 			}
 
-			// TODO: Use actual falling information from the move result
-			var falling = FlxG.keys.pressed.F;
+			// Use actual falling information from the move result
+			var falling = isFalling;
 			if (falling) {
 				var startFrame = 0;
 				if (animation.name == WALK_UP || animation.name == CHOMP_UP) {
@@ -258,11 +258,11 @@ class Player extends Moleness {
 			}
 
 			// Check if the player has now reached the next block
-			// TODO: This may be causing slight jitter. Not sure if it matters once animations are in place
 			if (getPosition(temp).distanceTo(target) < 1) {
 				setPosition(Math.round(target.x), Math.round(target.y));
 				target.copyFrom(Constants.NO_TARGET);
 				stopped = true;
+				isFalling = false;
 			}
 		} else {
 			// Player isn't giving input, so lets check animation stuff
