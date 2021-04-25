@@ -68,6 +68,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
 					Constants.AFTER_DIG);
 				// TODO: SFX dug through dirt here
+				FmodManager.PlaySoundOneShot(FmodSFX.MoleDig);
 			}
 
 			// buffer is slightly bigger than screen, so we position it so it's centered correctly

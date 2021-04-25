@@ -11,11 +11,13 @@ class FmodSongs {
 }
 
 class FmodSFX {
-    public static inline var squeak:String = "event:/SFX/BabyMole/squeak";
+    public static inline var BabyMoleCollect:String = "event:/SFX/BabyMole/BabyMoleCollect";
+    public static inline var BabyMoleSqueak:String = "event:/SFX/BabyMole/BabyMoleSqueak";
     public static inline var MenuHover:String = "event:/SFX/Menu/MenuHover";
     public static inline var MenuSelect:String = "event:/SFX/Menu/MenuSelect";
-    public static inline var Dig:String = "event:/SFX/Mole/Dig";
     public static inline var Dig1:String = "event:/SFX/Mole/Dig/Dig1";
     public static inline var Dig2:String = "event:/SFX/Mole/Dig/Dig2";
     public static inline var Dig3:String = "event:/SFX/Mole/Dig/Dig3";
+    public static inline var MoleDig:String = "event:/SFX/Mole/MoleDig";
+    public static inline var SnakeEatMole:String = "event:/SFX/Snake/SnakeEatMole";
 }
