@@ -81,12 +81,16 @@ class LayerBuffer extends FlxTilemap {
 			curSeconds -= elapsed;
 
 			if (curSeconds <= 0) {
-				scale.set(targetScale, targetScale);
-				var targetTint255 = (targetTint * 255).floor();
-				color = FlxColor.fromRGB(targetTint255, targetTint255, targetTint255);
-				alpha = targetAlpha;
+				setCurrent(targetScale, targetTint, targetAlpha);
 			}
 		}
+	}
+
+	public function setCurrent(scale:Float, tint:Float, alpha:Float) {
+		this.scale.set(scale, scale);
+		var targetTint255 = (tint * 255).floor();
+		color = FlxColor.fromRGB(targetTint255, targetTint255, targetTint255);
+		this.alpha = alpha;
 	}
 
 	public function setTarget(scale:Float, tint:Float, alpha:Float) {

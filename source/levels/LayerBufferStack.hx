@@ -123,8 +123,9 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			for (i in 0...layers.length) {
 				var l = layers[i];
 				l.worldZ += dir;
-				l.setTarget(1.0 - l.worldZ * 0.1, // target scale
-					1 - l.worldZ * 0.3, // target tint
+				l.setCurrent(1.0 - (i + dir) * 0.1, 1 - (i + dir) * 0.3, 1.0);
+				l.setTarget(1.0 - i * 0.1, // target scale
+					1 - i * 0.3, // target tint
 					1.0); // target alpha
 				setEntireBufferTileTypes(layers[i]);
 			}
