@@ -17,5 +17,5 @@ class Constants {
 
 	public static var NO_TARGET:FlxPoint = FlxPoint.get(-999, -999);
 
-	public static final SNAKE_SPEED = 20;
+	public static final SNAKE_SPEED = 40;
 }

@@ -80,7 +80,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			invisibleForeLayer.pushData(dir, getNextLevelData(dir, invisibleForeLayer));
 			invisibleForeLayer.setPosition(x, y);
 
-			return new MoveResult(worldTarget, targetTile);
+			return new MoveResult(worldTarget, targetTile, false);
 		} else {
 			// TODO: SFX tried to dig through rock here
 		}
@@ -103,7 +103,9 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 
 		var shouldFall = !(leftHand && rightHand) && !(leftFoot && rightFoot) && !peen;
 		if (shouldFall) {
-			return movePlayer(Cardinal.S, playerPos);
+			var result = movePlayer(Cardinal.S, playerPos);
+			result.isFalling = true;
+			return result;
 		}
 		return null;
 	}
@@ -116,10 +118,10 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		return tileType != Constants.ROCK;
 	}
 
-	public function switchLayer(dir:Int, playerPos:FlxPoint) {
+	public function switchLayer(dir:Int, playerPos:FlxPoint, onFinish:Void->Void):Bool {
 		if (dir != -1 && dir != 1) {
 			trace("You are not allowed to move more than one layer at a time");
-			return;
+			return false;
 		}
 
 		var main = layers[0];
@@ -144,7 +146,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				}
 				l.setCurrent(1.0 - (i + dir) * 0.1, 1 - (i + dir) * 0.3, startAlpha);
 				l.setTarget(1.0 - i * 0.1, 1 - i * 0.3, 1.0);
-				setEntireBufferTileTypes(layers[i]);
+				setEntireBufferTileTypes(l);
+
+				if (i == 0) {
+					l.onReachedTarget = onFinish;
+				}
 			}
 			invisibleForeLayer.worldZ += dir;
 			if (dir > 0) {
@@ -153,9 +159,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				invisibleForeLayer.setTarget(1.0 - i * 0.1, 1 - i * 0.3, 0.0);
 			}
 			setEntireBufferTileTypes(invisibleForeLayer);
+			return true;
 		} else {
 			// TODO: SFX tried to dig through rock here
 		}
+		return false;
 	}
 
 	public function getNextLevelData(dir:Cardinal, buffer:LayerBuffer):Array<Int> {

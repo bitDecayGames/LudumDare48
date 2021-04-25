@@ -1,5 +1,7 @@
 package entities;
 
+import flixel.FlxG;
+import input.SimpleController;
 import flixel.FlxSprite;
 import zero.extensions.StringExt;
 import helpers.TileType;
@@ -46,15 +48,20 @@ class Player extends Moleness {
 	private static inline var CHOMP_LEFT = "chompLeft";
 	private static inline var CHOMP_RIGHT = "chompRight";
 
+	private static inline var FALLING = "falling";
+
 	private static inline var TAIL_LEFT = "tailLeft";
 	private static inline var TAIL_RIGHT = "tailRight";
 	private static inline var TAIL_UP = "tailUp";
 	private static inline var TAIL_DOWN = "tailDown";
 
+	public static inline var SLOW = "Slow";
+
 	var speed:Float = 60;
-	public var secondsToMoveOneEmptyBlock:Float = 0.1;
-	public var secondsToDigOneDirtBlock:Float = 0.2;
-	public var secondsToFallOneBlock:Float = 0.05;
+
+	public var secondsToMoveOneEmptyBlock:Float = 0.3;
+	public var secondsToDigOneDirtBlock:Float = 0.4;
+	public var secondsToFallOneBlock:Float = 0.1;
 
 	private var totalSecondsToTarget:Float = 0.0;
 	private var curTime:Float = 0.0;
@@ -65,6 +72,7 @@ class Player extends Moleness {
 
 	private var travelDir:Cardinal = Cardinal.NONE;
 	private var originalPosition:FlxPoint = FlxPoint.get(0, 0);
+	private var isFalling:Bool = false;
 
 	var targetType:TileType = EMPTY_SPACE;
 
@@ -78,50 +86,65 @@ class Player extends Moleness {
 
 	public var tail:FlxSprite;
 
+	public var isTransitioningBetweenLayers:Bool = false;
+
 	public function new() {
 		super();
+
+		#if fast
+		secondsToMoveOneEmptyBlock = 0.1;
+		secondsToDigOneDirtBlock = 0.2;
+		secondsToFallOneBlock = 0.05;
+		#end
 		makeGraphic(Constants.TILE_SIZE, Constants.TILE_SIZE, FlxColor.BLUE);
 		updateHitbox();
 
 		loadGraphic(AssetPaths.Player__png, true, 32, 32);
 		var row = 12;
-		animation.add(IDLE_RIGHT, [for(i in 0...8) i], framerate);
-		animation.add(IDLE_LEFT, [for(i in 0...8) i], framerate, true, true);
-		animation.add(IDLE_UP, [7*row], framerate, true, true);
-		animation.add(IDLE_DOWN, [5*row], framerate, true, true);
 
-		animation.add(WALK_RIGHT, [for(i in row...row+8) i], framerate);
-		animation.add(WALK_LEFT, [for(i in row...row+8) i], framerate, true, true);
-		animation.add(WALK_DOWN, [for(i in 5*row...5*row+8) i], framerate);
-		animation.add(WALK_UP, [for(i in 7*row...7*row+8) i], framerate);
+		animation.add(IDLE_RIGHT, [for (i in 0...8) i], framerate);
+		animation.add(IDLE_LEFT, [for (i in 0...8) i], framerate, true, true);
+		animation.add(IDLE_UP, [for (i in 9 * row + 9...10 * row) i], framerate, true, true);
+		animation.add(IDLE_DOWN, [for (i in 4 * row + 9...5 * row) i], framerate, true, true);
 
-		animation.add(TURN_RIGHT_TO_UP, [row+9, row+10].concat([for(i in 10*row+1...10*row+5) i]), framerate * 2, false);
-		animation.add(TURN_RIGHT_TO_LEFT, [for(i in row+8...2*row) i], framerate, false);
-		animation.add(TURN_RIGHT_TO_DOWN, [row+9, row+10].concat([for(i in 7*row+9...8*row) i]), framerate * 2, false);
+		animation.add(WALK_RIGHT, [for (i in row...row + 8) i], framerate);
+		animation.add(WALK_LEFT, [for (i in row...row + 8) i], framerate, true, true);
+		animation.add(WALK_DOWN, [for (i in 5 * row...5 * row + 8) i], framerate);
+		animation.add(WALK_UP, [for (i in 7 * row...7 * row + 8) i], framerate);
 
-		animation.add(TURN_LEFT_TO_UP, [2*row+9, 2*row+10].concat([for(i in 10*row+1...10*row+5) i]), framerate * 2, false);
-		animation.add(TURN_LEFT_TO_RIGHT, [for(i in 2*row+8...3*row) i], framerate, false);
-		animation.add(TURN_LEFT_TO_DOWN, [2*row+8, 2*row+9].concat([for(i in 7*row+9...8*row) i]), framerate * 2, false);
+		animation.add(TURN_RIGHT_TO_UP, [row + 9, row + 10].concat([for (i in 10 * row + 1...10 * row + 5) i]), framerate * 2, false);
+		animation.add(TURN_RIGHT_TO_LEFT, [for (i in row + 8...2 * row) i], framerate, false);
+		animation.add(TURN_RIGHT_TO_DOWN, [row + 9, row + 10].concat([for (i in 7 * row + 9...8 * row) i]), framerate * 2, false);
 
-		animation.add(TURN_DOWN_TO_LEFT, [7*row+11, 7*row+10, row+9, row+10, row+11], framerate * 2, false);
-		animation.add(TURN_DOWN_TO_UP, [for(i in 5*row+8...6*row) i], framerate, false);
-		animation.add(TURN_DOWN_TO_RIGHT, [7*row+11, 7*row+10, 2*row+9, 2*row+10, 2*row+11], framerate * 2, false);
+		animation.add(TURN_LEFT_TO_UP, [2 * row + 9, 2 * row + 10].concat([for (i in 10 * row + 1...10 * row + 5) i]), framerate * 2, false);
+		animation.add(TURN_LEFT_TO_RIGHT, [for (i in 2 * row + 8...3 * row) i], framerate, false);
+		animation.add(TURN_LEFT_TO_DOWN, [2 * row + 8, 2 * row + 9].concat([for (i in 7 * row + 9...8 * row) i]), framerate * 2, false);
 
-		animation.add(TURN_UP_TO_LEFT, [5*row+11, 5*row+10,row+9, row+10, row+11], framerate * 2, false);
-		animation.add(TURN_UP_TO_DOWN, [for(i in 7*row+8...8*row) i], framerate, false);
-		animation.add(TURN_UP_TO_RIGHT, [5*row+11, 5*row+10, 2*row+9, 2*row+10, 2*row+11], framerate * 2, false);
+		animation.add(TURN_DOWN_TO_LEFT, [7 * row + 11, 7 * row + 10, row + 9, row + 10, row + 11], framerate * 2, false);
+		animation.add(TURN_DOWN_TO_UP, [for (i in 5 * row + 8...6 * row) i], framerate, false);
+		animation.add(TURN_DOWN_TO_RIGHT, [7 * row + 11, 7 * row + 10, 2 * row + 9, 2 * row + 10, 2 * row + 11], framerate * 2, false);
 
-		animation.add(CHOMP_UP, [for(i in 8*row...8*row+8) i], framerate);
-		animation.add(CHOMP_DOWN, [for(i in 6*row...6*row+8) i], framerate);
-		animation.add(CHOMP_RIGHT, [for(i in 2*row...2*row+8) i], framerate);
-		animation.add(CHOMP_LEFT, [for(i in 2*row...2*row+8) i], framerate, true, true);
+		animation.add(TURN_UP_TO_LEFT, [5 * row + 11, 5 * row + 10, row + 9, row + 10, row + 11], framerate * 2, false);
+		animation.add(TURN_UP_TO_DOWN, [for (i in 7 * row + 8...8 * row) i], framerate, false);
+		animation.add(TURN_UP_TO_RIGHT, [5 * row + 11, 5 * row + 10, 2 * row + 9, 2 * row + 10, 2 * row + 11], framerate * 2, false);
+
+		animation.add(CHOMP_UP, [for (i in 8 * row...8 * row + 8) i], framerate);
+		animation.add(CHOMP_DOWN, [for (i in 6 * row...6 * row + 8) i], framerate);
+		animation.add(CHOMP_RIGHT, [for (i in 2 * row...2 * row + 8) i], framerate);
+		animation.add(CHOMP_LEFT, [for (i in 2 * row...2 * row + 8) i], framerate, true, true);
+
+		animation.add(FALLING, [for (i in 11 * row...11 * row + 9) i], framerate);
 
 		tail = new FlxSprite();
 		tail.loadGraphic(AssetPaths.Player__png, true, 32, 32);
-		tail.animation.add(TAIL_RIGHT, [for(i in 3*row...3*row+8) i], framerate);
-		tail.animation.add(TAIL_LEFT, [for(i in 3*row...3*row+8) i], framerate, true, true);
-		tail.animation.add(TAIL_UP, [for(i in 9*row...9*row+8) i], framerate);
-		tail.animation.add(TAIL_DOWN, [for(i in 4*row...4*row+8) i], framerate);
+		tail.animation.add(TAIL_RIGHT, [for (i in 3 * row...3 * row + 8) i], framerate);
+		tail.animation.add(TAIL_RIGHT + SLOW, [for (i in 3 * row...3 * row + 8) i], framerate / 5);
+		tail.animation.add(TAIL_LEFT, [for (i in 3 * row...3 * row + 8) i], framerate, true, true);
+		tail.animation.add(TAIL_LEFT + SLOW, [for (i in 3 * row...3 * row + 8) i], framerate / 5, true, true);
+		tail.animation.add(TAIL_UP, [for (i in 9 * row...9 * row + 8) i], framerate);
+		tail.animation.add(TAIL_UP + SLOW, [for (i in 9 * row...9 * row + 8) i], framerate / 5);
+		tail.animation.add(TAIL_DOWN, [for (i in 4 * row...4 * row + 8) i], framerate);
+		tail.animation.add(TAIL_DOWN + SLOW, [for (i in 4 * row...4 * row + 8) i], framerate / 5);
 	}
 
 	override public function update(delta:Float) {
@@ -141,6 +164,8 @@ class Player extends Moleness {
 
 		// Move the player to the next block
 		if (targetValid()) {
+			// assume we are not stopped
+			stopped = false;
 			if (curTime >= 0.0) {
 				var percentToTarget = 1.0 - curTime / totalSecondsToTarget;
 				var diffToTarget = FlxPoint.get(target.x - originalPosition.x, target.y - originalPosition.y);
@@ -154,7 +179,20 @@ class Player extends Moleness {
 				}
 			}
 
-			if (travelDir != lastDirection) {
+			// Use actual falling information from the move result
+			var falling = isFalling;
+			if (falling) {
+				var startFrame = 0;
+				if (animation.name == WALK_UP || animation.name == CHOMP_UP) {
+					startFrame = 3;
+				} else if (animation.name == WALK_DOWN || animation.name == CHOMP_DOWN) {
+					startFrame = 7;
+				}
+
+				animation.play(FALLING, startFrame);
+			}
+
+			if (!falling && travelDir != lastDirection) {
 				// need to play animation and wait for it to finish
 				switch (lastDirection) {
 					case N:
@@ -202,27 +240,31 @@ class Player extends Moleness {
 
 				inTransition = true;
 				lastDirection = travelDir;
+
+				// return early as we need to finish this animation before moving
 				return;
 			}
 
-			switch (lastDirection) {
-				case N:
-					animation.play(targetType == DIRT ? CHOMP_UP : WALK_UP);
-				case S:
-					animation.play(targetType == DIRT ? CHOMP_DOWN : WALK_DOWN);
-				case E:
-					animation.play(targetType == DIRT ? CHOMP_RIGHT : WALK_RIGHT);
-				case W:
-					animation.play(targetType == DIRT ? CHOMP_LEFT : WALK_LEFT);
-				default:
+			if (!falling) {
+				switch (lastDirection) {
+					case N:
+						animation.play(targetType == DIRT ? CHOMP_UP : WALK_UP);
+					case S:
+						animation.play(targetType == DIRT ? CHOMP_DOWN : WALK_DOWN);
+					case E:
+						animation.play(targetType == DIRT ? CHOMP_RIGHT : WALK_RIGHT);
+					case W:
+						animation.play(targetType == DIRT ? CHOMP_LEFT : WALK_LEFT);
+					default:
+				}
 			}
 
 			// Check if the player has now reached the next block
-			// TODO: This may be causing slight jitter. Not sure if it matters once animations are in place
 			if (getPosition(temp).distanceTo(target) < 1) {
 				setPosition(Math.round(target.x), Math.round(target.y));
 				target.copyFrom(Constants.NO_TARGET);
 				stopped = true;
+				isFalling = false;
 			}
 		} else {
 			// Player isn't giving input, so lets check animation stuff
@@ -256,24 +298,34 @@ class Player extends Moleness {
 
 		// Using 32, there are tiny gaps between rat and tail
 		var tailOffsets = [
-			N => FlxPoint.get(0,31),
-			S => FlxPoint.get(0,-31),
-			E => FlxPoint.get(-31,0),
-			W => FlxPoint.get(31,0),
-			NONE => FlxPoint.get(0,0),
+			N => FlxPoint.get(0, 31),
+			S => FlxPoint.get(0, -30),
+			E => FlxPoint.get(-30, 0),
+			W => FlxPoint.get(30, 0),
+			NONE => FlxPoint.get(0, 0),
 		];
 
-		switch(lastDirection) {
+		var tailAnim:String = "";
+
+		switch (lastDirection) {
 			case N:
-				tail.animation.play(TAIL_UP);
+				tailAnim = TAIL_UP;
 			case S:
-				tail.animation.play(TAIL_DOWN);
+				tailAnim = TAIL_DOWN;
 			case E:
-				tail.animation.play(TAIL_RIGHT);
+				tailAnim = TAIL_RIGHT;
 			case W:
-				tail.animation.play(TAIL_LEFT);
+				tailAnim = TAIL_LEFT;
 			default:
+				// set it to something so we don't explode
+				tailAnim = TAIL_UP;
 		}
+
+		if (stopped) {
+			tailAnim += SLOW;
+		}
+
+		tail.animation.play(tailAnim);
 
 		tail.x = x + tailOffsets.get(lastDirection).x;
 		tail.y = y + tailOffsets.get(lastDirection).y;
@@ -293,7 +345,7 @@ class Player extends Moleness {
 	}
 
 	public function getDepthIntention():Int {
-		if (hasTarget()) {
+		if (hasTarget() || isTransitioningBetweenLayers) {
 			return 0;
 		}
 		return InputCalcuator.getDepthInput();
@@ -302,6 +354,7 @@ class Player extends Moleness {
 	public function setTarget(t:MoveResult) {
 		target.copyFrom(t.target);
 		originalPosition = getPosition();
+		isFalling = t.isFalling;
 
 		var tmp = FlxVector.get();
 		getPosition(tmp).subtractPoint(target);
@@ -317,7 +370,10 @@ class Player extends Moleness {
 			// just trying to move normally
 			totalSecondsToTarget = secondsToMoveOneEmptyBlock;
 		}
-		// TODO: MW need to account for falling speed difference
+		// need to account for falling speed difference
+		if (isFalling) {
+			totalSecondsToTarget = secondsToFallOneBlock;
+		}
 		curTime = totalSecondsToTarget;
 
 		moveFollower(new FlxPoint(x, y));
