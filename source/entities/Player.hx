@@ -68,21 +68,22 @@ class Player extends Moleness {
 		animation.add(WALK_DOWN, [for(i in 5*row...5*row+8) i], framerate);
 		animation.add(WALK_UP, [for(i in 7*row...7*row+8) i], framerate);
 
-		animation.add(TURN_RIGHT_TO_UP, [0], framerate, false);
+		//good
+		animation.add(TURN_RIGHT_TO_UP, [row+9, row+10].concat([for(i in 10*row+1...10*row+5) i]), framerate * 2, false);
 		animation.add(TURN_RIGHT_TO_LEFT, [for(i in row+8...2*row) i], framerate, false);
-		animation.add(TURN_RIGHT_TO_DOWN, [0], framerate, false);
+		animation.add(TURN_RIGHT_TO_DOWN, [row+9, row+10].concat([for(i in 7*row+9...8*row) i]), framerate * 2, false);
 
-		animation.add(TURN_LEFT_TO_UP, [0], framerate, false);
+		animation.add(TURN_LEFT_TO_UP, [2*row+9, 2*row+10].concat([for(i in 10*row+1...10*row+5) i]), framerate * 2, false);
 		animation.add(TURN_LEFT_TO_RIGHT, [for(i in 2*row+8...3*row) i], framerate, false);
-		animation.add(TURN_LEFT_TO_DOWN, [0], framerate, false);
+		animation.add(TURN_LEFT_TO_DOWN, [2*row+8, 2*row+9].concat([for(i in 7*row+9...8*row) i]), framerate * 2, false);
 
-		animation.add(TURN_DOWN_TO_LEFT, [0], framerate, false);
+		animation.add(TURN_DOWN_TO_LEFT, [7*row+11, 7*row+10, row+9, row+10, row+11], framerate * 2, false);
 		animation.add(TURN_DOWN_TO_UP, [for(i in 5*row+8...6*row) i], framerate, false);
-		animation.add(TURN_DOWN_TO_RIGHT, [0], framerate, false);
+		animation.add(TURN_DOWN_TO_RIGHT, [7*row+11, 7*row+10, 2*row+9, 2*row+10, 2*row+11], framerate * 2, false);
 
-		animation.add(TURN_UP_TO_LEFT, [0], framerate, false);
+		animation.add(TURN_UP_TO_LEFT, [5*row+11, 5*row+10,row+9, row+10, row+11], framerate * 2, false);
 		animation.add(TURN_UP_TO_DOWN, [for(i in 7*row+8...8*row) i], framerate, false);
-		animation.add(TURN_UP_TO_RIGHT, [0], framerate, false);
+		animation.add(TURN_UP_TO_RIGHT, [5*row+11, 5*row+10, 2*row+9, 2*row+10, 2*row+11], framerate * 2, false);
 
 		animation.add(CHOMP_UP, [for(i in 8*row...8*row+8) i], framerate);
 		animation.add(CHOMP_DOWN, [for(i in 6*row...6*row+8) i], framerate);
