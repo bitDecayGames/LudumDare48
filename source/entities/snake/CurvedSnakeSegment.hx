@@ -5,7 +5,11 @@ import spacial.Cardinal;
 
 using extensions.FlxObjectExt;
 
-class CurvedSnakeSegment extends FlxSprite {    
+class CurvedSnakeSegment extends FlxSprite {
+
+    public static inline var LOOPS_PER_STRAIGHT_SEGMENT_LENGTH = 6;
+    public static inline var FRAMES_PER_SCALE = 4;
+
     public static function create(currentDirection:Cardinal, nextDirection: Cardinal) {
         var assetPath = "";
 
@@ -29,6 +33,18 @@ class CurvedSnakeSegment extends FlxSprite {
         }
         #end
 
-        return new CurvedSnakeSegment(0, 0, assetPath);
+        return new CurvedSnakeSegment(assetPath);
+    }
+
+    public function new(path:String) {
+        super(0, 0);
+        loadGraphic(path, true, 32, 32);
+        animation.add("move", [0,1,2,3], 10);
+        animation.play("move");
+    }
+
+    public function straightLengthsPerSecond(lps:Float) {
+        var scalesPerSecond = lps / 6;
+        animation.getByName("move").frameRate = scalesPerSecond * FRAMES_PER_SCALE;
     }
 }
