@@ -14,6 +14,8 @@ import misc.FlxTextFactory;
 import openfl.display.Sprite;
 #if play
 import states.PlayState;
+#elseif credits
+import states.CreditsState;
 #elseif mike
 import states.teststates.MikesNoisyState;
 #elseif jakect
@@ -31,6 +33,8 @@ class Main extends Sprite {
 
 		#if play
 		startingState = PlayState;
+		#elseif credits
+		startingState = CreditsState;
 		#elseif mike
 		startingState = MikesNoiseyState;
 		#elseif jakect

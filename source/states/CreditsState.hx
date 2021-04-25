@@ -1,5 +1,6 @@
 package states;
 
+import flixel.addons.ui.FlxUITypedButton;
 import config.Configure;
 import flixel.FlxG;
 import flixel.FlxObject;
@@ -11,6 +12,7 @@ import flixel.util.FlxColor;
 import haxefmod.flixel.FmodFlxUtilities;
 import helpers.UiHelpers;
 import misc.FlxTextFactory;
+import flixel.addons.ui.FlxUICursor;
 
 using extensions.FlxStateExt;
 
@@ -39,16 +41,30 @@ class CreditsState extends FlxUIState {
 	];
 
 	override public function create():Void {
+		_xml_id = "credits";
+		if (Configure.get().menus.keyboardNavigation || Configure.get().menus.controllerNavigation) {
+			_makeCursor = true;
+		}
 		super.create();
 		bgColor = backgroundColor;
 		camera.pixelPerfectRender = true;
 
 		// Button
 
-		_btnMainMenu = UiHelpers.createMenuButton("Main Menu", clickMainMenu);
-		_btnMainMenu.setPosition(FlxG.width - _btnMainMenu.width, FlxG.height - _btnMainMenu.height);
-		_btnMainMenu.updateHitbox();
-		add(_btnMainMenu);
+		if (_makeCursor) {
+			cursor.loadGraphic(AssetPaths.pointer__png, true, 32, 32);
+			cursor.animation.add("pointing", [0, 1], 3);
+			cursor.animation.play("pointing");
+
+			var keys:Int = 0;
+			if (Configure.get().menus.keyboardNavigation) {
+				keys |= FlxUICursor.KEYS_ARROWS | FlxUICursor.KEYS_WASD;
+			}
+			if (Configure.get().menus.controllerNavigation) {
+				keys |= FlxUICursor.GAMEPAD_DPAD;
+			}
+			cursor.setDefaultKeys(keys);
+		}
 
 		// Credits
 
@@ -104,6 +120,17 @@ class CreditsState extends FlxUIState {
 		center(_txtThankYou);
 		add(_txtThankYou);
 		_allCreditElements.push(_txtThankYou);
+	}
+
+	override public function getEvent(name:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>):Void {
+		if (name == FlxUITypedButton.CLICK_EVENT) {
+			var button_action:String = params[0];
+			trace('Action: "${button_action}"');
+
+			if (button_action == "main_menu") {
+				clickMainMenu();
+			}
+		}
 	}
 
 	private function AddSectionToCreditsTextArrays(role:String, creators:Array<String>, finalRoleArray:Array<FlxText>, finalCreatorsArray:Array<FlxText>) {

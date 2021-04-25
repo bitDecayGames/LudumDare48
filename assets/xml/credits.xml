@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<data>
+	<button x="-100" name="back_to_main_menu" label="Main Menu" align="center">
+		<anchor x="right"/>
+		<param type="string" value="main_menu"/>
+	</button>
+
+	<align axis="vertical" spacing="2" resize="false">
+		<!-- May need to add space if we want more objects in this alignment -->
+		<bounds top="95%" bottom="100%" left="10%" right="20%"/>
+		<objects value="back_to_main_menu"/>
+	</align>
+</data>

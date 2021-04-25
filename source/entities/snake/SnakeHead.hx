@@ -1,5 +1,6 @@
 package entities.snake;
 
+import helpers.Constants;
 import flixel.util.FlxPath;
 import flixel.FlxG;
 import flixel.math.FlxPoint;
@@ -9,12 +10,19 @@ import spacial.Cardinal;
 import flixel.FlxSprite;
 
 class SnakeHead extends FlxSprite {
+    private static final ANIMATION_IDLE = "anim_idle";
+
     var strSeg: StraightSnakeSegment;
     var map: FlxTilemap;
     var target: FlxSprite;
 
     public function new() {
-        super(0, 0, AssetPaths.head__png);
+        super();
+        loadGraphic(AssetPaths.head__png, true, Constants.TILE_SIZE, Constants.TILE_SIZE);
+        var framerate = 3;
+        animation.add(ANIMATION_IDLE, [for (i in 0...8) i], framerate);
+        animation.play(ANIMATION_IDLE);
+
         path = new FlxPath();
     }
 
