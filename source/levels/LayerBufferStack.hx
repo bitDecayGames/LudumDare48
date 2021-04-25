@@ -23,7 +23,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		super();
 		calculator = new VoxelCalculator();
 		for (i in 0...3) {
-			var l = new LayerBuffer(width, height, padding);
+			var l = new LayerBuffer(width, height, padding, calculator);
 			l.worldZ = i;
 			l.setTarget(1.0 - i * 0.05, // target scale
 				1 - i * 0.3, // target tint
@@ -35,7 +35,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			add(layers[layers.length - 1 - i]);
 		}
 		var i = -1;
-		invisibleForeLayer = new LayerBuffer(width, height, padding);
+		invisibleForeLayer = new LayerBuffer(width, height, padding, calculator);
 		invisibleForeLayer.alpha = 0.0;
 		invisibleForeLayer.worldZ = -1;
 		setEntireBufferTileTypes(invisibleForeLayer);
