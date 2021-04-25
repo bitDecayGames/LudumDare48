@@ -1,29 +1,22 @@
 package entities;
 
 import input.InputCalcuator;
-import haxe.macro.Expr.Constant;
 import flixel.math.FlxVector;
-import input.SimpleController;
 import flixel.math.FlxPoint;
-import flixel.FlxG;
 import spacial.Cardinal;
 import flixel.util.FlxColor;
-import flixel.FlxSprite;
 import helpers.Constants;
 
 using extensions.FlxPointExt;
 
-class Player extends FlxSprite {
+class Player extends Moleness {
 	var speed:Float = 240;
-	var moving:Bool;
 
-	private static var NO_TARGET = FlxPoint.get(-999, -999);
-
-	public var target:FlxPoint = FlxPoint.get().copyFrom(NO_TARGET);
+	var target:FlxPoint = FlxPoint.get().copyFrom(Constants.NO_TARGET);
 
 	var temp:FlxVector = FlxVector.get();
 
-	var moleFollowingMe:FlxSprite;
+	var molesFollowingMe:Int;
 
 	public function new() {
 		super();
@@ -33,6 +26,8 @@ class Player extends FlxSprite {
 
 	override public function update(delta:Float) {
 		super.update(delta);
+
+		molesFollowingMe = numMolesFollowingMe();
 
 		// Move the player to the next block
 		if (targetValid()) {
@@ -44,14 +39,14 @@ class Player extends FlxSprite {
 			// Check if the player has now reached the next block
 			// TODO: This may be causing slight jitter. Not sure if it matters once animations are in place
 			if (getPosition(temp).distanceTo(target) < 1) {
-				setPosition(target.x, target.y);
-				target.copyFrom(NO_TARGET);
+				setPosition(Math.round(target.x), Math.round(target.y));
+				target.copyFrom(Constants.NO_TARGET);
 			}
 		}
 	}
 
 	public function getIntention():Cardinal {
-		if (!target.equals(NO_TARGET)) {
+		if (hasTarget()) {
 			// still chasing our target
 			return Cardinal.NONE;
 		} else {
@@ -59,19 +54,23 @@ class Player extends FlxSprite {
 		}
 	}
 
+	public function hasTarget():Bool {
+		return !target.equals(Constants.NO_TARGET);
+	}
+
 	public function getDepthIntention():Int {
+		if (hasTarget()) {
+			return 0;
+		}
 		return InputCalcuator.getDepthInput();
 	}
 
 	public function setTarget(t:FlxPoint) {
 		target.copyFrom(t);
+		moveFollower(new FlxPoint(x, y));
 	}
 
 	public function targetValid():Bool {
-		return !target.equals(NO_TARGET);
-	}
-
-	public function follow(_moleFollowingMe) {
-		moleFollowingMe = _moleFollowingMe;
+		return !target.equals(Constants.NO_TARGET);
 	}
 }

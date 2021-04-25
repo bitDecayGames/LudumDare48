@@ -62,6 +62,14 @@ enum abstract Cardinal(Int) from Int to Int {
 	}
 
 	/**
+	 * Converts the cardinal direction to its opposite
+	**/
+	public function reverse():Cardinal {
+		var vec = asVector().rotate(FlxPoint.weak(), 180);
+		return closest(vec, true);
+	}
+
+	/**
 	 * Finds the closest cardinal for the given vector
 	**/
 	public static function closest(vec:FlxVector, fourDirection:Bool = false):Cardinal {
