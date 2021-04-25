@@ -86,6 +86,8 @@ class Player extends Moleness {
 
 	public var tail:FlxSprite;
 
+	public var isTransitioningBetweenLayers:Bool = false;
+
 	public function new() {
 		super();
 
@@ -343,7 +345,7 @@ class Player extends Moleness {
 	}
 
 	public function getDepthIntention():Int {
-		if (hasTarget()) {
+		if (hasTarget() || isTransitioningBetweenLayers) {
 			return 0;
 		}
 		return InputCalcuator.getDepthInput();

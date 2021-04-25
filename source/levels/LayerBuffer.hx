@@ -25,8 +25,9 @@ class LayerBuffer extends FlxTilemap {
 	public var targetTint:Float = 1.0;
 	public var targetAlpha:Float = 1.0;
 	public var secondsToTarget:Float = 1.25;
+	public var onReachedTarget:Void->Void;
 
-	private var originalScale:Float = 1.0;
+	var originalScale:Float = 1.0;
 	private var originalTint:Float = 1.0;
 	private var originalAlpha:Float = 1.0;
 
@@ -77,6 +78,10 @@ class LayerBuffer extends FlxTilemap {
 
 			if (curSeconds <= 0) {
 				setCurrent(targetScale, targetTint, targetAlpha);
+				if (onReachedTarget != null) {
+					onReachedTarget();
+					onReachedTarget = null;
+				}
 			}
 		}
 	}
