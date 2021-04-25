@@ -7,6 +7,7 @@ import flixel.math.FlxRandom;
 import flixel.math.FlxVector;
 
 using extensions.FlxObjectExt;
+using zero.extensions.FloatExt;
 
 class StraightSnakeSegment extends FlxTiledSprite {
     public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
@@ -31,8 +32,8 @@ class StraightSnakeSegment extends FlxTiledSprite {
             getAssetsPath(dir),
             0,
             0,
-            horizontal(dir),
-            vertical(dir)
+            dir.horizontal(),
+            dir.vertical()
         );
 
         direction = dir;
@@ -40,41 +41,39 @@ class StraightSnakeSegment extends FlxTiledSprite {
     }
 
     private function getAssetsPath(dir: Cardinal) {
-        if (horizontal(dir)) {
+        if (dir.horizontal()) {
             return AssetPaths.straight__png;
-        } else if (vertical(dir)) {
+        } else if (dir.vertical()) {
             return AssetPaths.straightUD__png;
         }
         throw "dir " + dir + " not supported";
     }
 
-    private function vertical(dir: Cardinal): Bool {
-        return dir == Cardinal.N || dir == Cardinal.S;
-    }
-
-    private function horizontal(dir: Cardinal): Bool {
-        return dir == Cardinal.W || dir == Cardinal.E;
-    }
-
-    public function stop(prevCurPos: FlxVector, newCurvPos: FlxVector) {
+    public function stop(prevCrv: CurvedSnakeSegment, nextCrv: CurvedSnakeSegment) {
         stopMovement = true;
 
-        // trace("prev: " + prevCurPos + ", cur: " + newCurvPos);
-
-        if (horizontal(direction)) {
-            width = prevCurPos.x - newCurvPos.x - Constants.TILE_SIZE;
-        } else if (vertical(direction)) {
-            height = prevCurPos.y - newCurvPos.y - Constants.TILE_SIZE;
+        if (direction.horizontal()) {
+            width = prevCrv.x - nextCrv.x - Constants.TILE_SIZE;
+            width = width.snap_to_grid(Constants.TILE_SIZE);
+        } else if (direction.vertical()) {
+            height = prevCrv.y - nextCrv.y - Constants.TILE_SIZE;
+            height = height.snap_to_grid(Constants.TILE_SIZE);
         }
 
-        // trace("w: " + width + ", h: " + height);
+        setPosition(x, y);
+    }
+
+    public override function setPosition(X:Float = 0, Y:Float = 0) {
+        super.setPosition(X, Y);
+        x = x.snap_to_grid(Constants.TILE_SIZE);
+        y = y.snap_to_grid(Constants.TILE_SIZE);
     }
 
     override public function update(delta:Float) {
         super.update(delta);
 
         var deltaDir = Constants.SNAKE_SPEED * delta;
-        if (horizontal(direction)) {
+        if (direction.horizontal()) {
             if (stopMovement) {
                 if (direction == Cardinal.W) {
                     scrollX -= deltaDir;
@@ -93,7 +92,7 @@ class StraightSnakeSegment extends FlxTiledSprite {
                     width += deltaDir;
                 }
             }
-        } else if (vertical(direction)) {
+        } else if (direction.vertical()) {
             if (stopMovement) {
                 if (direction == Cardinal.N) {
                     scrollY -= deltaDir;

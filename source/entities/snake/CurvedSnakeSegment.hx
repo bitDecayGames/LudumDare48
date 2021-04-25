@@ -5,8 +5,12 @@ import flixel.FlxSprite;
 import spacial.Cardinal;
 
 using extensions.FlxObjectExt;
+using zero.extensions.FloatExt;
 
 class CurvedSnakeSegment extends FlxSprite {
+    public final startDir: Cardinal;
+    public final endDir: Cardinal;
+
     public static function create(currentDirection:Cardinal, nextDirection: Cardinal) {
         var assetPath = "";
 
@@ -40,10 +44,10 @@ class CurvedSnakeSegment extends FlxSprite {
         }
         #end
 
-        return new CurvedSnakeSegment(assetPath, reverse);
+        return new CurvedSnakeSegment(assetPath, reverse, currentDirection, nextDirection);
     }
 
-    public function new(path:String, reverse:Bool) {
+    public function new(path:String, reverse:Bool, startDir: Cardinal, endDir: Cardinal) {
         super(0, 0);
         loadGraphic(path, true, 32, 32);
 
@@ -62,5 +66,14 @@ class CurvedSnakeSegment extends FlxSprite {
         }
         animation.add("move", frames, fps);
         animation.play("move");
+
+        this.startDir = startDir;
+        this.endDir = endDir;
+    }
+
+    public override function setPosition(X:Float = 0, Y:Float = 0) {
+        super.setPosition(X, Y);
+        x = x.snap_to_grid(Constants.TILE_SIZE);
+        y = y.snap_to_grid(Constants.TILE_SIZE);
     }
 }
