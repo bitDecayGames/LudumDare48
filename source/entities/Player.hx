@@ -1,5 +1,7 @@
 package entities;
 
+import flixel.FlxG;
+import input.SimpleController;
 import flixel.FlxSprite;
 import zero.extensions.StringExt;
 import helpers.TileType;
@@ -46,15 +48,19 @@ class Player extends Moleness {
 	private static inline var CHOMP_LEFT = "chompLeft";
 	private static inline var CHOMP_RIGHT = "chompRight";
 
+	private static inline var FALLING = "falling";
+
 	private static inline var TAIL_LEFT = "tailLeft";
 	private static inline var TAIL_RIGHT = "tailRight";
 	private static inline var TAIL_UP = "tailUp";
 	private static inline var TAIL_DOWN = "tailDown";
 
+	public static inline var SLOW = "Slow";
+
 	var speed:Float = 60;
-	public var secondsToMoveOneEmptyBlock:Float = 0.1;
-	public var secondsToDigOneDirtBlock:Float = 0.2;
-	public var secondsToFallOneBlock:Float = 0.05;
+	public var secondsToMoveOneEmptyBlock:Float = 0.3;
+	public var secondsToDigOneDirtBlock:Float = 0.4;
+	public var secondsToFallOneBlock:Float = 0.1;
 
 	private var totalSecondsToTarget:Float = 0.0;
 	private var curTime:Float = 0.0;
@@ -116,12 +122,18 @@ class Player extends Moleness {
 		animation.add(CHOMP_RIGHT, [for(i in 2*row...2*row+8) i], framerate);
 		animation.add(CHOMP_LEFT, [for(i in 2*row...2*row+8) i], framerate, true, true);
 
+		animation.add(FALLING, [for(i in 11*row...11*row+9) i], framerate);
+
 		tail = new FlxSprite();
 		tail.loadGraphic(AssetPaths.Player__png, true, 32, 32);
 		tail.animation.add(TAIL_RIGHT, [for(i in 3*row...3*row+8) i], framerate);
+		tail.animation.add(TAIL_RIGHT+SLOW, [for(i in 3*row...3*row+8) i], framerate / 5);
 		tail.animation.add(TAIL_LEFT, [for(i in 3*row...3*row+8) i], framerate, true, true);
+		tail.animation.add(TAIL_LEFT+SLOW, [for(i in 3*row...3*row+8) i], framerate / 5, true, true);
 		tail.animation.add(TAIL_UP, [for(i in 9*row...9*row+8) i], framerate);
+		tail.animation.add(TAIL_UP+SLOW, [for(i in 9*row...9*row+8) i], framerate / 5);
 		tail.animation.add(TAIL_DOWN, [for(i in 4*row...4*row+8) i], framerate);
+		tail.animation.add(TAIL_DOWN+SLOW, [for(i in 4*row...4*row+8) i], framerate / 5);
 	}
 
 	override public function update(delta:Float) {
@@ -141,6 +153,8 @@ class Player extends Moleness {
 
 		// Move the player to the next block
 		if (targetValid()) {
+			// assume we are not stopped
+			stopped = false;
 			if (curTime >= 0.0) {
 				var percentToTarget = 1.0 - curTime / totalSecondsToTarget;
 				var diffToTarget = FlxPoint.get(target.x - originalPosition.x, target.y - originalPosition.y);
@@ -154,7 +168,20 @@ class Player extends Moleness {
 				}
 			}
 
-			if (travelDir != lastDirection) {
+			// TODO: Use actual falling information from the move result
+			var falling = FlxG.keys.pressed.F;
+			if (falling) {
+				var startFrame = 0;
+				if (animation.name == WALK_UP || animation.name == CHOMP_UP) {
+					startFrame = 3;
+				} else if (animation.name == WALK_DOWN || animation.name == CHOMP_DOWN) {
+					startFrame = 7;
+				}
+
+				animation.play(FALLING, startFrame);
+			}
+
+			if (!falling && travelDir != lastDirection) {
 				// need to play animation and wait for it to finish
 				switch (lastDirection) {
 					case N:
@@ -202,19 +229,23 @@ class Player extends Moleness {
 
 				inTransition = true;
 				lastDirection = travelDir;
+
+				// return early as we need to finish this animation before moving
 				return;
 			}
 
-			switch (lastDirection) {
-				case N:
-					animation.play(targetType == DIRT ? CHOMP_UP : WALK_UP);
-				case S:
-					animation.play(targetType == DIRT ? CHOMP_DOWN : WALK_DOWN);
-				case E:
-					animation.play(targetType == DIRT ? CHOMP_RIGHT : WALK_RIGHT);
-				case W:
-					animation.play(targetType == DIRT ? CHOMP_LEFT : WALK_LEFT);
-				default:
+			if (!falling) {
+				switch (lastDirection) {
+					case N:
+						animation.play(targetType == DIRT ? CHOMP_UP : WALK_UP);
+					case S:
+						animation.play(targetType == DIRT ? CHOMP_DOWN : WALK_DOWN);
+					case E:
+						animation.play(targetType == DIRT ? CHOMP_RIGHT : WALK_RIGHT);
+					case W:
+						animation.play(targetType == DIRT ? CHOMP_LEFT : WALK_LEFT);
+					default:
+				}
 			}
 
 			// Check if the player has now reached the next block
@@ -257,23 +288,33 @@ class Player extends Moleness {
 		// Using 32, there are tiny gaps between rat and tail
 		var tailOffsets = [
 			N => FlxPoint.get(0,31),
-			S => FlxPoint.get(0,-31),
-			E => FlxPoint.get(-31,0),
-			W => FlxPoint.get(31,0),
+			S => FlxPoint.get(0,-30),
+			E => FlxPoint.get(-30,0),
+			W => FlxPoint.get(30,0),
 			NONE => FlxPoint.get(0,0),
 		];
 
+		var tailAnim:String = "";
+
 		switch(lastDirection) {
 			case N:
-				tail.animation.play(TAIL_UP);
+				tailAnim = TAIL_UP;
 			case S:
-				tail.animation.play(TAIL_DOWN);
+				tailAnim = TAIL_DOWN;
 			case E:
-				tail.animation.play(TAIL_RIGHT);
+				tailAnim = TAIL_RIGHT;
 			case W:
-				tail.animation.play(TAIL_LEFT);
+				tailAnim = TAIL_LEFT;
 			default:
+				// set it to something so we don't explode
+				tailAnim = TAIL_UP;
 		}
+
+		if (stopped) {
+			tailAnim += SLOW;
+		}
+
+		tail.animation.play(tailAnim);
 
 		tail.x = x + tailOffsets.get(lastDirection).x;
 		tail.y = y + tailOffsets.get(lastDirection).y;
