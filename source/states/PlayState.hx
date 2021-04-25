@@ -1,11 +1,10 @@
 package states;
 
+import entities.MoveResult;
 import flixel.FlxCamera;
-import flixel.math.FlxPoint;
 import helpers.Constants;
 import spacial.Cardinal;
 import levels.LayerBufferStack;
-import levels.VoxelCalculator;
 import flixel.addons.transition.FlxTransitionableState;
 import signals.Lifecycle;
 import entities.Player;
@@ -35,7 +34,7 @@ class PlayState extends FlxTransitionableState {
 		player.y = Constants.TILE_SIZE * 11;
 		add(player);
 
-		player.setTarget(player.getPosition());
+		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE));
 
 		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
 	}
@@ -45,17 +44,17 @@ class PlayState extends FlxTransitionableState {
 
 		if (!player.hasTarget()) {
 			// check if the player should be falling first
-			var newPlayerTarget = buffer.fallPlayer(player.getPosition());
-			if (newPlayerTarget != null) {
-				player.setTarget(newPlayerTarget);
+			var result = buffer.fallPlayer(player.getPosition());
+			if (result != null) {
+				player.setTarget(result);
 			}
 
 			// now check if the player wants to move somewhere in the current plane
 			var dir = player.getIntention();
 			if (dir != Cardinal.NONE) {
-				newPlayerTarget = buffer.movePlayer(dir, player.getPosition());
-				if (newPlayerTarget != null) {
-					player.setTarget(newPlayerTarget);
+				result = buffer.movePlayer(dir, player.getPosition());
+				if (result != null) {
+					player.setTarget(result);
 				}
 			}
 

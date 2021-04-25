@@ -4,16 +4,15 @@ import flixel.math.FlxVector;
 import flixel.math.FlxPoint;
 import helpers.Constants;
 import flixel.util.FlxColor;
-import flixel.FlxSprite;
 
 class MoleFriend extends Moleness {
-	var speed:Float = 45;
-
+	
 	public var moleIdLikeToFollow:Moleness = null;
+	public var catchUpToMILF:Bool = true;
+	public var targetList:List<FlxPoint> = new List<FlxPoint>();
 
+	var speed:Float = 45;
 	var maxDistanceFromMILF:Float = 32;
-
-	var catchUpToMILF:Bool = true;
 
 	// Directly used for movement change
 	var currentPosition:FlxPoint = FlxPoint.get();
@@ -21,8 +20,6 @@ class MoleFriend extends Moleness {
 	var moveVector:FlxVector = FlxVector.get();
 	var target:FlxPoint = FlxPoint.get();
 	var normalTarget:FlxVector = FlxVector.get();
-
-	var targetList:List<FlxPoint> = new List<FlxPoint>();
 
 	// deubg
 	var currentTime:Float = 0;
@@ -64,6 +61,7 @@ class MoleFriend extends Moleness {
 			}
 			// First time movement must catch up to MILF. Stop using this logic when close to milf.
 			else if (catchUpToMILF) {
+				// May need to check to see if the next position is available (No dirt or rock)
 				if (tooFarFromMILF()) {
 					moveVector.copyFrom(currentPosition).subtractPoint(milfPosition);
 					moveVector.normalize();
@@ -86,15 +84,14 @@ class MoleFriend extends Moleness {
 					}
 				}
 				else {
-					catchUpToMILF = true;
+					catchUpToMILF = false;
 				}
 			}
 			// After caught up to milf then movement is based off next available target given from milf.
-			// else if (targetAvailable()) {
-			// 	target.copyFrom(targetList.pop());
-
-			// 	moveFollower(currentPosition);
-			// }
+			else if (targetAvailable()) {
+				target.copyFrom(targetList.pop());
+				moveFollower(currentPosition);
+			}
 		}
 	}
 
@@ -113,7 +110,7 @@ class MoleFriend extends Moleness {
 	}
 
 	public function clearCloseTargets() {
-		if (targetList.first() != null && targetList.first().distanceTo(currentPosition) <= maxDistanceFromMILF) {
+		if (targetList.first() != null && targetList.first().distanceTo(currentPosition) < maxDistanceFromMILF) {
 			targetList.pop();
 			clearCloseTargets();
 		}
@@ -123,13 +120,6 @@ class MoleFriend extends Moleness {
 		normalTarget.copyFrom(currentPosition).subtractPoint(target).normalize();
 		x -= normalTarget.x * speed * delta;
 		y -= normalTarget.y * speed * delta;
-	}
-
-	public function moveFollower(target:FlxPoint) {
-		// Only add to follwer target list if they are not catching up to MILF (me, I'm the milf)
-		if (moleFollowingMe != null && !moleFollowingMe.catchUpToMILF) {
-			moleFollowingMe.targetList.add(target);
-		}
 	}
 
 	public function follow(_moleIdLikeToFollow:Moleness) {

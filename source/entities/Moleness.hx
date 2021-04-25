@@ -1,5 +1,6 @@
 package entities;
 
+import flixel.math.FlxPoint;
 import flixel.FlxSprite;
 import entities.MoleFriend;
 
@@ -22,6 +23,13 @@ class Moleness extends FlxSprite {
 		}
 		else {
 			return numMoles;
+		}
+	}
+
+	public function moveFollower(target:FlxPoint) {
+		// Only add to follwer target list if they are not catching up to MILF (me, I'm the milf)
+		if (moleFollowingMe != null && !moleFollowingMe.catchUpToMILF) {
+			moleFollowingMe.targetList.add(target);
 		}
 	}
 }
