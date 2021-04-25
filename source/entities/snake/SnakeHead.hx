@@ -1,13 +1,21 @@
 package entities.snake;
 
+import flixel.util.FlxPath;
+import flixel.FlxG;
+import flixel.math.FlxPoint;
+import flixel.tile.FlxBaseTilemap.FlxTilemapDiagonalPolicy;
+import flixel.tile.FlxTilemap;
 import spacial.Cardinal;
 import flixel.FlxSprite;
 
 class SnakeHead extends FlxSprite {
     var strSeg: StraightSnakeSegment;
+    var map: FlxTilemap;
+    var target: FlxSprite;
 
     public function new() {
         super(0, 0, AssetPaths.head__png);
+        path = new FlxPath();
     }
 
     public function setSegment(seg: StraightSnakeSegment) {
@@ -23,10 +31,66 @@ class SnakeHead extends FlxSprite {
         }
     }
 
+    public function setMap(m: FlxTilemap) {
+        map = m;
+        generatePath();
+    }
+
+    public function setTarget(t: FlxSprite) {
+        target = t;
+        generatePath();
+    }
+
+    public function clearTarget() {
+        target = null;
+        path.cancel();
+    }
+
+    private function generatePath() {
+        path.cancel();
+
+        if (map == null) {
+            #if debug
+            trace("map not set");
+            #end
+            return;
+        }
+        if (target == null) {
+            #if debug
+            trace("target not set");
+            #end
+            return;
+        }
+
+        var start = FlxPoint.get(x + width / 2, y + height / 2);
+        var end = FlxPoint.get(target.x + target.width / 2, target.y + target.height / 2);
+		var pathPoints:Array<FlxPoint> = map.findPath(
+			start,
+			end,
+			true,
+			false,
+			FlxTilemapDiagonalPolicy.NONE
+		);
+
+        // if pathPoints null, cannot find path
+		if (pathPoints != null) {
+			path.start(pathPoints);
+		} else {
+            #if debug
+            trace("could not generate path");
+            #end
+        }
+    }
+
     override public function update(delta: Float) {
         super.update(delta);
 
-        // var newPos = strSeg.direction.asVector().normalize().scale(strSeg.width).add(strSeg.x, strSeg.y);
+        FlxG.collide(map, this);
+
+		if (path.finished) {
+			path.cancel();
+		}
+
         var newPos = strSeg.getPosition();
         switch(strSeg.direction) {
             case N:
@@ -41,5 +105,17 @@ class SnakeHead extends FlxSprite {
                 throw 'direction ${strSeg.direction} unsupported';
         }
         setPosition(newPos.x, newPos.y);
+    }
+
+    override public function draw():Void
+    {
+        super.draw();
+
+        #if debug
+        if (!path.finished)
+        {
+            drawDebug();
+        }
+        #end
     }
 }
