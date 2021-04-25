@@ -6,6 +6,10 @@ class VoxelCalculator {
 	public var perlin:Perlin;
 	public var modified:Map<String, Int>;
 	public var scale:Float = 0.2;
+	public var leftBound:Int = -10;
+	public var rightBound:Int = 10;
+	public var foreBound:Int = 3;
+	public var backBound:Int = -3;
 
 	public function new() {
 		perlin = new Perlin();
@@ -20,6 +24,9 @@ class VoxelCalculator {
 	 * @return Int [0: empty air, 1: dirt, 2: solid rock]
 	 */
 	public function get(x:Int, y:Int, z:Int):Int {
+		if (x < leftBound || x > rightBound || z < backBound || z > foreBound) {
+			return 2;
+		}
 		if (y < 0) {
 			// return air if y is less than 0 since that means we are at ground level
 			return 0;
