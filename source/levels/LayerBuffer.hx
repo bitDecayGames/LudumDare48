@@ -120,12 +120,15 @@ class LayerBuffer extends FlxTilemap {
 		return calculator.get(worldX + X, worldY + Y, worldZ) == tileType;
 	}
 
+	public function tileIsAnyType(x:Int, y:Int, tileTypes:Array<Int>):Bool {
+		for (tileType in tileTypes) {
+			if (tileIsType(x, y, tileType)) return true;
+		}
+		return false;
+	}
+
 	public function tileToPaintWithTerrain(X:Int, Y:Int, Tile:Int):Int {
 		// See: https://web.archive.org/web/20100823062711/http://www.saltgames.com/?p=184
-		// if (!tileIsType(X,Y, Tile)) {
-		// 	throw("tileIsType said a tile is not ${Tile} but it is!");
-		// }
-
 
 		var TILE_SHEET_WIDTH = 16;
 		
@@ -141,11 +144,20 @@ class LayerBuffer extends FlxTilemap {
 		if (Tile == TileType.DUG_DIRT) tileIndex += TILE_SHEET_WIDTH * 2;
 		if (Tile == TileType.ROCK) tileIndex += TILE_SHEET_WIDTH * 3;
 		
+		// figure out what tile types to compare against
+		var tileTypesToCheck = new Array<Int>();
+		if (Tile == TileType.EMPTY_SPACE || Tile == TileType.DUG_DIRT) {
+			tileTypesToCheck.push(TileType.EMPTY_SPACE);
+			tileTypesToCheck.push(TileType.DUG_DIRT);
+		} else {
+			tileTypesToCheck.push(Tile);
+		}
+
 		// Now, use the correct style on that row based on the type of the surrounding tiles
-		if (tileIsType(X, Y - 1, Tile)) tileIndex += 1;
-		if (tileIsType(X + 1, Y, Tile)) tileIndex += 2;
-		if (tileIsType(X, Y + 1, Tile)) tileIndex += 4;
-		if (tileIsType(X - 1, Y, Tile)) tileIndex += 8;
+		if (tileIsAnyType(X, Y - 1, tileTypesToCheck)) tileIndex += 1;
+		if (tileIsAnyType(X + 1, Y, tileTypesToCheck)) tileIndex += 2;
+		if (tileIsAnyType(X, Y + 1, tileTypesToCheck)) tileIndex += 4;
+		if (tileIsAnyType(X - 1, Y, tileTypesToCheck)) tileIndex += 8;
 		return tileIndex;
 	}
 
