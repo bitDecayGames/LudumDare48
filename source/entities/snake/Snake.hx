@@ -19,11 +19,15 @@ class Snake extends FlxGroup {
         straightSegments = [];
         curvedSegments = [];
 
-        head = new SnakeHead();
+        var startDir = Cardinal.E;
+        head = new SnakeHead(startDir);
+        head.setPosition(startPos.x, startPos.y);
+        head.onNewSegment(function(prevDir, newDir) {
+            addSegment(newDir);
+        });
         add(head);
 
-        addSegment(Cardinal.E);
-        activeStraightSegment.setPosition(startPos.x, startPos.y);
+        addSegment(startDir);
     }
 
     public function setMap(m: FlxTilemap) {
@@ -75,7 +79,6 @@ class Snake extends FlxGroup {
         }
 
         activeStraightSegment = strSeg;
-        head.setSegment(activeStraightSegment);
         straightSegments.push(strSeg);
 		add(strSeg);
     }
