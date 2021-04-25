@@ -2,19 +2,15 @@ package entities;
 
 import helpers.TileType;
 import input.InputCalcuator;
-import haxe.macro.Expr.Constant;
 import flixel.math.FlxVector;
-import input.SimpleController;
 import flixel.math.FlxPoint;
-import flixel.FlxG;
 import spacial.Cardinal;
 import flixel.util.FlxColor;
-import flixel.FlxSprite;
 import helpers.Constants;
 
 using extensions.FlxPointExt;
 
-class Player extends FlxSprite {
+class Player extends Moleness {
 	private static inline var IDLE = "idle";
 	private static inline var WALK_RIGHT = "walkRight";
 	private static inline var WALK_LEFT = "walkLeft";
@@ -47,9 +43,7 @@ class Player extends FlxSprite {
 	var framerate:Int = 10;
 	var moving:Bool;
 
-	private static var NO_TARGET = FlxPoint.get(-999, -999);
-
-	public var target:FlxPoint = FlxPoint.get().copyFrom(NO_TARGET);
+	public var target:FlxPoint = FlxPoint.get().copyFrom(Constants.NO_TARGET);
 	var targetType:TileType;
 
 	var temp:FlxVector = FlxVector.get();
@@ -58,7 +52,7 @@ class Player extends FlxSprite {
 	var lastDirection:Cardinal = NONE;
 	var inTransition:Bool = false;
 
-	var moleFollowingMe:FlxSprite;
+	var molesFollowingMe:Int;
 
 	public function new() {
 		super();
@@ -106,6 +100,8 @@ class Player extends FlxSprite {
 				return;
 			}
 		}
+
+		molesFollowingMe = numMolesFollowingMe();
 
 		// Move the player to the next block
 		if (targetValid()) {
@@ -189,8 +185,8 @@ class Player extends FlxSprite {
 			// Check if the player has now reached the next block
 			// TODO: This may be causing slight jitter. Not sure if it matters once animations are in place
 			if (getPosition(temp).distanceTo(target) < 1) {
-				setPosition(target.x, target.y);
-				target.copyFrom(NO_TARGET);
+				setPosition(Math.round(target.x), Math.round(target.y));
+				target.copyFrom(Constants.NO_TARGET);
 				stopped = true;
 			}
 		} else {
@@ -205,7 +201,7 @@ class Player extends FlxSprite {
 	}
 
 	public function getIntention():Cardinal {
-		if (!target.equals(NO_TARGET)) {
+		if (hasTarget()) {
 			// still chasing our target
 			return Cardinal.NONE;
 		} else {
@@ -213,20 +209,24 @@ class Player extends FlxSprite {
 		}
 	}
 
+	public function hasTarget():Bool {
+		return !target.equals(Constants.NO_TARGET);
+	}
+
 	public function getDepthIntention():Int {
+		if (hasTarget()) {
+			return 0;
+		}
 		return InputCalcuator.getDepthInput();
 	}
 
 	public function setTarget(t:MoveResult) {
 		target.copyFrom(t.target);
 		targetType = t.moveIntoType;
+		moveFollower(new FlxPoint(x, y));
 	}
 
 	public function targetValid():Bool {
-		return !target.equals(NO_TARGET);
-	}
-
-	public function follow(_moleFollowingMe) {
-		moleFollowingMe = _moleFollowingMe;
+		return !target.equals(Constants.NO_TARGET);
 	}
 }

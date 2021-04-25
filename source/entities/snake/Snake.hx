@@ -47,10 +47,12 @@ class Snake extends FlxGroup {
     override public function update(elapsed:Float) {
 		super.update(elapsed);
 
+        #if debug
         if (FlxG.keys.justPressed.SPACE) {
             var dir = StraightSnakeSegment.randomDir(activeStraightSegment.direction);
             addSegment(dir);
         }
+        #end
 
         var x = activeStraightSegment.x + activeStraightSegment.width;
         var y = activeStraightSegment.y + activeStraightSegment.height;

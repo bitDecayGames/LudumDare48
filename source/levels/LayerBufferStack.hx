@@ -77,6 +77,31 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		return null;
 	}
 
+	public function fallPlayer(playerPos:FlxPoint):MoveResult {
+		var main = layers[0];
+
+		var bufferTarget = FlxPoint.get().copyFrom(playerPos);
+		bufferTarget.subtract(main.worldX * Constants.TILE_SIZE, main.worldY * Constants.TILE_SIZE);
+		bufferTarget.x -= 10;
+		bufferTarget.y -= 10;
+
+		var leftHand = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.W.asVector().scale(Constants.TILE_SIZE))));
+		var leftFoot = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SW.asVector().scale(Constants.TILE_SIZE))));
+		var rightHand = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.E.asVector().scale(Constants.TILE_SIZE))));
+		var rightFoot = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.SE.asVector().scale(Constants.TILE_SIZE))));
+		var peen = !isEmpty(main.get_index_from_point(FlxPoint.get().copyFrom(bufferTarget).addPoint(Cardinal.S.asVector().scale(Constants.TILE_SIZE))));
+
+		var shouldFall = !(leftHand && rightHand) && !(leftFoot && rightFoot) && !peen;
+		if (shouldFall) {
+			return movePlayer(Cardinal.S, playerPos);
+		}
+		return null;
+	}
+
+	private function isEmpty(tileType:Int):Bool {
+		return tileType == Constants.EMPTY_SPACE || tileType == Constants.DUG_DIRT;
+	}
+
 	public function switchLayer(dir:Int) {
 		if (dir != -1 && dir != 1) {
 			trace("You are not allowed to move more than one layer at a time");
