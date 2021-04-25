@@ -5,6 +5,7 @@ import flixel.FlxSprite;
 import spacial.Cardinal;
 
 using extensions.FlxObjectExt;
+using zero.extensions.FloatExt;
 
 class CurvedSnakeSegment extends FlxSprite {
     public final startDir: Cardinal;
@@ -68,5 +69,11 @@ class CurvedSnakeSegment extends FlxSprite {
 
         this.startDir = startDir;
         this.endDir = endDir;
+    }
+
+    public override function setPosition(X:Float = 0, Y:Float = 0) {
+        super.setPosition(X, Y);
+        x = x.snap_to_grid(Constants.TILE_SIZE);
+        y = y.snap_to_grid(Constants.TILE_SIZE);
     }
 }

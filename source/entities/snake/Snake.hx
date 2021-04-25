@@ -1,12 +1,12 @@
 package entities.snake;
 
+import haxe.macro.Expr.Constant;
 import flixel.util.FlxSort;
 import flixel.group.FlxSpriteGroup;
 import flixel.FlxSprite;
 import flixel.tile.FlxTilemap;
 import helpers.Constants;
 import spacial.Cardinal;
-import flixel.FlxG;
 import flixel.math.FlxVector;
 
 class Snake extends FlxSpriteGroup {
@@ -19,7 +19,9 @@ class Snake extends FlxSpriteGroup {
         super();
         straightSegments = [];
         // HACK put one curved segment off screen to start
-        curvedSegments = [CurvedSnakeSegment.create(Cardinal.S, Cardinal.E)];
+        var startCrvSeg = CurvedSnakeSegment.create(Cardinal.S, Cardinal.E);
+        startCrvSeg.x = -Constants.TILE_SIZE;
+        curvedSegments = [startCrvSeg];
 
         var startDir = Cardinal.E;
         head = new SnakeHead(startDir);

@@ -7,6 +7,7 @@ import flixel.math.FlxRandom;
 import flixel.math.FlxVector;
 
 using extensions.FlxObjectExt;
+using zero.extensions.FloatExt;
 
 class StraightSnakeSegment extends FlxTiledSprite {
     public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
@@ -53,9 +54,19 @@ class StraightSnakeSegment extends FlxTiledSprite {
 
         if (direction.horizontal()) {
             width = prevCrv.x - nextCrv.x - Constants.TILE_SIZE;
+            width = width.snap_to_grid(Constants.TILE_SIZE);
         } else if (direction.vertical()) {
             height = prevCrv.y - nextCrv.y - Constants.TILE_SIZE;
+            height = height.snap_to_grid(Constants.TILE_SIZE);
         }
+
+        setPosition(x, y);
+    }
+
+    public override function setPosition(X:Float = 0, Y:Float = 0) {
+        super.setPosition(X, Y);
+        x = x.snap_to_grid(Constants.TILE_SIZE);
+        y = y.snap_to_grid(Constants.TILE_SIZE);
     }
 
     override public function update(delta:Float) {
