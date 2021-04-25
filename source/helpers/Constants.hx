@@ -16,4 +16,6 @@ class Constants {
 	public static var AFTER_DIG:Int = DUG_DIRT;
 
 	public static var NO_TARGET:FlxPoint = FlxPoint.get(-999, -999);
+
+	public static final SNAKE_SPEED = 20;
 }

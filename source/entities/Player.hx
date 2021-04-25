@@ -1,5 +1,6 @@
 package entities;
 
+import zero.extensions.StringExt;
 import helpers.TileType;
 import input.InputCalcuator;
 import flixel.math.FlxVector;
@@ -11,7 +12,11 @@ import helpers.Constants;
 using extensions.FlxPointExt;
 
 class Player extends Moleness {
-	private static inline var IDLE = "idle";
+	private static inline var IDLE_LEFT = "idleLeft";
+	private static inline var IDLE_RIGHT = "idleRight";
+	private static inline var IDLE_UP = "idleUp";
+	private static inline var IDLE_DOWN = "idleDown";
+
 	private static inline var WALK_RIGHT = "walkRight";
 	private static inline var WALK_LEFT = "walkLeft";
 	private static inline var TURN_RIGHT_TO_LEFT = "turnRightLeft";
@@ -70,7 +75,10 @@ class Player extends Moleness {
 
 		loadGraphic(AssetPaths.Player__png, true, 32, 32);
 		var row = 12;
-		animation.add("idle", [0]);
+		animation.add(IDLE_RIGHT, [for (i in 0...8) i], framerate);
+		animation.add(IDLE_LEFT, [for (i in 0...8) i], framerate, true, true);
+		animation.add(IDLE_UP, [7 * row], framerate, true, true);
+		animation.add(IDLE_DOWN, [5 * row], framerate, true, true);
 
 		animation.add(WALK_RIGHT, [for (i in row...row + 8) i], framerate);
 		animation.add(WALK_LEFT, [for (i in row...row + 8) i], framerate, true, true);
@@ -176,13 +184,11 @@ class Player extends Moleness {
 
 				inTransition = true;
 				lastDirection = travelDir;
-				trace('started ${animation.name}');
 				return;
 			}
 
 			switch (lastDirection) {
 				case N:
-					trace("playing up");
 					animation.play(targetType == DIRT ? CHOMP_UP : WALK_UP);
 				case S:
 					animation.play(targetType == DIRT ? CHOMP_DOWN : WALK_DOWN);
@@ -203,9 +209,18 @@ class Player extends Moleness {
 		} else {
 			// Player isn't giving input, so lets check animation stuff
 			if (stopped) {
-				if (animation.name != IDLE) {
-					trace("playing idle");
-					animation.play(IDLE);
+				if (!StringExt.contains(animation.name, "idle")) {
+					switch (lastDirection) {
+						case N:
+							animation.play(IDLE_UP);
+						case S:
+							animation.play(IDLE_DOWN);
+						case E:
+							animation.play(IDLE_RIGHT);
+						case W:
+							animation.play(IDLE_LEFT);
+						default:
+					}
 				}
 			}
 		}

@@ -1,5 +1,7 @@
 package entities.snake;
 
+import flixel.FlxG;
+import helpers.Constants;
 import entities.RotatingTileSprite.RotatingTiledSprite;
 import spacial.Cardinal;
 import flixel.math.FlxRandom;
@@ -11,32 +13,12 @@ class StraightSnakeSegment extends RotatingTiledSprite {
     public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
     private static final rand = new FlxRandom();
 
-    public static function up() {
-        return new StraightSnakeSegment(Cardinal.N);
-    }
-
-    public static function down() {
-        return new StraightSnakeSegment(Cardinal.S);
-    }
-
-    public static function left() {
-        return new StraightSnakeSegment(Cardinal.W);
-    }
-
-    public static function right() {
-        return new StraightSnakeSegment(Cardinal.E);
-    }
-
     public static function randomDir(curDir: Cardinal) {
         var arrCpy = ALL_DIRECTIONS.copy();
         arrCpy.remove(curDir);
         arrCpy.remove(curDir.reverse());
         return rand.getObject(arrCpy);
     }
-
-    private static final WIDTH = 32;
-    private static final HEIGHT = 32;
-    private static final SPEED = 20;
 
     public final direction:Cardinal;
     public final directionVector:FlxVector;
@@ -45,16 +27,16 @@ class StraightSnakeSegment extends RotatingTiledSprite {
 
     public function new(direction:Cardinal) {
         super(
-            AssetPaths.straight__png, WIDTH, HEIGHT,
-            horizontal(direction),
-            vertical(direction)
+            AssetPaths.straight__png,
+            Constants.TILE_SIZE,
+            Constants.TILE_SIZE,
+            true,
+            false
         );
-        if (direction == Cardinal.W) {
-            flipY = true;
-        } else if (direction == Cardinal.N) {
-            angle = 90;
-        } else if (direction == Cardinal.S) {
+        if (direction == Cardinal.N) {
             angle = 270;
+        } else if (direction == Cardinal.S) {
+            angle = 90;
         }
         this.direction = direction;
         this.directionVector = direction.asVector();
@@ -75,23 +57,12 @@ class StraightSnakeSegment extends RotatingTiledSprite {
     override public function update(delta:Float) {
         super.update(delta);
 
-        if (horizontal(direction)) {
-            var dx = directionVector.x * SPEED * delta;
-            if (stopMovement) {
-                scrollX += dx;
-            } else {
-                width += dx;
-                scrollX = width % WIDTH;
-            }
-
-        } else if (vertical(direction)) {
-            var dy = directionVector.y * SPEED * delta;
-            if (stopMovement) {
-                scrollY += dy;
-            } else {
-                height += dy;
-                scrollY = height % HEIGHT;
-            }
+        var dx = directionVector.length * Constants.SNAKE_SPEED * delta;
+        if (stopMovement) {
+            scrollX += dx;
+        } else {
+            width += dx;
+            scrollX = width % Constants.TILE_SIZE;
         }
     }
 }
