@@ -26,7 +26,20 @@ class SnakeHead extends FlxSprite {
     override public function update(delta: Float) {
         super.update(delta);
 
-        var newPos = strSeg.direction.asVector().scale(strSeg.width).add(strSeg.x, strSeg.y);
+        // var newPos = strSeg.direction.asVector().normalize().scale(strSeg.width).add(strSeg.x, strSeg.y);
+        var newPos = strSeg.getPosition();
+        switch(strSeg.direction) {
+            case N:
+                newPos.y -= width;
+            case S:
+                newPos.y += strSeg.height;
+            case E:
+                newPos.x += strSeg.width;
+            case W:
+                newPos.x -= width;
+            default:
+                throw 'direction ${strSeg.direction} unsupported';
+        }
         setPosition(newPos.x, newPos.y);
     }
 }

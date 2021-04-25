@@ -27,8 +27,8 @@ class StraightSnakeSegment extends FlxTiledSprite {
     public function new(dir:Cardinal) {
         super(
             getAssetsPath(dir),
-            Constants.TILE_SIZE,
-            Constants.TILE_SIZE,
+            0,
+            0,
             horizontal(dir),
             vertical(dir)
         );
@@ -61,26 +61,36 @@ class StraightSnakeSegment extends FlxTiledSprite {
     override public function update(delta:Float) {
         super.update(delta);
 
-        var deltaDir = directionVector.length * Constants.SNAKE_SPEED * delta;
+        var deltaDir = Constants.SNAKE_SPEED * delta;
         if (horizontal(direction)) {
             if (stopMovement) {
-                scrollX += deltaDir;
+                if (direction == Cardinal.W) {
+                    scrollX -= deltaDir;
+                } else {
+                    scrollX += deltaDir;
+                }
             } else {
                 if (direction == Cardinal.W) {
                     x -= deltaDir;
+                } else {
+                    scrollX = width % Constants.TILE_SIZE;
                 }
                 width += deltaDir;
-                scrollX = width % Constants.TILE_SIZE;
             }
         } else if (vertical(direction)) {
             if (stopMovement) {
-                scrollY -= deltaDir;
+                if (direction == Cardinal.N) {
+                    scrollY -= deltaDir;
+                } else {
+                    scrollY += deltaDir;
+                }
             } else {
                 if (direction == Cardinal.N) {
                     y -= deltaDir;
+                } else {
+                    scrollY = height % Constants.TILE_SIZE;
                 }
                 height += deltaDir;
-                scrollY = -1 * (height % Constants.TILE_SIZE);
             }
         }
     }

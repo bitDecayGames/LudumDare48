@@ -30,14 +30,37 @@ class Snake extends FlxGroup {
         if (activeStraightSegment != null) {
             activeStraightSegment.stop();
 
-            var crvPos = activeStraightSegment.direction.asVector().scale(activeStraightSegment.width).add(activeStraightSegment.x, activeStraightSegment.y);
-
+            var crvPos = activeStraightSegment.getPosition();
+            switch(activeStraightSegment.direction) {
+                case N:
+                    crvPos.y -= Constants.TILE_SIZE;
+                case S:
+                    crvPos.y += activeStraightSegment.height;
+                case E:
+                    crvPos.x += activeStraightSegment.width;
+                case W:
+                    crvPos.x -= Constants.TILE_SIZE;
+                default:
+                    throw 'direction ${activeStraightSegment.direction} unsupported';
+            }
             var crvSeg = CurvedSnakeSegment.create(activeStraightSegment.direction, strSeg.direction);
             crvSeg.setPosition(crvPos.x, crvPos.y);
             curvedSegments.push(crvSeg);
             add(crvSeg);
 
-            var strSegVec = dir.asVector().scale(Constants.TILE_SIZE).add(crvSeg.x, crvSeg.y);
+            var strSegVec = crvSeg.getPosition();
+            switch(dir) {
+                case N:
+                    strSegVec.y -= strSeg.height;
+                case S:
+                    strSegVec.y += crvSeg.height;
+                case E:
+                    strSegVec.x += crvSeg.width;
+                case W:
+                    strSegVec.x -= strSeg.width;
+                default:
+                    throw 'direction ${strSeg.direction} unsupported';
+            }
             strSeg.setPosition(strSegVec.x, strSegVec.y);
         }
 
