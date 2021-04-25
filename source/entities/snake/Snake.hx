@@ -1,5 +1,7 @@
 package entities.snake;
 
+import flixel.FlxSprite;
+import flixel.tile.FlxTilemap;
 import helpers.Constants;
 import spacial.Cardinal;
 import flixel.FlxG;
@@ -10,7 +12,7 @@ class Snake extends FlxGroup {
     var straightSegments:Array<StraightSnakeSegment>;
     var activeStraightSegment:StraightSnakeSegment;
     var curvedSegments:Array<CurvedSnakeSegment>;
-    var head:SnakeHead;
+    public final head:SnakeHead;
 
     public function new(startPos:FlxVector) {
         super();
@@ -22,6 +24,14 @@ class Snake extends FlxGroup {
 
         addSegment(Cardinal.E);
         activeStraightSegment.setPosition(startPos.x, startPos.y);
+    }
+
+    public function setMap(m: FlxTilemap) {
+        head.setMap(m);
+    }
+
+    public function setTarget(t: FlxSprite) {
+        head.setTarget(t);
     }
 
     private function addSegment(dir: Cardinal) {
