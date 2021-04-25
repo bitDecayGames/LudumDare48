@@ -173,11 +173,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	}
 
 	public function setEntireBufferTileTypes(buffer:LayerBuffer) {
-		for (y in 0...buffer.bufHeight) {
-			for (x in 0...buffer.bufWidth) {
-				buffer.setTile(x, y, calculator.get(buffer.worldX + x, buffer.worldY + y, buffer.worldZ));
-			}
-		}
+		buffer.setEntireBufferTileTypes();
 	}
 
 	public function getWorldDataRow(x:Int, y:Int, z:Int, num:Int):Array<Int> {

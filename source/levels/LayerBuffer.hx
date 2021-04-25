@@ -55,6 +55,8 @@ class LayerBuffer extends FlxTilemap {
 		local = [for (i in 0...bufHeight) [for (k in 0...bufWidth) 1]];
 		tilemap = new FlxTilemap();
 		trace('width: ${local.length}   height: ${local[0].length}');
+		
+		loadMapFrom2DArray(localWithTerrain(), AssetPaths.tiles2__png, 32, 32);
 		reload();
 
 		tilemap.x = -32;
@@ -107,27 +109,20 @@ class LayerBuffer extends FlxTilemap {
 		return super.setTile(X, Y, tileToPaintWithTerrain(X, Y, Tile), UpdateGraphics);
 	}
 
-	public function tileToPaintSimple(X:Int, Y:Int, Tile:Int):Int {
-		// simple:
-		switch(Tile) {
-			case 0:
-				return 1;
-			case 1:
-				return 17;
-			case 2:
-				return 18;
-			default:
-				return 0;
-		}
-	}
-
 	public function tileIsType(X:Int, Y:Int, tileType:TileType):Bool {
+		trace("x, y: ",x, y);
+		trace("worldX, worldY: ", worldX, worldY);
+
 		return calculator.get(worldX + X, worldY + Y, worldZ) == tileType;
 	}
 
 	public function tileToPaintWithTerrain(X:Int, Y:Int, Tile:Int):Int {
 		// See: https://web.archive.org/web/20100823062711/http://www.saltgames.com/?p=184
-	
+		// if (!tileIsType(X,Y, Tile)) {
+		// 	throw("tileIsType said a tile is not ${Tile} but it is!");
+		// }
+
+
 		var TILE_SHEET_WIDTH = 16;
 		
 		if (Tile == TileType.DIRT) {
@@ -138,17 +133,9 @@ class LayerBuffer extends FlxTilemap {
 		var tileIndex = 0;
 
 		// Use the correct row of the tile sheet for this TileType
-		if (Tile == TileType.EMPTY_SPACE) {
-			tileIndex += TILE_SHEET_WIDTH * 1;
-		}
-
-		if (Tile == TileType.DUG_DIRT) {
-			tileIndex += TILE_SHEET_WIDTH * 2;
-		}
-
-		if (Tile == TileType.ROCK) {
-			tileIndex += TILE_SHEET_WIDTH * 3;
-		}
+		if (Tile == TileType.EMPTY_SPACE) tileIndex += TILE_SHEET_WIDTH * 1;
+		if (Tile == TileType.DUG_DIRT) tileIndex += TILE_SHEET_WIDTH * 2;
+		if (Tile == TileType.ROCK) tileIndex += TILE_SHEET_WIDTH * 3;
 		
 		// Now, use the correct style on that row based on the type of the surrounding tiles
 		if (tileIsType(X, Y - 1, Tile)) tileIndex += 1;
@@ -206,7 +193,7 @@ class LayerBuffer extends FlxTilemap {
 	}
 
 	public function reload() {
-		loadMapFrom2DArray(localWithTerrain(), AssetPaths.tiles2__png, 32, 32);
+		setEntireBufferTileTypes();
 	}
 
 	public function localWithTerrain():Array<Array<Int>> {
@@ -215,5 +202,13 @@ class LayerBuffer extends FlxTilemap {
 
 	public function dump() {
 		trace(local);
+	}
+
+	public function setEntireBufferTileTypes() {
+		for (y in 0...bufHeight) {
+			for (x in 0...bufWidth) {
+				setTile(x, y, calculator.get(worldX + x, worldY + y, worldZ));
+			}
+		}
 	}
 }
