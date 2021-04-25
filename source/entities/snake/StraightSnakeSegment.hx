@@ -1,15 +1,14 @@
 package entities.snake;
 
-import flixel.FlxG;
+import flixel.addons.display.FlxTiledSprite;
 import helpers.Constants;
-import entities.RotatingTileSprite.RotatingTiledSprite;
 import spacial.Cardinal;
 import flixel.math.FlxRandom;
 import flixel.math.FlxVector;
 
 using extensions.FlxObjectExt;
 
-class StraightSnakeSegment extends RotatingTiledSprite {
+class StraightSnakeSegment extends FlxTiledSprite {
     public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
     private static final rand = new FlxRandom();
 
@@ -25,21 +24,26 @@ class StraightSnakeSegment extends RotatingTiledSprite {
 
     private var stopMovement = false;
 
-    public function new(direction:Cardinal) {
+    public function new(dir:Cardinal) {
         super(
-            AssetPaths.straight__png,
-            Constants.TILE_SIZE,
-            Constants.TILE_SIZE,
-            true,
-            false
+            getAssetsPath(dir),
+            0,
+            0,
+            horizontal(dir),
+            vertical(dir)
         );
-        if (direction == Cardinal.N) {
-            angle = 270;
-        } else if (direction == Cardinal.S) {
-            angle = 90;
+
+        direction = dir;
+        directionVector = dir.asVector();
+    }
+
+    private function getAssetsPath(dir: Cardinal) {
+        if (horizontal(dir)) {
+            return AssetPaths.straight__png;
+        } else if (vertical(dir)) {
+            return AssetPaths.straightUD__png;
         }
-        this.direction = direction;
-        this.directionVector = direction.asVector();
+        throw "dir " + dir + " not supported";
     }
 
     private function vertical(dir: Cardinal): Bool {
@@ -57,12 +61,37 @@ class StraightSnakeSegment extends RotatingTiledSprite {
     override public function update(delta:Float) {
         super.update(delta);
 
-        var dx = directionVector.length * Constants.SNAKE_SPEED * delta;
-        if (stopMovement) {
-            scrollX += dx;
-        } else {
-            width += dx;
-            scrollX = width % Constants.TILE_SIZE;
+        var deltaDir = Constants.SNAKE_SPEED * delta;
+        if (horizontal(direction)) {
+            if (stopMovement) {
+                if (direction == Cardinal.W) {
+                    scrollX -= deltaDir;
+                } else {
+                    scrollX += deltaDir;
+                }
+            } else {
+                if (direction == Cardinal.W) {
+                    x -= deltaDir;
+                } else {
+                    scrollX = width % Constants.TILE_SIZE;
+                }
+                width += deltaDir;
+            }
+        } else if (vertical(direction)) {
+            if (stopMovement) {
+                if (direction == Cardinal.N) {
+                    scrollY -= deltaDir;
+                } else {
+                    scrollY += deltaDir;
+                }
+            } else {
+                if (direction == Cardinal.N) {
+                    y -= deltaDir;
+                } else {
+                    scrollY = height % Constants.TILE_SIZE;
+                }
+                height += deltaDir;
+            }
         }
     }
 }

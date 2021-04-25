@@ -1,5 +1,6 @@
 package entities;
 
+import flixel.FlxSprite;
 import zero.extensions.StringExt;
 import helpers.TileType;
 import input.InputCalcuator;
@@ -10,6 +11,7 @@ import flixel.util.FlxColor;
 import helpers.Constants;
 
 using extensions.FlxPointExt;
+using zero.extensions.StringExt;
 
 class Player extends Moleness {
 	private static inline var IDLE_LEFT = "idleLeft";
@@ -44,6 +46,12 @@ class Player extends Moleness {
 	private static inline var CHOMP_LEFT = "chompLeft";
 	private static inline var CHOMP_RIGHT = "chompRight";
 
+	private static inline var TAIL_LEFT = "tailLeft";
+	private static inline var TAIL_RIGHT = "tailRight";
+	private static inline var TAIL_UP = "tailUp";
+	private static inline var TAIL_DOWN = "tailDown";
+
+	var speed:Float = 60;
 	public var secondsToMoveOneEmptyBlock:Float = 0.1;
 	public var secondsToDigOneDirtBlock:Float = 0.2;
 	public var secondsToFallOneBlock:Float = 0.05;
@@ -68,6 +76,8 @@ class Player extends Moleness {
 
 	var molesFollowingMe:Int = 0;
 
+	public var tail:FlxSprite;
+
 	public function new() {
 		super();
 		makeGraphic(Constants.TILE_SIZE, Constants.TILE_SIZE, FlxColor.BLUE);
@@ -75,41 +85,49 @@ class Player extends Moleness {
 
 		loadGraphic(AssetPaths.Player__png, true, 32, 32);
 		var row = 12;
-		animation.add(IDLE_RIGHT, [for (i in 0...8) i], framerate);
-		animation.add(IDLE_LEFT, [for (i in 0...8) i], framerate, true, true);
-		animation.add(IDLE_UP, [7 * row], framerate, true, true);
-		animation.add(IDLE_DOWN, [5 * row], framerate, true, true);
+		animation.add(IDLE_RIGHT, [for(i in 0...8) i], framerate);
+		animation.add(IDLE_LEFT, [for(i in 0...8) i], framerate, true, true);
+		animation.add(IDLE_UP, [7*row], framerate, true, true);
+		animation.add(IDLE_DOWN, [5*row], framerate, true, true);
 
-		animation.add(WALK_RIGHT, [for (i in row...row + 8) i], framerate);
-		animation.add(WALK_LEFT, [for (i in row...row + 8) i], framerate, true, true);
-		animation.add(WALK_DOWN, [for (i in 5 * row...5 * row + 8) i], framerate);
-		animation.add(WALK_UP, [for (i in 7 * row...7 * row + 8) i], framerate);
+		animation.add(WALK_RIGHT, [for(i in row...row+8) i], framerate);
+		animation.add(WALK_LEFT, [for(i in row...row+8) i], framerate, true, true);
+		animation.add(WALK_DOWN, [for(i in 5*row...5*row+8) i], framerate);
+		animation.add(WALK_UP, [for(i in 7*row...7*row+8) i], framerate);
 
-		// good
-		animation.add(TURN_RIGHT_TO_UP, [row + 9, row + 10].concat([for (i in 10 * row + 1...10 * row + 5) i]), framerate * 2, false);
-		animation.add(TURN_RIGHT_TO_LEFT, [for (i in row + 8...2 * row) i], framerate, false);
-		animation.add(TURN_RIGHT_TO_DOWN, [row + 9, row + 10].concat([for (i in 7 * row + 9...8 * row) i]), framerate * 2, false);
+		animation.add(TURN_RIGHT_TO_UP, [row+9, row+10].concat([for(i in 10*row+1...10*row+5) i]), framerate * 2, false);
+		animation.add(TURN_RIGHT_TO_LEFT, [for(i in row+8...2*row) i], framerate, false);
+		animation.add(TURN_RIGHT_TO_DOWN, [row+9, row+10].concat([for(i in 7*row+9...8*row) i]), framerate * 2, false);
 
-		animation.add(TURN_LEFT_TO_UP, [2 * row + 9, 2 * row + 10].concat([for (i in 10 * row + 1...10 * row + 5) i]), framerate * 2, false);
-		animation.add(TURN_LEFT_TO_RIGHT, [for (i in 2 * row + 8...3 * row) i], framerate, false);
-		animation.add(TURN_LEFT_TO_DOWN, [2 * row + 8, 2 * row + 9].concat([for (i in 7 * row + 9...8 * row) i]), framerate * 2, false);
+		animation.add(TURN_LEFT_TO_UP, [2*row+9, 2*row+10].concat([for(i in 10*row+1...10*row+5) i]), framerate * 2, false);
+		animation.add(TURN_LEFT_TO_RIGHT, [for(i in 2*row+8...3*row) i], framerate, false);
+		animation.add(TURN_LEFT_TO_DOWN, [2*row+8, 2*row+9].concat([for(i in 7*row+9...8*row) i]), framerate * 2, false);
 
-		animation.add(TURN_DOWN_TO_LEFT, [7 * row + 11, 7 * row + 10, row + 9, row + 10, row + 11], framerate * 2, false);
-		animation.add(TURN_DOWN_TO_UP, [for (i in 5 * row + 8...6 * row) i], framerate, false);
-		animation.add(TURN_DOWN_TO_RIGHT, [7 * row + 11, 7 * row + 10, 2 * row + 9, 2 * row + 10, 2 * row + 11], framerate * 2, false);
+		animation.add(TURN_DOWN_TO_LEFT, [7*row+11, 7*row+10, row+9, row+10, row+11], framerate * 2, false);
+		animation.add(TURN_DOWN_TO_UP, [for(i in 5*row+8...6*row) i], framerate, false);
+		animation.add(TURN_DOWN_TO_RIGHT, [7*row+11, 7*row+10, 2*row+9, 2*row+10, 2*row+11], framerate * 2, false);
 
-		animation.add(TURN_UP_TO_LEFT, [5 * row + 11, 5 * row + 10, row + 9, row + 10, row + 11], framerate * 2, false);
-		animation.add(TURN_UP_TO_DOWN, [for (i in 7 * row + 8...8 * row) i], framerate, false);
-		animation.add(TURN_UP_TO_RIGHT, [5 * row + 11, 5 * row + 10, 2 * row + 9, 2 * row + 10, 2 * row + 11], framerate * 2, false);
+		animation.add(TURN_UP_TO_LEFT, [5*row+11, 5*row+10,row+9, row+10, row+11], framerate * 2, false);
+		animation.add(TURN_UP_TO_DOWN, [for(i in 7*row+8...8*row) i], framerate, false);
+		animation.add(TURN_UP_TO_RIGHT, [5*row+11, 5*row+10, 2*row+9, 2*row+10, 2*row+11], framerate * 2, false);
 
-		animation.add(CHOMP_UP, [for (i in 8 * row...8 * row + 8) i], framerate);
-		animation.add(CHOMP_DOWN, [for (i in 6 * row...6 * row + 8) i], framerate);
-		animation.add(CHOMP_RIGHT, [for (i in 2 * row...2 * row + 8) i], framerate);
-		animation.add(CHOMP_LEFT, [for (i in 2 * row...2 * row + 8) i], framerate, true, true);
+		animation.add(CHOMP_UP, [for(i in 8*row...8*row+8) i], framerate);
+		animation.add(CHOMP_DOWN, [for(i in 6*row...6*row+8) i], framerate);
+		animation.add(CHOMP_RIGHT, [for(i in 2*row...2*row+8) i], framerate);
+		animation.add(CHOMP_LEFT, [for(i in 2*row...2*row+8) i], framerate, true, true);
+
+		tail = new FlxSprite();
+		tail.loadGraphic(AssetPaths.Player__png, true, 32, 32);
+		tail.animation.add(TAIL_RIGHT, [for(i in 3*row...3*row+8) i], framerate);
+		tail.animation.add(TAIL_LEFT, [for(i in 3*row...3*row+8) i], framerate, true, true);
+		tail.animation.add(TAIL_UP, [for(i in 9*row...9*row+8) i], framerate);
+		tail.animation.add(TAIL_DOWN, [for(i in 4*row...4*row+8) i], framerate);
 	}
 
 	override public function update(delta:Float) {
 		super.update(delta);
+
+		updateTail(delta);
 
 		if (inTransition) {
 			if (animation.finished) {
@@ -224,6 +242,41 @@ class Player extends Moleness {
 				}
 			}
 		}
+	}
+
+	private function updateTail(delta:Float) {
+		tail.update(delta);
+
+		if (animation.name != null && animation.name.contains("turn")) {
+			tail.visible = false;
+			return;
+		}
+
+		tail.visible = true;
+
+		// Using 32, there are tiny gaps between rat and tail
+		var tailOffsets = [
+			N => FlxPoint.get(0,31),
+			S => FlxPoint.get(0,-31),
+			E => FlxPoint.get(-31,0),
+			W => FlxPoint.get(31,0),
+			NONE => FlxPoint.get(0,0),
+		];
+
+		switch(lastDirection) {
+			case N:
+				tail.animation.play(TAIL_UP);
+			case S:
+				tail.animation.play(TAIL_DOWN);
+			case E:
+				tail.animation.play(TAIL_RIGHT);
+			case W:
+				tail.animation.play(TAIL_LEFT);
+			default:
+		}
+
+		tail.x = x + tailOffsets.get(lastDirection).x;
+		tail.y = y + tailOffsets.get(lastDirection).y;
 	}
 
 	public function getIntention():Cardinal {
