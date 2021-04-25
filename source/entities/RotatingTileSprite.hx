@@ -1,5 +1,6 @@
 package entities;
 
+import helpers.Constants;
 import flixel.addons.display.FlxTiledSprite;
 import flixel.math.FlxPoint;
 import flixel.math.FlxVector;
@@ -10,7 +11,7 @@ class RotatingTiledSprite extends FlxTiledSprite {
 
     override public function updateVerticesData() {
         super.updateVerticesData();
-        pivotPoint.set(width / 2, height / 2);
+        pivotPoint.set(Constants.HALF_TILE_SIZE, Constants.HALF_TILE_SIZE);
 
         for (i in 1...vertices.length) {
             if (i % 2 == 0) {
