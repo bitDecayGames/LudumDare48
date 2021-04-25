@@ -25,7 +25,7 @@ class MainMenuState extends FlxUIState {
 	var _btnCredits:FlxButton;
 	var _btnExit:FlxButton;
 
-	var _txtTitle:FlxText;	
+	var _txtTitle:FlxText;
 
 	override public function create():Void {
 		_xml_id = "main_menu";
@@ -35,15 +35,15 @@ class MainMenuState extends FlxUIState {
 
 		super.create();
 
-		camera.scroll.y = camera.scroll.y-camera.height;
+		// camera.scroll.y = camera.scroll.y-camera.height;
 
-        _txtTitle = new FlxText();
-        _txtTitle.setPosition(0, camera.height-20);
-        _txtTitle.size = 20;
-        _txtTitle.alignment = FlxTextAlign.CENTER;
-        _txtTitle.text = "Text";
-        
-        add(_txtTitle);
+		// _txtTitle = new FlxText();
+		// _txtTitle.setPosition(0, camera.height - 20);
+		// _txtTitle.size = 20;
+		// _txtTitle.alignment = FlxTextAlign.CENTER;
+		// _txtTitle.text = "Text";
+
+		// add(_txtTitle);
 
 		if (_makeCursor) {
 			cursor.loadGraphic(AssetPaths.pointer__png, true, 32, 32);
@@ -103,7 +103,7 @@ class MainMenuState extends FlxUIState {
 		FmodManager.Update();
 
 		if (camera.scroll.y <= 0) {
-			camera.scroll.set(FlxG.camera.scroll.x, FlxG.camera.scroll.y+10);
+			camera.scroll.set(FlxG.camera.scroll.x, FlxG.camera.scroll.y + 10);
 		}
 
 		if (FlxG.keys.pressed.D && FlxG.keys.justPressed.M) {
@@ -120,7 +120,7 @@ class MainMenuState extends FlxUIState {
 
 		var test2 = _ui.getAsset("play_button");
 		test2.visible = false;
-		
+
 		var test3 = _ui.getAsset("credits_button");
 		test3.visible = false;
 
