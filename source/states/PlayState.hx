@@ -35,7 +35,7 @@ class PlayState extends FlxTransitionableState {
 		add(player);
 		add(player.tail);
 
-		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE));
+		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE, false));
 
 		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
 	}

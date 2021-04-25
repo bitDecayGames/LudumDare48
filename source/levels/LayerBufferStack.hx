@@ -79,7 +79,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			invisibleForeLayer.pushData(dir, getNextLevelData(dir, invisibleForeLayer));
 			invisibleForeLayer.setPosition(x, y);
 
-			return new MoveResult(worldTarget, targetTile);
+			return new MoveResult(worldTarget, targetTile, false);
 		} else {
 			// TODO: SFX tried to dig through rock here
 		}
@@ -102,7 +102,9 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 
 		var shouldFall = !(leftHand && rightHand) && !(leftFoot && rightFoot) && !peen;
 		if (shouldFall) {
-			return movePlayer(Cardinal.S, playerPos);
+			var result = movePlayer(Cardinal.S, playerPos);
+			result.isFalling = true;
+			return result;
 		}
 		return null;
 	}
