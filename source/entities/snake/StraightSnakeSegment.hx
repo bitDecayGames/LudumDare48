@@ -12,6 +12,8 @@ class StraightSnakeSegment extends FlxTiledSprite {
     public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
     private static final rand = new FlxRandom();
 
+    var trashLen = Constants.TILE_SIZE * 1.0;
+
     public static function randomDir(curDir: Cardinal) {
         var arrCpy = ALL_DIRECTIONS.copy();
         arrCpy.remove(curDir);
@@ -54,8 +56,18 @@ class StraightSnakeSegment extends FlxTiledSprite {
         return dir == Cardinal.W || dir == Cardinal.E;
     }
 
-    public function stop() {
+    public function stop(prevCurPos: FlxVector, newCurvPos: FlxVector) {
         stopMovement = true;
+
+        // trace("prev: " + prevCurPos + ", cur: " + newCurvPos);
+
+        if (horizontal(direction)) {
+            width = prevCurPos.x - newCurvPos.x - Constants.TILE_SIZE;
+        } else if (vertical(direction)) {
+            height = prevCurPos.y - newCurvPos.y - Constants.TILE_SIZE;
+        }
+
+        // trace("w: " + width + ", h: " + height);
     }
 
     override public function update(delta:Float) {
@@ -75,7 +87,11 @@ class StraightSnakeSegment extends FlxTiledSprite {
                 } else {
                     scrollX = width % Constants.TILE_SIZE;
                 }
-                width += deltaDir;
+                if (trashLen > 0) {
+                    trashLen -= deltaDir;
+                } else {
+                    width += deltaDir;
+                }
             }
         } else if (vertical(direction)) {
             if (stopMovement) {
@@ -90,7 +106,11 @@ class StraightSnakeSegment extends FlxTiledSprite {
                 } else {
                     scrollY = height % Constants.TILE_SIZE;
                 }
-                height += deltaDir;
+                if (trashLen > 0) {
+                    trashLen -= deltaDir;
+                } else {
+                    height += deltaDir;
+                }
             }
         }
     }

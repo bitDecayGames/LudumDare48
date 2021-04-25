@@ -1,14 +1,15 @@
 package entities.snake;
 
+import flixel.util.FlxSort;
+import flixel.group.FlxSpriteGroup;
 import flixel.FlxSprite;
 import flixel.tile.FlxTilemap;
 import helpers.Constants;
 import spacial.Cardinal;
 import flixel.FlxG;
 import flixel.math.FlxVector;
-import flixel.group.FlxGroup;
 
-class Snake extends FlxGroup {
+class Snake extends FlxSpriteGroup {
     var straightSegments:Array<StraightSnakeSegment>;
     var activeStraightSegment:StraightSnakeSegment;
     var curvedSegments:Array<CurvedSnakeSegment>;
@@ -17,7 +18,8 @@ class Snake extends FlxGroup {
     public function new(startPos:FlxVector) {
         super();
         straightSegments = [];
-        curvedSegments = [];
+        // HACK put one curved segment off screen to start
+        curvedSegments = [CurvedSnakeSegment.create(Cardinal.S, Cardinal.E)];
 
         var startDir = Cardinal.E;
         head = new SnakeHead(startDir);
@@ -42,8 +44,6 @@ class Snake extends FlxGroup {
         var strSeg = new StraightSnakeSegment(dir);
 
         if (activeStraightSegment != null) {
-            activeStraightSegment.stop();
-
             // var crvPos: FlxVector = head.getPosition();
             // switch(activeStraightSegment.direction) {
             //     case N:
@@ -61,6 +61,8 @@ class Snake extends FlxGroup {
             crvSeg.setPosition(head.x, head.y);
             curvedSegments.push(crvSeg);
             add(crvSeg);
+
+            activeStraightSegment.stop(curvedSegments[curvedSegments.length - 2].getPosition(), crvSeg.getPosition());
 
             var strSegVec = crvSeg.getPosition();
             switch(dir) {
@@ -85,6 +87,9 @@ class Snake extends FlxGroup {
 
     override public function update(elapsed:Float) {
 		super.update(elapsed);
+
+        // TODO Get snake head sorting above rest of snake body
+        // sort(SnakeHeadSorter.sort, FlxSort.ASCENDING);
 
         #if debug
         if (FlxG.keys.justPressed.SPACE) {
