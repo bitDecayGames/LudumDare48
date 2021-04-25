@@ -61,6 +61,29 @@ enum abstract Cardinal(Int) from Int to Int {
 		return facing;
 	}
 
+	public function opposite():Cardinal {
+		switch(this) {
+			case N:
+				return S;
+			case NE:
+				return SW;
+			case E:
+				return W;
+			case SE:
+				return NW;
+			case S:
+				return N;
+			case SW:
+				return NE;
+			case W:
+				return E;
+			case NW:
+				return SE;
+			default:
+				return NONE;
+		}
+	}
+
 	/**
 	 * Finds the closest cardinal for the given vector
 	**/
