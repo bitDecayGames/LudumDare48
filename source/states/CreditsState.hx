@@ -176,7 +176,7 @@ class CreditsState extends FlxUIState {
 	}
 
 	function clickMainMenu():Void {
-		FmodFlxUtilities.TransitionToState(new MainMenuState());
+		FmodFlxUtilities.TransitionToState(new MoleFactsState(new MainMenuState()));
 	}
 
 	override public function onFocusLost() {

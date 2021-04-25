@@ -1,5 +1,6 @@
 package entities.snake;
 
+import flixel.math.FlxVector;
 import helpers.Constants;
 import flixel.util.FlxPath;
 import flixel.FlxG;
@@ -9,28 +10,36 @@ import flixel.tile.FlxTilemap;
 import spacial.Cardinal;
 import flixel.FlxSprite;
 
+typedef NewSegmentCallback = Cardinal->Cardinal->Void;
+
 class SnakeHead extends FlxSprite {
-    var strSeg: StraightSnakeSegment;
+    private static final ANIMATION_IDLE = "anim_idle";
+
     var map: FlxTilemap;
     var target: FlxSprite;
 
-    public function new() {
+    var prevDir:Cardinal;
+    var curDir:Cardinal;
+
+    private var newSegmentCallback: NewSegmentCallback;
+
+    public function new(dir: Cardinal) {
         super();
         loadGraphic(AssetPaths.head__png, true, Constants.TILE_SIZE, Constants.TILE_SIZE);
+        var framerate = 3;
+        animation.add(ANIMATION_IDLE, [for (i in 0...8) i], framerate);
+        animation.play(ANIMATION_IDLE);
+
         path = new FlxPath();
+
+        newSegmentCallback = function(prevDir: Cardinal, newDir: Cardinal) {};
+
+        curDir = dir;
+        prevDir = curDir;
     }
 
-    public function setSegment(seg: StraightSnakeSegment) {
-        strSeg = seg;
-
-        flipX = seg.direction == Cardinal.E;
-        if (seg.direction == Cardinal.N) {
-            angle = 90;
-        } else if (seg.direction == Cardinal.S) {
-            angle = 270;
-        } else {
-            angle = 0;
-        }
+    public function onNewSegment(callback: NewSegmentCallback) {
+        newSegmentCallback = callback;
     }
 
     public function setMap(m: FlxTilemap) {
@@ -76,7 +85,7 @@ class SnakeHead extends FlxSprite {
 
         // if pathPoints null, cannot find path
 		if (pathPoints != null) {
-			path.start(pathPoints);
+			path.start(pathPoints, Constants.SNAKE_SPEED);
 		} else {
             #if debug
             trace("could not generate path");
@@ -93,20 +102,35 @@ class SnakeHead extends FlxSprite {
 			path.cancel();
 		}
 
-        var newPos = strSeg.getPosition();
-        switch(strSeg.direction) {
-            case N:
-                newPos.y -= width;
-            case S:
-                newPos.y += strSeg.height;
-            case E:
-                newPos.x += strSeg.width;
-            case W:
-                newPos.x -= width;
-            default:
-                throw 'direction ${strSeg.direction} unsupported';
+        curDir = Cardinal.closest(FlxVector.get(velocity.x, velocity.y), true);
+        if (curDir != prevDir) {
+            newSegmentCallback(prevDir, curDir);
         }
-        setPosition(newPos.x, newPos.y);
+        prevDir = curDir;
+
+        flipX = curDir == Cardinal.E;
+        if (curDir == Cardinal.N) {
+            angle = 90;
+        } else if (curDir == Cardinal.S) {
+            angle = 270;
+        } else {
+            angle = 0;
+        }
+
+        // var newPos = strSeg.getPosition();
+        // switch(strSeg.direction) {
+        //     case N:
+        //         newPos.y -= width;
+        //     case S:
+        //         newPos.y += strSeg.height;
+        //     case E:
+        //         newPos.x += strSeg.width;
+        //     case W:
+        //         newPos.x -= width;
+        //     default:
+        //         throw 'direction ${strSeg.direction} unsupported';
+        // }
+        // setPosition(newPos.x, newPos.y);
     }
 
     override public function draw():Void

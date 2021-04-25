@@ -61,6 +61,20 @@ class Configure {
 	}
 
 	/**
+	 * Helper to load mole fact entries from config.json
+	 *
+	 * @returns Array of mole fact strings
+	 */
+	public static function getMoleFacts():Array<String> {
+		if (config == null) {
+			loadConfig();
+		}
+
+		var entries:Array<String> = config.molefacts;
+		return entries;
+	}
+
+	/**
 	 * Loads all configuration from config.json
 	 */
 	private static function loadConfig() {
