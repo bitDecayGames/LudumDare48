@@ -51,7 +51,7 @@ class Player extends FlxSprite {
 	}
 
 	public function getIntention():Cardinal {
-		if (!target.equals(NO_TARGET)) {
+		if (hasTarget()) {
 			// still chasing our target
 			return Cardinal.NONE;
 		} else {
@@ -59,7 +59,14 @@ class Player extends FlxSprite {
 		}
 	}
 
+	public function hasTarget():Bool {
+		return !target.equals(NO_TARGET);
+	}
+
 	public function getDepthIntention():Int {
+		if (hasTarget()) {
+			return 0;
+		}
 		return InputCalcuator.getDepthInput();
 	}
 

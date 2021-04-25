@@ -43,16 +43,27 @@ class PlayState extends FlxTransitionableState {
 	override public function update(elapsed:Float) {
 		super.update(elapsed);
 
-		var dir = player.getIntention();
-		if (dir != Cardinal.NONE) {
-			var newPlayerTarget = buffer.movePlayer(dir, player.getPosition());
+		if (!player.hasTarget()) {
+			// check if the player should be falling first
+			var newPlayerTarget = buffer.fallPlayer(player.getPosition());
 			if (newPlayerTarget != null) {
 				player.setTarget(newPlayerTarget);
 			}
-		}
-		var depthDir = player.getDepthIntention();
-		if (depthDir != 0) {
-			buffer.switchLayer(depthDir);
+
+			// now check if the player wants to move somewhere in the current plane
+			var dir = player.getIntention();
+			if (dir != Cardinal.NONE) {
+				newPlayerTarget = buffer.movePlayer(dir, player.getPosition());
+				if (newPlayerTarget != null) {
+					player.setTarget(newPlayerTarget);
+				}
+			}
+
+			// now check if they
+			var depthDir = player.getDepthIntention();
+			if (depthDir != 0) {
+				buffer.switchLayer(depthDir);
+			}
 		}
 	}
 
