@@ -59,6 +59,10 @@ class Player extends FlxSprite {
 		}
 	}
 
+	public function getDepthIntention():Int {
+		return InputCalcuator.getDepthInput();
+	}
+
 	public function setTarget(t:FlxPoint) {
 		target.copyFrom(t);
 	}

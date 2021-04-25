@@ -1,5 +1,6 @@
 package levels;
 
+import flixel.util.FlxColor;
 import flixel.math.FlxPoint;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import helpers.Constants;
@@ -19,11 +20,17 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		super();
 		calculator = new VoxelCalculator();
 		for (i in 0...3) {
-			var l = new LayerBuffer(width, height, padding);
+			var l = new LayerBuffer(width, height, padding + (2 * i));
 			l.worldZ = i;
+			var scale = 1.0 - i * 0.1;
+			l.scale.set(scale, scale);
+			var tint = (255 * (1 - i * 0.3)).floor();
+			l.color = FlxColor.fromRGB(tint, tint, tint);
 			setEntireBufferTileTypes(l);
 			layers.push(l);
-			add(l);
+		}
+		for (i in 0...3) {
+			add(layers[layers.length - 1 - i]);
 		}
 	}
 
@@ -44,12 +51,13 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		var targetTile = main.get_index_from_point(bufferTarget);
 
 		// 2 is rocks for now... can't move into those
-		if (targetTile < 2) {
-			if (targetTile == 1) {
+		if (targetTile != Constants.ROCK) {
+			if (targetTile == Constants.DIRT) {
 				var x = (bufferTarget.x / main.get_tile_width()).floor();
 				var y = (bufferTarget.y / main.get_tile_height()).floor();
-				main.setTile(x, y, 0);
-				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ, 0);
+				main.setTile(x, y, Constants.AFTER_DIG);
+				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
+					Constants.AFTER_DIG);
 			}
 			for (i in 0...layers.length) {
 				layers[i].pushData(dir, getNextLevelData(dir, layers[i]));
@@ -59,11 +67,23 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			var x = worldTarget.x - 8 * Constants.TILE_SIZE;
 			var y = worldTarget.y - 12 * Constants.TILE_SIZE;
 			for (i in 0...layers.length) {
+				// TODO: MW instead of setting position, if we lerp to this new xy it will smooth out the snappy tilemap
 				layers[i].setPosition(x, y);
 			}
 			return worldTarget;
 		}
 		return null;
+	}
+
+	public function switchLayer(dir:Int) {
+		if (dir != -1 && dir != 1) {
+			trace("You are not allowed to move more than one layer at a time");
+			return;
+		}
+		for (i in 0...3) {
+			layers[i].worldZ += dir;
+			setEntireBufferTileTypes(layers[i]);
+		}
 	}
 
 	public function getNextLevelData(dir:Cardinal, buffer:LayerBuffer):Array<Int> {

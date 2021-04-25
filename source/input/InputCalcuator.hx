@@ -1,4 +1,6 @@
 package input;
+
+import flixel.FlxG;
 import input.SimpleController.Button;
 import flixel.math.FlxVector;
 import spacial.Cardinal;
@@ -37,5 +39,15 @@ class InputCalcuator {
 		}
 
 		return Cardinal.closest(temp, fourDirection);
+	}
+
+	public static function getDepthInput(player:Int = 0):Int {
+		if (SimpleController.just_pressed(Button.A) || FlxG.keys.justPressed.E) {
+			return 1;
+		} else if (SimpleController.just_pressed(Button.B) || FlxG.keys.justPressed.Q) {
+			return -1;
+		} else {
+			return 0;
+		}
 	}
 }
