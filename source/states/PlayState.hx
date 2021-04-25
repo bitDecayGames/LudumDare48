@@ -34,6 +34,7 @@ class PlayState extends FlxTransitionableState {
 		player.y = Constants.TILE_SIZE * 11;
 		add(player);
 		add(player.tail);
+		add(player.emitter);
 
 		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE, false));
 
