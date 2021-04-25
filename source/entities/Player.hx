@@ -1,15 +1,10 @@
 package entities;
 
-import flixel.addons.ui.FlxUI.Rounding;
 import input.InputCalcuator;
-import haxe.macro.Expr.Constant;
 import flixel.math.FlxVector;
-import input.SimpleController;
 import flixel.math.FlxPoint;
-import flixel.FlxG;
 import spacial.Cardinal;
 import flixel.util.FlxColor;
-import flixel.FlxSprite;
 import helpers.Constants;
 
 using extensions.FlxPointExt;
@@ -72,6 +67,7 @@ class Player extends Moleness {
 
 	public function setTarget(t:FlxPoint) {
 		target.copyFrom(t);
+		moveFollower(new FlxPoint(x, y));
 	}
 
 	public function targetValid():Bool {
