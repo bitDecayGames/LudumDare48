@@ -249,9 +249,7 @@ class Player extends Moleness {
 		if(animation.name != "falling" && FmodManager.IsSoundPlaying(fallingSoundId)){
 			FmodManager.StopSoundImmediately(fallingSoundId);
 			FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
-			trace("Stopped in the movement check");
 		}
-		trace("Animation: " + animation.name);
 	}
 
 	private function updateEmitter(delta:Float) {
@@ -319,7 +317,6 @@ class Player extends Moleness {
 			tailAnim += Moleness.SLOW;
 		}
 
-		// trace('starting new tail anim on frame: ${tail.animation.frameIndex}');
 		tail.animation.play(tailAnim, false, false, tail.animation.frameIndex % 8);
 	}
 
@@ -353,7 +350,6 @@ class Player extends Moleness {
 
 		if (t.changeInDepth != 0) {
 			var newTrans = new LevelTransition(z, z + t.changeInDepth, t.target);
-			trace(newTrans);
 			layerTransitions.push(newTrans);
 			z += t.changeInDepth;
 		}

@@ -82,7 +82,6 @@ class MainMenuState extends FlxUIState {
 	override public function getEvent(name:String, sender:Dynamic, data:Dynamic, ?params:Array<Dynamic>):Void {
 		if (name == FlxUITypedButton.CLICK_EVENT) {
 			var button_action:String = params[0];
-			trace('Action: "${button_action}"');
 
 			if (button_action == "play") {
 				clickPlay();
@@ -112,7 +111,7 @@ class MainMenuState extends FlxUIState {
 			}
 			lastCursorLocation = cursor.location;
 		}
-		
+
 
 		if (camera.scroll.y <= 0) {
 			camera.scroll.set(FlxG.camera.scroll.x, FlxG.camera.scroll.y + 10);

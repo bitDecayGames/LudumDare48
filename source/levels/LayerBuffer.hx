@@ -55,7 +55,10 @@ class LayerBuffer extends FlxTilemap {
 		worldY = worldYTile - padding;
 
 		local = [for (i in 0...bufHeight) [for (k in 0...bufWidth) 1]];
+
+		#if debug
 		trace('width: ${local.length}   height: ${local[0].length}');
+		#end
 
 		loadMapFrom2DArray(localWithTerrain(), AssetPaths.tiles2__png, 32, 32);
 		reload();

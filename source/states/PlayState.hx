@@ -106,7 +106,6 @@ class PlayState extends FlxTransitionableState {
 
 			if (!gameOver) {
 				gameOver = true;
-				trace("kicking off the swirl");
 				Timer.delay(() -> {
 					var swirlOut = new SwirlTransition(Trans.OUT, () -> {
 						// make sure our music is stopped;

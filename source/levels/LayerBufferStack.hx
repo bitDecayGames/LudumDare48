@@ -60,7 +60,9 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		moleFriend.x = x;
 		moleFriend.y = y;
 		moleFriend.z = layers[0].worldZ;
+		#if debug
 		trace('adding a friend at: (${x}, ${y}))');
+		#end
 		moleFriends.add(moleFriend);
 	}
 
