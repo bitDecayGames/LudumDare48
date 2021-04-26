@@ -52,7 +52,7 @@ class PlayState extends FlxTransitionableState {
 
 		#if nosnake
 		#else
-		snake = new NewSnake(FlxVector.get(-7*Constants.TILE_SIZE, 0));
+		snake = new NewSnake(FlxVector.get(-7 * Constants.TILE_SIZE, 0));
 		add(snake);
 		add(snake.searcher.tileset);
 		#end
@@ -74,6 +74,11 @@ class PlayState extends FlxTransitionableState {
 		super.update(elapsed);
 
 		FlxG.watch.addQuick('player pos:', player.getPosition());
+
+		#if nosnake
+		#else
+		snake.makePartsVisibleOrNot(buffer.layers[0].worldZ);
+		#end
 
 		if (!player.hasTarget()) {
 			if (snakeNeedsUpdate) {

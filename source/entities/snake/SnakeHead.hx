@@ -15,131 +15,138 @@ import flixel.FlxSprite;
 typedef NewSegmentCallback = Cardinal->Cardinal->Void;
 
 class SnakeHead extends FlxSprite {
-    private static final ANIMATION_IDLE = "anim_idle";
+	private static final ANIMATION_IDLE = "anim_idle";
 
-    var map: FlxTilemap;
-    var target: FlxSprite;
+	var map:FlxTilemap;
+	var target:FlxSprite;
 
-    var prevDir:Cardinal;
-    var curDir:Cardinal;
+	var prevDir:Cardinal;
+	var curDir:Cardinal;
 
-    private var newSegmentCallback: NewSegmentCallback;
+	public var z:Int = 0;
+	public var shouldBeVisible:Bool = true;
 
-    public function new(p:FlxPoint, dir: Cardinal) {
-        super(p.x, p.y);
-        loadGraphic(AssetPaths.head__png, true, Constants.TILE_SIZE, Constants.TILE_SIZE);
-        var framerate = 3;
-        animation.add(ANIMATION_IDLE, [for (i in 0...8) i], framerate);
-        animation.play(ANIMATION_IDLE);
+	private var newSegmentCallback:NewSegmentCallback;
 
-        path = new FlxPath();
-        path.cancel();
+	public function new(p:FlxPoint, dir:Cardinal) {
+		super(p.x, p.y);
+		loadGraphic(AssetPaths.head__png, true, Constants.TILE_SIZE, Constants.TILE_SIZE);
+		var framerate = 3;
+		animation.add(ANIMATION_IDLE, [for (i in 0...8) i], framerate);
+		animation.play(ANIMATION_IDLE);
 
-        newSegmentCallback = function(prevDir: Cardinal, newDir: Cardinal) {};
+		path = new FlxPath();
+		path.cancel();
 
-        curDir = dir;
-        prevDir = curDir;
-    }
+		newSegmentCallback = function(prevDir:Cardinal, newDir:Cardinal) {};
 
-    public function onNewSegment(callback: NewSegmentCallback) {
-        newSegmentCallback = callback;
-    }
+		curDir = dir;
+		prevDir = curDir;
+	}
 
-    public function hasTarget():Bool {
-        return target != null;
-    }
+	public function onNewSegment(callback:NewSegmentCallback) {
+		newSegmentCallback = callback;
+	}
 
-    public function setTarget(t: FlxSprite, searcher:SnakeSearch) {
-        target = t;
-        searcher.updateSearchSpace(this, t);
-        generatePath(searcher);
-    }
+	public function hasTarget():Bool {
+		return target != null;
+	}
 
-    public function clearTarget() {
-        target = null;
-        path.cancel();
-    }
+	public function setTarget(t:FlxSprite, searcher:SnakeSearch) {
+		target = t;
+		searcher.updateSearchSpace(this, t);
+		generatePath(searcher);
+	}
 
-    private function generatePath(searcher:SnakeSearch) {
-        path.cancel();
+	public function clearTarget() {
+		target = null;
+		path.cancel();
+	}
 
-        if (target == null) {
-            #if debug
-            trace("target not set");
-            #end
-            return;
-        }
+	private function generatePath(searcher:SnakeSearch) {
+		path.cancel();
 
-        var start = FlxPoint.get(x + width / 2, y + height / 2);
-        var end = FlxPoint.get(target.x + target.width / 2, target.y + target.height / 2);
-		var pathPoints:Array<FlxPoint> = searcher.tileset.findPath(
-			start,
-			end,
-			false,
-			false,
-			FlxTilemapDiagonalPolicy.NONE
-		);
+		if (target == null) {
+			#if debug
+			trace("target not set");
+			#end
+			return;
+		}
 
-        #if debug
-        trace('attempting pathfind from ${start} to ${end}');
-        #end
+		var start = FlxPoint.get(x + width / 2, y + height / 2);
+		var end = FlxPoint.get(target.x + target.width / 2, target.y + target.height / 2);
+		var pathPoints:Array<FlxPoint> = searcher.tileset.findPath(start, end, false, false, FlxTilemapDiagonalPolicy.NONE);
 
-        // if pathPoints null, cannot find path
+		#if debug
+		trace('attempting pathfind from ${start} to ${end}');
+		#end
+
+		// if pathPoints null, cannot find path
 		if (pathPoints != null) {
 			path.start(pathPoints, Constants.SNAKE_SPEED);
 		} else {
-            #if debug
-            trace("could not generate path");
-            #end
-        }
-    }
+			#if debug
+			trace("could not generate path");
+			#end
+		}
+	}
 
-    var targetNode:FlxPoint = FlxPoint.get().copyFrom(Constants.NO_TARGET);
+	var targetNode:FlxPoint = FlxPoint.get().copyFrom(Constants.NO_TARGET);
 
-    override public function update(delta: Float) {
-        super.update(delta);
+	override public function update(delta:Float) {
+		super.update(delta);
 
 		if (path.finished) {
 			path.cancel();
-            target = null;
+			target = null;
 		}
 
-        curDir = Cardinal.closest(FlxVector.get(velocity.x, velocity.y), true);
+		curDir = Cardinal.closest(FlxVector.get(velocity.x, velocity.y), true);
 
-        if (path != null && path.nodes.length > 0) {
-            if (!targetNode.equals(path.nodes[path.nodeIndex])) {
-                // reached a target, move to next place!
-                newSegmentCallback(prevDir, curDir);
-                targetNode.copyFrom(path.nodes[path.nodeIndex]);
-            }
+		if (path != null && path.nodes.length > 0) {
+			if (!targetNode.equals(path.nodes[path.nodeIndex])) {
+				// reached a target, move to next place!
+				newSegmentCallback(prevDir, curDir);
+				targetNode.copyFrom(path.nodes[path.nodeIndex]);
+			}
 
-            if (FlxG.overlap(this, target)) {
-                // TODO: Player got eated
-                FmodFlxUtilities.TransitionToState(new FailState());
-            }
-        }
+			if (FlxG.overlap(this, target)) {
+				// TODO: Player got eated
+				FmodFlxUtilities.TransitionToState(new FailState());
+			}
+		}
 
-        prevDir = curDir;
+		prevDir = curDir;
 
-        flipX = curDir == Cardinal.E;
-        if (curDir == Cardinal.N) {
-            angle = 90;
-        } else if (curDir == Cardinal.S) {
-            angle = 270;
-        } else {
-            angle = 0;
-        }
-    }
+		flipX = curDir == Cardinal.E;
+		if (curDir == Cardinal.N) {
+			angle = 90;
+		} else if (curDir == Cardinal.S) {
+			angle = 270;
+		} else {
+			angle = 0;
+		}
 
-    override public function draw():Void
-    {
-        super.draw();
+		if (shouldBeVisible) {
+			alpha += delta * 2;
+			if (alpha > 1.0) {
+				alpha = 1.0;
+			}
+		} else {
+			alpha -= delta * 2;
+			if (alpha < 0.0) {
+				alpha = 0.0;
+			}
+		}
+	}
 
-        #if debug
-        if (!path.finished)
-        {
-            drawDebug();
-        }
-        #end
-    }
+	override public function draw():Void {
+		super.draw();
+
+		#if debug
+		if (!path.finished) {
+			drawDebug();
+		}
+		#end
+	}
 }
