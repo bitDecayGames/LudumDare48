@@ -108,6 +108,7 @@ class PlayState extends FlxTransitionableState {
 
 			if (!gameOver) {
 				gameOver = true;
+				FmodManager.StopSong();
 				Timer.delay(() -> {
 					var swirlOut = new SwirlTransition(Trans.OUT, () -> {
 						// make sure our music is stopped;
