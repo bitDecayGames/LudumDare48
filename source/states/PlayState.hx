@@ -1,5 +1,7 @@
 package states;
 
+import flixel.math.FlxVector;
+import entities.snake.Snake;
 import entities.MoveResult;
 import flixel.FlxCamera;
 import helpers.Constants;
@@ -17,6 +19,9 @@ using Math;
 class PlayState extends FlxTransitionableState {
 	var player:Player;
 
+	var snake:Snake;
+	var snakeNeedsUpdate:Bool = false;
+
 	var buffer:LayerBufferStack;
 
 	override public function create() {
@@ -27,15 +32,18 @@ class PlayState extends FlxTransitionableState {
 		FlxG.camera.pixelPerfectRender = true;
 
 		// Buffer is 2 tiles wider and taller than the play field on purpose
-		buffer = new LayerBufferStack(14, 22, 2);
+		buffer = new LayerBufferStack(-7, -11, 14, 22, 2);
 		add(buffer);
 
 		player = new Player();
-		player.x = Constants.TILE_SIZE * 7;
-		player.y = Constants.TILE_SIZE * 11;
 		add(player);
 		add(player.tail);
 		add(player.emitter);
+
+		buffer.repositionLayers(Cardinal.NONE, player.getPosition());
+
+		snake = new Snake(FlxVector.get());
+		add(snake);
 
 		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE, false));
 
@@ -45,6 +53,16 @@ class PlayState extends FlxTransitionableState {
 	override public function update(elapsed:Float) {
 		super.update(elapsed);
 
+		if (!player.hasTarget()) {
+			if (snakeNeedsUpdate) {
+				trace('updating snake to pursue location: ${player.getPosition()}');
+				snake.setMap(buffer.layers[0]);
+				snake.setTarget(player);
+				snakeNeedsUpdate = false;
+			}
+		} else {
+			snakeNeedsUpdate = true;
+		}
 		if (!player.hasTarget() && !player.isTransitioningBetweenLayers) {
 			// check if the player should be falling first (only if not currently transitioning between layers)
 			var result = buffer.fallPlayer(player.getPosition());
