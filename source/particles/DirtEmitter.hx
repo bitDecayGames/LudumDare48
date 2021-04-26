@@ -26,6 +26,8 @@ class DirtEmitter extends FlxEmitter {
 				this.angle.set(NE, SE);
 			case W:
 				this.angle.set(SW, NW);
+			case NONE:
+				this.angle.set(0, 0);
 			default:
 		}
 	}
