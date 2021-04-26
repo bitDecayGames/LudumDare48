@@ -56,6 +56,11 @@ class VoxelCalculator {
 		}
 		if (y > downBound) {
 			if (y < queenBound) {
+				if (x < leftBound + 3 || x > rightBound - 6) {
+					// return rocks to funnel the player to the queen
+					return 2;
+				}
+
 				// return air for the player to fall into
 				return 0;
 			} else {
