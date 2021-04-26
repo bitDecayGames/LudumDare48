@@ -376,7 +376,7 @@ class Player extends Moleness {
 		}
 		curTime = totalSecondsToTarget;
 
-		moveFollower(MoleTarget.fromPoint(FlxPoint.get(x, y), totalSecondsToTarget, z));
+		moveFollower(MoleTarget.fromPoint(FlxPoint.get(x, y), totalSecondsToTarget, z, t.dir));
 	}
 
 	public function targetValid():Bool {

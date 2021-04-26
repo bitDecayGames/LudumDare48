@@ -1,5 +1,6 @@
 package entities.snake;
 
+import haxe.Timer;
 import states.FailState;
 import haxefmod.flixel.FmodFlxUtilities;
 import flixel.math.FlxVector;
@@ -132,7 +133,8 @@ class SnakeHead extends FlxSprite {
 			}
 
 			if (FlxG.overlap(this, player)) {
-				FmodFlxUtilities.TransitionToState(new FailState());
+                FmodManager.PlaySoundOneShot(FmodSFX.SnakeEatMole);
+                FmodFlxUtilities.TransitionToState(new FailState());
 			}
 		}
 
