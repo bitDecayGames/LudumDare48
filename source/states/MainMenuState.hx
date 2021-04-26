@@ -125,7 +125,7 @@ class MainMenuState extends FlxUIState {
 				// make sure our music is stopped;
 				FmodManager.StopSongImmediately();
 				FlxG.switchState(new MoleFactsState(new PlayState()));
-			}, FlxColor.GRAY);
+			});
 			openSubState(swirlOut);
 		}, 500);
 	}
