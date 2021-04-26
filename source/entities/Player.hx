@@ -1,5 +1,6 @@
 package entities;
 
+import entities.Moleness.MoleTarget;
 import flixel.FlxG;
 import input.SimpleController;
 import particles.DirtEmitter;
@@ -429,7 +430,7 @@ class Player extends Moleness {
 		}
 		curTime = totalSecondsToTarget;
 
-		moveFollower(new FlxPoint(x, y));
+		moveFollower(MoleTarget.fromPoint(FlxPoint.get(x, y), totalSecondsToTarget));
 	}
 
 	public function targetValid():Bool {
