@@ -1,5 +1,7 @@
 package states;
 
+import levels.VoxelCalculator;
+import flixel.FlxSprite;
 import metrics.Metrics;
 import helpers.TileType;
 import entities.snake.NewSnake;
@@ -38,11 +40,18 @@ class PlayState extends FlxTransitionableState {
 		FlxG.camera.pixelPerfectRender = true;
 
 		var milfs = new FlxTypedGroup<MoleFriend>();
+
 		// Buffer is 2 tiles wider and taller than the play field on purpose
 		buffer = new LayerBufferStack(-7, -11, 14, 22, 2, milfs);
 		add(buffer);
 
+		var queen = new FlxSprite(AssetPaths.queen__png);
+		queen.x = -queen.width/2;
+		queen.y = (VoxelCalculator.queenBound + 1.5) * Constants.TILE_SIZE - queen.height;
+
+		add(queen);
 		add(milfs);
+
 		player = new Player();
 		add(player);
 		add(player.tail);
@@ -73,7 +82,19 @@ class PlayState extends FlxTransitionableState {
 	override public function update(elapsed:Float) {
 		super.update(elapsed);
 
-		FlxG.watch.addQuick('player pos:', player.getPosition());
+		// slightly past the downBound
+		if (player.y >= (VoxelCalculator.downBound + 4) * Constants.TILE_SIZE) {
+			// game has ended! Great success!
+			snake.active = false;
+			if (!player.hasTarget()) {
+				// make sure the player gets down to the QUEEN
+				var result = buffer.fallPlayer(player.getPosition(), snake);
+				if (result != null) {
+					player.setTarget(result);
+				}
+			}
+			return;
+		}
 
 		#if nosnake
 		#else

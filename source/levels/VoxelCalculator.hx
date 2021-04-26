@@ -9,10 +9,18 @@ class VoxelCalculator {
 	public var perlin:Perlin;
 	public var modified:Map<String, Int>;
 	public var scale:Float = 0.2;
-	public var leftBound:Int = -10;
-	public var rightBound:Int = 10;
-	public var foreBound:Int = 3;
-	public var backBound:Int = -3;
+	public static inline var leftBound:Int = -10;
+	public static inline var rightBound:Int = 10;
+	public static inline var foreBound:Int = 3;
+	public static inline var backBound:Int = -3;
+
+	#if dirt
+	public static inline var downBound:Int = 15;
+	public static inline var queenBound:Int = 25;
+	#else
+	public static inline var downBound:Int = 150;
+	public static inline var queenBound:Int = 160;
+	#end
 
 	public function new() {
 		perlin = new Perlin();
@@ -34,6 +42,15 @@ class VoxelCalculator {
 			// return air if y is less than 0 since that means we are at ground level
 			return 0;
 		}
+		if (y > downBound) {
+			if (y < queenBound) {
+				// return air for the player to fall into
+				return 0;
+			} else {
+				return 1;
+			}
+		}
+
 		var key = getKey(x, y, z);
 		if (modified.exists(key)) {
 			return modified.get(key);
