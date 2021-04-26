@@ -1,5 +1,6 @@
 package levels;
 
+import haxe.macro.Expr.Constant;
 import helpers.TileType;
 import entities.MoveResult;
 import flixel.util.FlxColor;
@@ -8,16 +9,24 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import helpers.Constants;
 import spacial.Cardinal;
 import flixel.tile.FlxTilemap;
-
+import entities.MoleFriend;
+import entities.Player;
+import states.PlayState;
 using extensions.FlxStateExt;
 using zero.flixel.extensions.FlxTilemapExt;
 using Math;
+import flixel.math.FlxRandom;
 
 class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
+	private static final rand = new FlxRandom();
+
 	public var layers:Array<LayerBuffer> = new Array<LayerBuffer>();
 	public var invisibleForeLayer:LayerBuffer;
 
 	public var calculator:VoxelCalculator;
+	public var moleFriends:Array<MoleFriend>;
+	public var playState:PlayState;
+	public var deepestY:Int;
 
 	public function new(width:Int, height:Int, padding:Int) {
 		super();
@@ -40,6 +49,43 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		invisibleForeLayer.worldZ = -1;
 		setEntireBufferTileTypes(invisibleForeLayer);
 		add(invisibleForeLayer);
+		moleFriends = new Array<MoleFriend>();
+		deepestY = 10;
+	}
+
+	public function addMoleFriend(x:Int, y:Int) {
+		var moleFriend = new MoleFriend();
+		moleFriend.x = x;
+		moleFriend.y = y;
+		trace('adding a friend at: (${x}, ${y}))');
+		moleFriends.push(moleFriend);
+		playState.add(moleFriend);
+	}
+
+	public function spawnMoleFriend(tileY:Int) {
+		var main = layers[0];
+		trace('trying to spawn a friend');
+		if (rand.float(0, 1) > .99) {
+			trace('not spawning due to probability');
+			return;
+		}
+		trace('bufWidth: ${main.bufWidth}');
+		for (tileX in 0...main.bufWidth) {
+			trace('checking if (${tileX}, ${tileY}) is empty');
+			if (main.tileIsType(tileX, tileY, TileType.EMPTY_SPACE)) {
+				trace('found a place to put a friend');
+				addMoleFriend(tileX * Constants.TILE_SIZE, tileY * Constants.TILE_SIZE);
+				break;
+			} 
+		}
+	}
+
+	public function makeFriendsFollowPlayer(player:Player) {
+		for (moleFriend in moleFriends) {
+			if (player.x == moleFriend.x && player.y == moleFriend.y && moleFriend.moleIdLikeToFollow == null) {
+				player.setFollower(moleFriend);
+			}
+		}
 	}
 
 	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):MoveResult {
@@ -57,7 +103,6 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		bufferTarget.y -= 10;
 
 		var targetTile = main.getTileTypeFromPoint(bufferTarget);
-		trace("targetTile: ", targetTile);
 
 		// 2 is rocks for now... can't move into those
 		if (targetTile != TileType.ROCK) {
@@ -79,7 +124,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			}
 			invisibleForeLayer.pushData(dir, getNextLevelData(dir, invisibleForeLayer));
 			invisibleForeLayer.setPosition(x, y);
-
+		
 			return new MoveResult(worldTarget, targetTile, false);
 		} else {
 			// TODO: SFX tried to dig through rock here
@@ -187,8 +232,13 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 
 	public function getWorldDataRow(x:Int, y:Int, z:Int, num:Int):Array<Int> {
 		var tiles:Array<Int> = [];
+	
+		
 		for (i in 0...num) {
 			tiles.push(calculator.get(x + i, y, z));
+		}
+		if (y > deepestY) {
+			spawnMoleFriend(x);
 		}
 		return tiles;
 	}

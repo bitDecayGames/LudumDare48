@@ -363,7 +363,7 @@ class Player extends Moleness {
 			tailAnim += SLOW;
 		}
 
-		trace('starting new tail anim on frame: ${tail.animation.frameIndex}');
+		//trace('starting new tail anim on frame: ${tail.animation.frameIndex}');
 		tail.animation.play(tailAnim, false, false, tail.animation.frameIndex % 8);
 	}
 
