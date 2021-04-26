@@ -65,9 +65,9 @@ class PlayState extends FlxTransitionableState {
 
 		buffer.repositionLayers(Cardinal.NONE, player.getPosition());
 
+		snake = new NewSnake(FlxVector.get(-7 * Constants.TILE_SIZE, 0));
 		#if nosnake
 		#else
-		snake = new NewSnake(FlxVector.get(-7 * Constants.TILE_SIZE, 0));
 		add(snake);
 		add(snake.searcher.tileset);
 		#end
