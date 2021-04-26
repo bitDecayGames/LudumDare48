@@ -50,7 +50,7 @@ class SnakeSearch {
 		trace('search space is from (${spaceX}, ${spaceY}) size ${spaceWidth}x${spaceHeight}');
 		#end
 
-		tileset.loadMapFrom2DArray(VoxelCalculator.instance.getBlock(spaceX, spaceY, 0, spaceWidth, spaceHeight), AssetPaths.testTiles__png);
+		tileset.loadMapFrom2DArray(VoxelCalculator.instance.getBlock(spaceX, spaceY, snake.z, spaceWidth, spaceHeight), AssetPaths.testTiles__png);
 
 		// position this so it renders properly if needed
 		tileset.x = (spaceX+1) * Constants.TILE_SIZE;

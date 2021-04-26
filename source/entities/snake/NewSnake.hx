@@ -17,12 +17,14 @@ class NewSnake extends FlxSpriteGroup {
 
 	var segGroup = new FlxSpriteGroup();
 
-	var target:FlxSprite;
+	public var player:Player;
 
-	public function new(pos:FlxPoint) {
+	public function new(pos:FlxPoint, player:Player) {
 		super();
 		searcher = new SnakeSearch();
+		this.player = player;
 		head = new SnakeHead(pos, E);
+		head.player = player;
 		head.onNewSegment(function(prevDir, newDir) {
 			addSegment(prevDir, newDir);
 		});
@@ -51,9 +53,8 @@ class NewSnake extends FlxSpriteGroup {
 		return false;
 	}
 
-	public function setTarget(t:FlxSprite) {
-		target = t;
-		head.setTarget(target, searcher);
+	public function updatePathing() {
+		head.updatePathing(searcher);
 	}
 
 	private function addSegment(inDir:Cardinal, outDir:Cardinal) {

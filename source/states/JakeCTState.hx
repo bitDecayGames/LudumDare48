@@ -39,7 +39,7 @@ class JakeCTState extends FlxTransitionableState {
 		add(goal);
 
 		// snake.setMap(map);
-		snake.setTarget(goal);
+		// snake.setTarget(goal);
 	}
 
 	override public function update(elapsed:Float) {
