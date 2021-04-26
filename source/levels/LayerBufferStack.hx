@@ -64,20 +64,25 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		playState.add(moleFriend);
 	}
 
-	public function spawnMoleFriend(tileY:Int) {
+	public function spawnMoleFriend(tileY:Int):Bool {
 		var main = layers[0];
-		// if (rand.float(0, 1) > .99) {
-		// 	return;
-		// }
-		trace('trying to spawn a friend at ' + tileY);
-		for (tileX in 0...main.bufWidth) {
+		if (rand.float(0, 1) > .5) {
+			return false;
+		}
+		var emptys:Array<Int> = [];
+		for (tileX in -main.bufWidth...main.bufWidth) {
 			// had to subtract worldX and worldY so that we normalize, because this method adds them back in and we don't want to add twice
-			if (main.tileIsType(tileX - main.worldX, tileY - main.worldY, TileType.EMPTY_SPACE)) {
-				trace('found a place to put a friend ' + tileX + ", " + tileY);
-				addMoleFriend(tileX * Constants.TILE_SIZE, tileY * Constants.TILE_SIZE);
-				// break;
+			if (main.tileIsType(tileX - main.worldX, tileY - main.worldY, TileType.EMPTY_SPACE)
+				&& !main.tileIsType(tileX - main.worldX, tileY + 1 - main.worldY, TileType.EMPTY_SPACE)) {
+				emptys.push(tileX);
 			}
 		}
+		if (emptys.length > 0) {
+			var tileX = emptys[rand.int(0, emptys.length)];
+			addMoleFriend((tileX + 1) * Constants.TILE_SIZE, (tileY + 1) * Constants.TILE_SIZE);
+			return true;
+		}
+		return false;
 	}
 
 	public function makeFriendsFollowPlayer(player:Player) {
@@ -106,17 +111,22 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 
 		// 2 is rocks for now... can't move into those
 		if (targetTile != TileType.ROCK) {
+			var tileX = ((worldTarget.x - 10) / Constants.TILE_SIZE).floor();
+			var tileY = ((worldTarget.y - 10) / Constants.TILE_SIZE).floor();
 			if (targetTile == TileType.DIRT) {
 				var x = (bufferTarget.x / main.get_tile_width()).floor();
 				var y = (bufferTarget.y / main.get_tile_height()).floor();
 				main.setTile(x, y, TileType.DUG_DIRT);
-				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
-					Constants.AFTER_DIG);
+				calculator.set(tileX, tileY, main.worldZ, Constants.AFTER_DIG);
 				// TODO: SFX dug through dirt here
 				FmodManager.PlaySoundOneShot(FmodSFX.MoleDig);
 			}
 
 			repositionLayers(dir, worldTarget);
+
+			if (dir == Cardinal.S) {
+				spawnFollower(main.worldY + main.bufHeight + 1);
+			}
 
 			return new MoveResult(worldTarget, targetTile, false);
 		} else {
@@ -245,11 +255,17 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		for (i in 0...num) {
 			tiles.push(calculator.get(x + i, y, z));
 		}
-		// if (y - 5 > deepestY) {
-		spawnMoleFriend(y - 5);
-		deepestY = y; // TODO: MW add 10 or so to this so that you have to travel another 10 rows down
-		// }
 		return tiles;
+	}
+
+	public function spawnFollower(y:Int) {
+		if (y > deepestY) {
+			if (spawnMoleFriend(y)) {
+				deepestY = y + 5;
+			} else {
+				deepestY = y;
+			}
+		}
 	}
 
 	public function getWorldDataColumn(x:Int, y:Int, z:Int, num:Int):Array<Int> {

@@ -10,7 +10,6 @@ import helpers.Constants;
 using Math;
 
 class LayerBuffer extends FlxTilemap {
-
 	// the world x of the top-left corner of the buffer
 	public var worldX:Int;
 
@@ -39,6 +38,7 @@ class LayerBuffer extends FlxTilemap {
 	var local:Array<Array<Int>> = new Array<Array<Int>>();
 
 	public var calculator:VoxelCalculator;
+
 	/**
 	 * @param width	main buffer width
 	 * @param height main buffer height
@@ -51,8 +51,8 @@ class LayerBuffer extends FlxTilemap {
 		bufHeight = height + 2 * padding;
 
 		// we added padding, so the world coords of our top left need to take padding into account
-		worldX = worldXTile-padding;
-		worldY = worldYTile-padding;
+		worldX = worldXTile - padding;
+		worldY = worldYTile - padding;
 
 		local = [for (i in 0...bufHeight) [for (k in 0...bufWidth) 1]];
 		trace('width: ${local.length}   height: ${local[0].length}');
@@ -117,7 +117,8 @@ class LayerBuffer extends FlxTilemap {
 
 	public function tileIsAnyType(x:Int, y:Int, tileTypes:Array<Int>):Bool {
 		for (tileType in tileTypes) {
-			if (tileIsType(x, y, tileType)) return true;
+			if (tileIsType(x, y, tileType))
+				return true;
 		}
 		return false;
 	}
@@ -135,9 +136,12 @@ class LayerBuffer extends FlxTilemap {
 		var tileIndex = 0;
 
 		// Use the correct row of the tile sheet for this TileType
-		if (Tile == TileType.EMPTY_SPACE) tileIndex += TILE_SHEET_WIDTH * 1;
-		if (Tile == TileType.DUG_DIRT) tileIndex += TILE_SHEET_WIDTH * 2;
-		if (Tile == TileType.ROCK) tileIndex += TILE_SHEET_WIDTH * 3;
+		if (Tile == TileType.EMPTY_SPACE)
+			tileIndex += TILE_SHEET_WIDTH * 1;
+		if (Tile == TileType.DUG_DIRT)
+			tileIndex += TILE_SHEET_WIDTH * 2;
+		if (Tile == TileType.ROCK)
+			tileIndex += TILE_SHEET_WIDTH * 3;
 
 		// figure out what tile types to compare against
 		var tileTypesToCheck = new Array<Int>();
@@ -149,10 +153,14 @@ class LayerBuffer extends FlxTilemap {
 		}
 
 		// Now, use the correct style on that row based on the type of the surrounding tiles
-		if (tileIsAnyType(X, Y - 1, tileTypesToCheck)) tileIndex += 1;
-		if (tileIsAnyType(X + 1, Y, tileTypesToCheck)) tileIndex += 2;
-		if (tileIsAnyType(X, Y + 1, tileTypesToCheck)) tileIndex += 4;
-		if (tileIsAnyType(X - 1, Y, tileTypesToCheck)) tileIndex += 8;
+		if (tileIsAnyType(X, Y - 1, tileTypesToCheck))
+			tileIndex += 1;
+		if (tileIsAnyType(X + 1, Y, tileTypesToCheck))
+			tileIndex += 2;
+		if (tileIsAnyType(X, Y + 1, tileTypesToCheck))
+			tileIndex += 4;
+		if (tileIsAnyType(X - 1, Y, tileTypesToCheck))
+			tileIndex += 8;
 		return tileIndex;
 	}
 
@@ -167,7 +175,7 @@ class LayerBuffer extends FlxTilemap {
 			case W:
 				pushOntoLeft(data);
 			case NONE:
-				// nothing to do
+			// nothing to do
 			default:
 				throw('cannot request level data for direction ${dir}');
 		}
@@ -210,7 +218,9 @@ class LayerBuffer extends FlxTilemap {
 	}
 
 	public function localWithTerrain():Array<Array<Int>> {
-		return [for (i in 0...bufHeight) [for (k in 0...bufWidth) tileToPaintWithTerrain(i, k, local[i][k])]];
+		return [
+			for (i in 0...bufHeight) [for (k in 0...bufWidth) tileToPaintWithTerrain(i, k, local[i][k])]
+		];
 	}
 
 	public function dump() {
