@@ -238,7 +238,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			tiles.push(calculator.get(x + i, y, z));
 		}
 		if (y > deepestY) {
-			spawnMoleFriend(x);
+			spawnMoleFriend(y);
 		}
 		return tiles;
 	}
