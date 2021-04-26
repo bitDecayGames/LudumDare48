@@ -42,14 +42,10 @@ class SnakeHead extends FlxSprite {
         newSegmentCallback = callback;
     }
 
-    public function setMap(m: FlxTilemap) {
-        map = m;
-        generatePath();
-    }
-
-    public function setTarget(t: FlxSprite) {
+    public function setTarget(t: FlxSprite, searcher:SnakeSearch) {
         target = t;
-        generatePath();
+        searcher.updateSearchSpace(this, t);
+        generatePath(searcher);
     }
 
     public function clearTarget() {
@@ -57,15 +53,20 @@ class SnakeHead extends FlxSprite {
         path.cancel();
     }
 
-    private function generatePath() {
+    private var interval = 2;
+    private var count = 0;
+
+    private function generatePath(searcher:SnakeSearch) {
+        // XXX: Stuff hella-breaks if we call this every time the player moves. This slows it down.
+        count--;
+        if (count > 0) {
+            return;
+        } else {
+            count = interval;
+        }
+
         path.cancel();
 
-        if (map == null) {
-            #if debug
-            trace("map not set");
-            #end
-            return;
-        }
         if (target == null) {
             #if debug
             trace("target not set");
@@ -75,7 +76,7 @@ class SnakeHead extends FlxSprite {
 
         var start = FlxPoint.get(x + width / 2, y + height / 2);
         var end = FlxPoint.get(target.x + target.width / 2, target.y + target.height / 2);
-		var pathPoints:Array<FlxPoint> = map.findPath(
+		var pathPoints:Array<FlxPoint> = searcher.tileset.findPath(
 			start,
 			end,
 			true,

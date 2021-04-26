@@ -44,6 +44,7 @@ class PlayState extends FlxTransitionableState {
 
 		snake = new Snake(FlxVector.get());
 		add(snake);
+		add(snake.searcher.tileset);
 
 		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE, false));
 
@@ -53,10 +54,10 @@ class PlayState extends FlxTransitionableState {
 	override public function update(elapsed:Float) {
 		super.update(elapsed);
 
+		FlxG.watch.addQuick('player pos:', player.getPosition());
+
 		if (!player.hasTarget()) {
 			if (snakeNeedsUpdate) {
-				trace('updating snake to pursue location: ${player.getPosition()}');
-				snake.setMap(buffer.layers[0]);
 				snake.setTarget(player);
 				snakeNeedsUpdate = false;
 			}

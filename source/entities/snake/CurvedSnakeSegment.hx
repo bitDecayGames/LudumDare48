@@ -40,7 +40,7 @@ class CurvedSnakeSegment extends FlxSprite {
 
         #if debug
         if (assetPath == "") {
-            throw "failed to create curved snake segment. cur: " + currentDirection + ", next:" + nextDirection;
+            trace('failed to create curved snake segment. cur: ${currentDirection}, next: ${nextDirection}');
         }
         #end
 

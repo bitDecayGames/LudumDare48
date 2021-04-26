@@ -17,13 +17,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public var layers:Array<LayerBuffer> = new Array<LayerBuffer>();
 	public var invisibleForeLayer:LayerBuffer;
 
-	public var calculator:VoxelCalculator;
 
 	public function new(worldXTile:Int, worldYTile:Int, width:Int, height:Int, padding:Int) {
 		super();
-		calculator = new VoxelCalculator();
 		for (i in 0...3) {
-			var l = new LayerBuffer(worldXTile, worldYTile, width, height, padding, calculator);
+			var l = new LayerBuffer(worldXTile, worldYTile, width, height, padding, VoxelCalculator.instance);
 			l.worldZ = i;
 			l.setTarget(1.0 - i * 0.05, // target scale
 				1 - i * 0.3, // target tint
@@ -35,7 +33,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			add(layers[layers.length - 1 - i]);
 		}
 		var i = -1;
-		invisibleForeLayer = new LayerBuffer(worldXTile, worldYTile, width, height, padding, calculator);
+		invisibleForeLayer = new LayerBuffer(worldXTile, worldYTile, width, height, padding, VoxelCalculator.instance);
 		invisibleForeLayer.alpha = 0.0;
 		invisibleForeLayer.worldZ = -1;
 		setEntireBufferTileTypes(invisibleForeLayer);
@@ -57,7 +55,6 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		bufferTarget.y -= 10;
 
 		var targetTile = main.getTileTypeFromPoint(bufferTarget);
-		trace("targetTile: ", targetTile);
 
 		// 2 is rocks for now... can't move into those
 		if (targetTile != TileType.ROCK) {
@@ -65,7 +62,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				var x = (bufferTarget.x / main.get_tile_width()).floor();
 				var y = (bufferTarget.y / main.get_tile_height()).floor();
 				main.setTile(x, y, TileType.DUG_DIRT);
-				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
+				VoxelCalculator.instance.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
 					Constants.AFTER_DIG);
 				// TODO: SFX dug through dirt here
 				FmodManager.PlaySoundOneShot(FmodSFX.MoleDig);
@@ -137,10 +134,10 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			.floor(),
 			main.worldZ + dir,
 		];
-		var allowableDig = isDiggable(calculator.get(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2]));
+		var allowableDig = isDiggable(VoxelCalculator.instance.get(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2]));
 
 		if (allowableDig) {
-			calculator.set(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2], Constants.AFTER_DIG);
+			VoxelCalculator.instance.set(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2], Constants.AFTER_DIG);
 			for (i in 0...layers.length) {
 				var l = layers[i];
 				l.worldZ += dir;
@@ -195,7 +192,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public function getWorldDataRow(x:Int, y:Int, z:Int, num:Int):Array<Int> {
 		var tiles:Array<Int> = [];
 		for (i in 0...num) {
-			tiles.push(calculator.get(x + i, y, z));
+			tiles.push(VoxelCalculator.instance.get(x + i, y, z));
 		}
 		return tiles;
 	}
@@ -203,7 +200,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public function getWorldDataColumn(x:Int, y:Int, z:Int, num:Int):Array<Int> {
 		var tiles:Array<Int> = [];
 		for (i in 0...num) {
-			tiles.push(calculator.get(x, y + i, z));
+			tiles.push(VoxelCalculator.instance.get(x, y + i, z));
 		}
 		return tiles;
 	}
