@@ -68,7 +68,8 @@ class SnakeHead extends FlxSprite {
                 generatePath(searcher, trans.location, trans.zFrom);
                 onPathComplete = () -> {
                     // remove this element when we get there
-                    player.layerTransitions.shift();
+                    player.layerTransitions.remove(trans);
+                    z = trans.zTo;
                 }
             }
         }
@@ -133,8 +134,10 @@ class SnakeHead extends FlxSprite {
 			}
 
 			if (FlxG.overlap(this, player)) {
-                FmodManager.PlaySoundOneShot(FmodSFX.SnakeEatMole);
-                FmodFlxUtilities.TransitionToState(new FailState());
+                if (player.z == z) {
+                    FmodManager.PlaySoundOneShot(FmodSFX.SnakeEatMole);
+                    FmodFlxUtilities.TransitionToState(new FailState());
+                }
 			}
 		}
 
