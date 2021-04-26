@@ -344,6 +344,9 @@ class Player extends Moleness {
 			// fallingSoundId = FmodManager.PlaySoundWithReference(FmodSFX.MoleFall);
 		}
 		isFalling = t.isFalling;
+		if (t.changeInDepth != 0) {
+			z += t.changeInDepth;
+		}
 
 		var tmp = FlxVector.get();
 		getPosition(tmp).subtractPoint(target);
@@ -365,7 +368,7 @@ class Player extends Moleness {
 		}
 		curTime = totalSecondsToTarget;
 
-		moveFollower(MoleTarget.fromPoint(FlxPoint.get(x, y), totalSecondsToTarget));
+		moveFollower(MoleTarget.fromPoint(FlxPoint.get(x, y), totalSecondsToTarget, z));
 	}
 
 	public function targetValid():Bool {

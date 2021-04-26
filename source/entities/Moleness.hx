@@ -61,6 +61,7 @@ class Moleness extends FlxSprite {
 	var moleImFollowing:Moleness;
 
 	public var tail:FlxSprite;
+	public var z:Int;
 
 	public function initAnimations() {
 		makeGraphic(Constants.TILE_SIZE, Constants.TILE_SIZE, FlxColor.BLUE);
@@ -119,6 +120,7 @@ class Moleness extends FlxSprite {
 			newFollower.moleImFollowing = this;
 			newFollower.isFollowing = true;
 			newFollower.alpha = 1.0 - (newFollower.numMolesFollowingMe() * 0.3);
+			newFollower.z = this.z;
 		}
 	}
 
@@ -140,13 +142,15 @@ class Moleness extends FlxSprite {
 
 class MoleTarget extends FlxPoint {
 	public var timeToTarget:Float;
+	public var z:Int;
 
-	public function new(x:Float, y:Float, timeToTarget:Float) {
+	public function new(x:Float, y:Float, timeToTarget:Float, z:Int) {
 		super(x, y);
 		this.timeToTarget = timeToTarget;
+		this.z = z;
 	}
 
-	public static function fromPoint(p:FlxPoint, timeToTarget:Float):MoleTarget {
-		return new MoleTarget(p.x, p.y, timeToTarget);
+	public static function fromPoint(p:FlxPoint, timeToTarget:Float, z:Int):MoleTarget {
+		return new MoleTarget(p.x, p.y, timeToTarget, z);
 	}
 }
