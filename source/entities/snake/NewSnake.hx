@@ -12,8 +12,10 @@ class NewSnake extends FlxSpriteGroup {
 	var head:SnakeHead;
 	public var searcher:SnakeSearch;
 
-	var segments = new Array<NewSegment>();
+	public var segments = new Array<NewSegment>();
 	var segGroup = new FlxSpriteGroup();
+
+	var target:FlxSprite;
 
 	public function new(pos:FlxPoint, dir:Cardinal) {
 		super();
@@ -26,8 +28,18 @@ class NewSnake extends FlxSpriteGroup {
 		add(head);
 	}
 
+	public function occupies(p:FlxPoint):Bool {
+		for (s in segments) {
+			if (s.overlapsPoint(p)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public function setTarget(t: FlxSprite) {
-        head.setTarget(t, searcher);
+		target = t;
+		head.setTarget(target, searcher);
     }
 
 	private function addSegment(inDir:Cardinal, outDir:Cardinal) {

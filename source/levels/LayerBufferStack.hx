@@ -1,5 +1,6 @@
 package levels;
 
+import entities.snake.NewSnake;
 import flixel.FlxG;
 import haxe.macro.Expr.Constant;
 import helpers.TileType;
@@ -97,7 +98,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		}
 	}
 
-	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):MoveResult {
+	public function movePlayer(dir:Cardinal, playerPos:FlxPoint, snake:NewSnake):MoveResult {
 		var main = layers[0];
 		var tileMovement = dir.asVector().scale(Constants.TILE_SIZE);
 
@@ -112,6 +113,15 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		bufferTarget.y -= 10;
 
 		var targetTile = main.getTileTypeFromPoint(bufferTarget);
+
+		// please god, help me
+		var snakeCheck = FlxPoint.get().copyFrom(worldTarget).add(10+16, 10+16);
+
+		if (snake.occupies(snakeCheck)) {
+			// TODO: SFX player tried to move into snake? Not sure if we actually want an SFX here because it
+			// will play every frame if the player is standing on the snake
+			return null;
+		}
 
 		// 2 is rocks for now... can't move into those
 		if (targetTile != TileType.ROCK) {
@@ -151,7 +161,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		invisibleForeLayer.setPosition(x, y);
 	}
 
-	public function fallPlayer(playerPos:FlxPoint):MoveResult {
+	public function fallPlayer(playerPos:FlxPoint, snake:NewSnake):MoveResult {
 		var main = layers[0];
 
 		var bufferTarget = FlxPoint.get().copyFrom(playerPos);
@@ -167,8 +177,10 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 
 		var shouldFall = !(leftHand && rightHand) && !(leftFoot && rightFoot) && !peen;
 		if (shouldFall) {
-			var result = movePlayer(Cardinal.S, playerPos);
-			result.isFalling = true;
+			var result = movePlayer(Cardinal.S, playerPos, snake);
+			if (result != null) {
+				result.isFalling = true;
+			}
 			return result;
 		}
 		return null;

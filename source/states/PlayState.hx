@@ -86,15 +86,20 @@ class PlayState extends FlxTransitionableState {
 		}
 		if (!player.hasTarget() && !player.isTransitioningBetweenLayers) {
 			// check if the player should be falling first (only if not currently transitioning between layers)
-			var result = buffer.fallPlayer(player.getPosition());
+			var result = buffer.fallPlayer(player.getPosition(), snake);
 			if (result != null) {
 				player.setTarget(result);
 			}
 
 			// now check if the player wants to move somewhere in the current plane
 			var dir = player.getIntention();
+			// if (snake.occupies(player.getMidpoint().addPoint(dir.asVector().scale(Constants.TILE_SIZE)))) {
+			// 	// TODO: SFX tried to run into snake. No movement
+			// 	dir = Cardinal.NONE;
+			// }
+			// snake.
 			if (dir != Cardinal.NONE) {
-				result = buffer.movePlayer(dir, player.getPosition());
+				result = buffer.movePlayer(dir, player.getPosition(), snake);
 				if (result != null) {
 					player.setTarget(result);
 				}
