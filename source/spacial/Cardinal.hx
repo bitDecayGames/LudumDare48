@@ -84,6 +84,21 @@ enum abstract Cardinal(Int) from Int to Int {
 		}
 	}
 
+	public function asLetter():String {
+		switch(this) {
+			case N:
+				return "u";
+			case E:
+				return "r";
+			case S:
+				return "d";
+			case W:
+				return "l";
+			default:
+				return "";
+		}
+	}
+
 	/**
 	 * Converts the cardinal direction to its opposite
 	**/

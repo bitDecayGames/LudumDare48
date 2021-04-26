@@ -11,7 +11,7 @@ class SnakeSearch {
 
 	// in tiles
 	private static var HEIGHT_BUFFER = 20;
-	private static var WIDTH_BUFFER = 10;
+	private static var WIDTH_BUFFER = 20;
 
 	public var tileset:FlxTilemap;
 
@@ -36,6 +36,10 @@ class SnakeSearch {
 		var xMaxTile = (xMax / Constants.TILE_SIZE).ceil();
 		var yMinTile = (yMin / Constants.TILE_SIZE).floor();
 		var yMaxTile = (yMax / Constants.TILE_SIZE).ceil();
+
+		// Just search the whole width of our playfield
+		yMinTile = -10;
+		yMaxTile = 10;
 
 		var spaceX = xMinTile - WIDTH_BUFFER;
 		var spaceY = yMinTile - HEIGHT_BUFFER;

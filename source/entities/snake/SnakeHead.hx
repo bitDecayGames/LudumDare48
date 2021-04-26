@@ -23,14 +23,15 @@ class SnakeHead extends FlxSprite {
 
     private var newSegmentCallback: NewSegmentCallback;
 
-    public function new(dir: Cardinal) {
-        super();
+    public function new(p:FlxPoint, dir: Cardinal) {
+        super(p.x, p.y);
         loadGraphic(AssetPaths.head__png, true, Constants.TILE_SIZE, Constants.TILE_SIZE);
         var framerate = 3;
         animation.add(ANIMATION_IDLE, [for (i in 0...8) i], framerate);
         animation.play(ANIMATION_IDLE);
 
         path = new FlxPath();
+        path.cancel();
 
         newSegmentCallback = function(prevDir: Cardinal, newDir: Cardinal) {};
 
@@ -53,18 +54,7 @@ class SnakeHead extends FlxSprite {
         path.cancel();
     }
 
-    private var interval = 2;
-    private var count = 0;
-
     private function generatePath(searcher:SnakeSearch) {
-        // XXX: Stuff hella-breaks if we call this every time the player moves. This slows it down.
-        count--;
-        if (count > 0) {
-            return;
-        } else {
-            count = interval;
-        }
-
         path.cancel();
 
         if (target == null) {
@@ -79,7 +69,7 @@ class SnakeHead extends FlxSprite {
 		var pathPoints:Array<FlxPoint> = searcher.tileset.findPath(
 			start,
 			end,
-			true,
+			false,
 			false,
 			FlxTilemapDiagonalPolicy.NONE
 		);
@@ -98,22 +88,34 @@ class SnakeHead extends FlxSprite {
         }
     }
 
+    var targetNode:FlxPoint = FlxPoint.get().copyFrom(Constants.NO_TARGET);
+
     override public function update(delta: Float) {
         super.update(delta);
-
-        if (FlxG.overlap(this, target)) {
-            // TODO: Player got eated
-            trace("BOOM YOU EATED");
-        }
 
 		if (path.finished) {
 			path.cancel();
 		}
 
         curDir = Cardinal.closest(FlxVector.get(velocity.x, velocity.y), true);
-        if (curDir != prevDir) {
-            newSegmentCallback(prevDir, curDir);
+
+        if (path != null && path.nodes.length > 0) {
+            // if (!targetNode.equals(Constants.NO_TARGET) && path.finished) {
+            //     // finished the path
+            //     // newSegme
+            // } else
+            if (!targetNode.equals(path.nodes[path.nodeIndex])) {
+                // reached a target
+                newSegmentCallback(prevDir, curDir);
+                targetNode.copyFrom(path.nodes[path.nodeIndex]);
+            }
+
+            if (FlxG.overlap(this, target)) {
+                // TODO: Player got eated
+                trace("BOOM YOU EATED");
+            }
         }
+
         prevDir = curDir;
 
         flipX = curDir == Cardinal.E;

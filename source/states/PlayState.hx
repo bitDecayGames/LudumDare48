@@ -1,5 +1,6 @@
 package states;
 
+import entities.snake.NewSnake;
 import entities.MoleFriend;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxVector;
@@ -21,7 +22,7 @@ using Math;
 class PlayState extends FlxTransitionableState {
 	var player:Player;
 
-	var snake:Snake;
+	var snake:NewSnake;
 	var snakeNeedsUpdate:Bool = false;
 
 	var buffer:LayerBufferStack;
@@ -51,7 +52,7 @@ class PlayState extends FlxTransitionableState {
 
 		#if nosnake
 		#else
-		snake = new Snake(FlxVector.get());
+		snake = new NewSnake(FlxVector.get(), E);
 		add(snake);
 		add(snake.searcher.tileset);
 		#end
