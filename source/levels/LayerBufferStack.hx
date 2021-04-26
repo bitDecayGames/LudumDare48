@@ -30,11 +30,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public var playState:PlayState;
 	public var deepestY:Int;
 
-	public function new(width:Int, height:Int, padding:Int) {
+	public function new(worldXTile:Int, worldYTile:Int, width:Int, height:Int, padding:Int) {
 		super();
 		calculator = new VoxelCalculator();
 		for (i in 0...3) {
-			var l = new LayerBuffer(width, height, padding, calculator);
+			var l = new LayerBuffer(worldXTile, worldYTile, width, height, padding, calculator);
 			l.worldZ = i;
 			l.setTarget(1.0 - i * 0.05, // target scale
 				1 - i * 0.3, // target tint
@@ -46,7 +46,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			add(layers[layers.length - 1 - i]);
 		}
 		var i = -1;
-		invisibleForeLayer = new LayerBuffer(width, height, padding, calculator);
+		invisibleForeLayer = new LayerBuffer(worldXTile, worldYTile, width, height, padding, calculator);
 		invisibleForeLayer.alpha = 0.0;
 		invisibleForeLayer.worldZ = -1;
 		setEntireBufferTileTypes(invisibleForeLayer);
@@ -113,23 +113,29 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				calculator.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
 					Constants.AFTER_DIG);
 				// TODO: SFX dug through dirt here
+				FmodManager.PlaySoundOneShot(FmodSFX.MoleDig);
 			}
 
-			// buffer is slightly bigger than screen, so we position it so it's centered correctly
-			var x = worldTarget.x - 8 * Constants.TILE_SIZE;
-			var y = worldTarget.y - 12 * Constants.TILE_SIZE;
-			for (i in 0...layers.length) {
-				layers[i].pushData(dir, getNextLevelData(dir, layers[i]));
-				layers[i].setPosition(x, y);
-			}
-			invisibleForeLayer.pushData(dir, getNextLevelData(dir, invisibleForeLayer));
-			invisibleForeLayer.setPosition(x, y);
+			repositionLayers(dir, worldTarget);
 
 			return new MoveResult(worldTarget, targetTile, false);
 		} else {
 			// TODO: SFX tried to dig through rock here
+			FmodManager.PlaySoundOneShot(FmodSFX.MoleRock);
 		}
 		return null;
+	}
+
+	public function repositionLayers(dir:Cardinal, target:FlxPoint) {
+		// buffer is slightly bigger than screen, so we position it so it's centered correctly
+		var x = target.x - 8 * Constants.TILE_SIZE;
+		var y = target.y - 12 * Constants.TILE_SIZE;
+		for (i in 0...layers.length) {
+			layers[i].pushData(dir, getNextLevelData(dir, layers[i]));
+			layers[i].setPosition(x, y);
+		}
+		invisibleForeLayer.pushData(dir, getNextLevelData(dir, invisibleForeLayer));
+		invisibleForeLayer.setPosition(x, y);
 	}
 
 	public function fallPlayer(playerPos:FlxPoint):MoveResult {
@@ -207,6 +213,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			return true;
 		} else {
 			// TODO: SFX tried to dig through rock here
+			FmodManager.PlaySoundOneShot(FmodSFX.MoleRock);
 		}
 		return false;
 	}
@@ -221,6 +228,8 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				getWorldDataColumn(buffer.worldX + buffer.bufWidth + 1, buffer.worldY, buffer.worldZ, buffer.bufHeight);
 			case W:
 				getWorldDataColumn(buffer.worldX - 1, buffer.worldY, buffer.worldZ, buffer.bufHeight);
+			case NONE:
+				[];
 			default:
 				throw('cannot request level data for direction ${dir}');
 		}

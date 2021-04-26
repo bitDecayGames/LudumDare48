@@ -92,6 +92,14 @@ enum abstract Cardinal(Int) from Int to Int {
 		return closest(vec, true);
 	}
 
+	public function vertical(): Bool {
+		return this == Cardinal.N || this == Cardinal.S;
+	}
+
+	public function horizontal(): Bool {
+		return this == Cardinal.W || this == Cardinal.E;
+	}
+
 	/**
 	 * Finds the closest cardinal for the given vector
 	**/

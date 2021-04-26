@@ -92,6 +92,8 @@ class Player extends Moleness {
 
 	public var isTransitioningBetweenLayers:Bool = false;
 
+	public var fallingSoundId:String = "";
+
 	public function new() {
 		super();
 
@@ -156,9 +158,13 @@ class Player extends Moleness {
 	override public function update(delta:Float) {
 		super.update(delta);
 
+		innerUpdate(delta);
+
 		updateTail(delta);
 		updateEmitter(delta);
+	}
 
+	private function innerUpdate(delta:Float) {
 		if (inTransition) {
 			if (animation.finished) {
 				inTransition = false;
@@ -283,6 +289,10 @@ class Player extends Moleness {
 				setPosition(Math.round(target.x), Math.round(target.y));
 				target.copyFrom(Constants.NO_TARGET);
 				justStopped = !stopped;
+				// if(justStopped && FmodManager.IsSoundPlaying(fallingSoundId)){
+				// 	FmodManager.StopSoundImmediately(fallingSoundId);
+				// 	FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
+				// }
 				stopped = true;
 				emitter.emitting = false;
 				isFalling = false;
@@ -303,17 +313,21 @@ class Player extends Moleness {
 						default:
 					}
 				}
+				// if(FmodManager.IsSoundPlaying(fallingSoundId)){
+				// 	FmodManager.StopSoundImmediately(fallingSoundId);
+				// 	FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
+				// }
 			}
 		}
 	}
 
 	private function updateEmitter(delta:Float) {
 		var emitterOffsets = [
-			N => FlxPoint.get(16,4),
-			S => FlxPoint.get(16,31),
-			E => FlxPoint.get(30,16),
-			W => FlxPoint.get(0,16),
-			NONE => FlxPoint.get(0,0),
+			N => FlxPoint.get(16, 4),
+			S => FlxPoint.get(16, 31),
+			E => FlxPoint.get(30, 16),
+			W => FlxPoint.get(0, 16),
+			NONE => FlxPoint.get(0, 0),
 		];
 
 		emitter.x = x + emitterOffsets.get(lastDirection).x;
@@ -332,8 +346,8 @@ class Player extends Moleness {
 
 		// Using 32, there are tiny gaps between rat and tail
 		var tailOffsets = [
-			N => FlxPoint.get(0, 31),
-			S => FlxPoint.get(0, -30),
+			N => FlxPoint.get(0, 32),
+			S => FlxPoint.get(0, -31),
 			E => FlxPoint.get(-30, 0),
 			W => FlxPoint.get(30, 0),
 			NONE => FlxPoint.get(0, 0),
@@ -363,7 +377,7 @@ class Player extends Moleness {
 			tailAnim += SLOW;
 		}
 
-		//trace('starting new tail anim on frame: ${tail.animation.frameIndex}');
+		// trace('starting new tail anim on frame: ${tail.animation.frameIndex}');
 		tail.animation.play(tailAnim, false, false, tail.animation.frameIndex % 8);
 	}
 
@@ -390,6 +404,9 @@ class Player extends Moleness {
 	public function setTarget(t:MoveResult) {
 		target.copyFrom(t.target);
 		originalPosition = getPosition();
+		if (!isFalling && t.isFalling) {
+			// fallingSoundId = FmodManager.PlaySoundWithReference(FmodSFX.MoleFall);
+		}
 		isFalling = t.isFalling;
 
 		var tmp = FlxVector.get();

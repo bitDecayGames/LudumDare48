@@ -83,6 +83,10 @@ class SnakeHead extends FlxSprite {
 			FlxTilemapDiagonalPolicy.NONE
 		);
 
+        #if debug
+        trace('attempting pathfind from ${start} to ${end}');
+        #end
+
         // if pathPoints null, cannot find path
 		if (pathPoints != null) {
 			path.start(pathPoints, Constants.SNAKE_SPEED);
@@ -116,21 +120,6 @@ class SnakeHead extends FlxSprite {
         } else {
             angle = 0;
         }
-
-        // var newPos = strSeg.getPosition();
-        // switch(strSeg.direction) {
-        //     case N:
-        //         newPos.y -= width;
-        //     case S:
-        //         newPos.y += strSeg.height;
-        //     case E:
-        //         newPos.x += strSeg.width;
-        //     case W:
-        //         newPos.x -= width;
-        //     default:
-        //         throw 'direction ${strSeg.direction} unsupported';
-        // }
-        // setPosition(newPos.x, newPos.y);
     }
 
     override public function draw():Void

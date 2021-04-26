@@ -7,10 +7,13 @@ import flixel.math.FlxRandom;
 import flixel.math.FlxVector;
 
 using extensions.FlxObjectExt;
+using zero.extensions.FloatExt;
 
 class StraightSnakeSegment extends FlxTiledSprite {
     public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
     private static final rand = new FlxRandom();
+
+    var trashLen = Constants.TILE_SIZE * 1.0;
 
     public static function randomDir(curDir: Cardinal) {
         var arrCpy = ALL_DIRECTIONS.copy();
@@ -29,8 +32,8 @@ class StraightSnakeSegment extends FlxTiledSprite {
             getAssetsPath(dir),
             0,
             0,
-            horizontal(dir),
-            vertical(dir)
+            dir.horizontal(),
+            dir.vertical()
         );
 
         direction = dir;
@@ -38,31 +41,47 @@ class StraightSnakeSegment extends FlxTiledSprite {
     }
 
     private function getAssetsPath(dir: Cardinal) {
-        if (horizontal(dir)) {
+        if (dir.horizontal()) {
             return AssetPaths.straight__png;
-        } else if (vertical(dir)) {
+        } else if (dir.vertical()) {
             return AssetPaths.straightUD__png;
         }
         throw "dir " + dir + " not supported";
     }
 
-    private function vertical(dir: Cardinal): Bool {
-        return dir == Cardinal.N || dir == Cardinal.S;
-    }
-
-    private function horizontal(dir: Cardinal): Bool {
-        return dir == Cardinal.W || dir == Cardinal.E;
-    }
-
-    public function stop() {
+    public function stop(prevCrv: CurvedSnakeSegment, nextCrv: CurvedSnakeSegment) {
         stopMovement = true;
+
+        if (direction.horizontal()) {
+            width = prevCrv.x - nextCrv.x - Constants.TILE_SIZE;
+            snapWidth();
+        } else if (direction.vertical()) {
+            height = prevCrv.y - nextCrv.y - Constants.TILE_SIZE;
+            snapHeight();
+        }
+
+        setPosition(x, y);
+    }
+
+    private function snapWidth() {
+        width = width.snap_to_grid(Constants.TILE_SIZE);
+    }
+
+    private function snapHeight() {
+        height = height.snap_to_grid(Constants.TILE_SIZE);
+    }
+
+    public override function setPosition(X:Float = 0, Y:Float = 0) {
+        super.setPosition(X, Y);
+        x = x.snap_to_grid(Constants.TILE_SIZE);
+        y = y.snap_to_grid(Constants.TILE_SIZE);
     }
 
     override public function update(delta:Float) {
         super.update(delta);
 
         var deltaDir = Constants.SNAKE_SPEED * delta;
-        if (horizontal(direction)) {
+        if (direction.horizontal()) {
             if (stopMovement) {
                 if (direction == Cardinal.W) {
                     scrollX -= deltaDir;
@@ -75,9 +94,13 @@ class StraightSnakeSegment extends FlxTiledSprite {
                 } else {
                     scrollX = width % Constants.TILE_SIZE;
                 }
-                width += deltaDir;
+                if (trashLen > 0) {
+                    trashLen -= deltaDir;
+                } else {
+                    width += deltaDir;
+                }
             }
-        } else if (vertical(direction)) {
+        } else if (direction.vertical()) {
             if (stopMovement) {
                 if (direction == Cardinal.N) {
                     scrollY -= deltaDir;
@@ -90,7 +113,11 @@ class StraightSnakeSegment extends FlxTiledSprite {
                 } else {
                     scrollY = height % Constants.TILE_SIZE;
                 }
-                height += deltaDir;
+                if (trashLen > 0) {
+                    trashLen -= deltaDir;
+                } else {
+                    height += deltaDir;
+                }
             }
         }
     }
