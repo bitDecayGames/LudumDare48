@@ -25,6 +25,8 @@ class MainMenuState extends FlxUIState {
 	var _btnCredits:FlxButton;
 	var _btnExit:FlxButton;
 
+	var lastCursorLocation:Int = -1;
+
 	var _txtTitle:FlxText;
 
 	override public function create():Void {
@@ -84,10 +86,12 @@ class MainMenuState extends FlxUIState {
 
 			if (button_action == "play") {
 				clickPlay();
+				_ui.getAsset("play_button").active = false;
 			}
 
 			if (button_action == "credits") {
 				clickCredits();
+				_ui.getAsset("credits_button").active = false;
 			}
 
 			#if windows
@@ -101,6 +105,14 @@ class MainMenuState extends FlxUIState {
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
 		FmodManager.Update();
+
+		if (cursor.location != lastCursorLocation) {
+			if (lastCursorLocation != -1){
+				FmodManager.PlaySoundOneShot(FmodSFX.MenuHover);
+			}
+			lastCursorLocation = cursor.location;
+		}
+		
 
 		if (camera.scroll.y <= 0) {
 			camera.scroll.set(FlxG.camera.scroll.x, FlxG.camera.scroll.y + 10);
@@ -131,6 +143,7 @@ class MainMenuState extends FlxUIState {
 	}
 
 	function clickCredits():Void {
+		FmodManager.PlaySoundOneShot(FmodSFX.MenuSelect);
 		FmodFlxUtilities.TransitionToState(new MoleFactsState(new CreditsState()));
 	}
 

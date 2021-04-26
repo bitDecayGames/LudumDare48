@@ -79,6 +79,7 @@ class MoleFactsState extends FlxUIState {
 
 			if (button_action == "next") {
 				clickNext();
+				_ui.getAsset("next").active = false;
 			}
 		}
 	}
@@ -98,12 +99,8 @@ class MoleFactsState extends FlxUIState {
 	}
 
 	function clickNext():Void {
-		Timer.delay(() -> {
-			var swirlOut = new SwirlTransition(Trans.OUT, () -> {
-				FlxG.switchState(goTo);
-			}, FlxColor.GRAY);
-			openSubState(swirlOut);
-		}, 500);
+		FmodManager.PlaySoundOneShot(FmodSFX.MenuSelect);
+		FlxG.switchState(goTo);
 	}
 
 	override public function onFocusLost() {

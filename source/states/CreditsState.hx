@@ -129,6 +129,7 @@ class CreditsState extends FlxUIState {
 
 			if (button_action == "main_menu") {
 				clickMainMenu();
+				_ui.getAsset("back_to_main_menu").active = false;
 			}
 		}
 	}
@@ -176,6 +177,7 @@ class CreditsState extends FlxUIState {
 	}
 
 	function clickMainMenu():Void {
+		FmodManager.PlaySoundOneShot(FmodSFX.MenuSelect);
 		FmodFlxUtilities.TransitionToState(new MoleFactsState(new MainMenuState()));
 	}
 

@@ -1,5 +1,6 @@
 package entities.snake;
 
+import haxe.Timer;
 import states.FailState;
 import haxefmod.flixel.FmodFlxUtilities;
 import flixel.math.FlxVector;
@@ -114,6 +115,7 @@ class SnakeHead extends FlxSprite {
 				var playerTarget = cast(target, Player);
 				if (playerTarget != null && playerTarget.z == z) {
 					// TODO: Player got eated
+					FmodManager.PlaySoundOneShot(FmodSFX.SnakeEatMole);
 					FmodFlxUtilities.TransitionToState(new FailState());
 				}
 			}

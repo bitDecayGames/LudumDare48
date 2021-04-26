@@ -71,6 +71,7 @@ class FailState extends FlxUIState {
 	}
 
 	function clickMainMenu():Void {
+		FmodManager.PlaySoundOneShot(FmodSFX.MenuSelect);
 		FmodFlxUtilities.TransitionToState(new MainMenuState());
 	}
 
