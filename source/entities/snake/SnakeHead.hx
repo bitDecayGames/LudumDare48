@@ -43,6 +43,10 @@ class SnakeHead extends FlxSprite {
         newSegmentCallback = callback;
     }
 
+    public function hasTarget():Bool {
+        return target != null;
+    }
+
     public function setTarget(t: FlxSprite, searcher:SnakeSearch) {
         target = t;
         searcher.updateSearchSpace(this, t);
@@ -95,17 +99,14 @@ class SnakeHead extends FlxSprite {
 
 		if (path.finished) {
 			path.cancel();
+            target = null;
 		}
 
         curDir = Cardinal.closest(FlxVector.get(velocity.x, velocity.y), true);
 
         if (path != null && path.nodes.length > 0) {
-            // if (!targetNode.equals(Constants.NO_TARGET) && path.finished) {
-            //     // finished the path
-            //     // newSegme
-            // } else
             if (!targetNode.equals(path.nodes[path.nodeIndex])) {
-                // reached a target
+                // reached a target, move to next place!
                 newSegmentCallback(prevDir, curDir);
                 targetNode.copyFrom(path.nodes[path.nodeIndex]);
             }

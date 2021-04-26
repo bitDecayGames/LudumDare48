@@ -46,6 +46,8 @@ class NewSegment extends FlxSprite {
 		trace(data);
 		animation.add("frames", frameData.get(data.key), framerate, true, data.flipX, data.flipY);
 		animation.play("frames", false, data.reverse);
+
+		immovable = true;
 	}
 }
 
