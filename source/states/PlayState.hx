@@ -45,6 +45,8 @@ class PlayState extends FlxTransitionableState {
 
 		FlxG.camera.pixelPerfectRender = true;
 
+		FlxG.worldBounds.set(-20 * Constants.TILE_SIZE, -1 * Constants.TILE_SIZE, 40 * Constants.TILE_SIZE, (VoxelCalculator.queenBound + 3) * Constants.TILE_SIZE);
+
 		var milfs = new FlxTypedGroup<MoleFriend>();
 
 		// Buffer is 2 tiles wider and taller than the play field on purpose
