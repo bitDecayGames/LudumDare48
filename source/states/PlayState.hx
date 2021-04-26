@@ -44,8 +44,8 @@ class PlayState extends FlxTransitionableState {
 		FmodManager.PlaySong(FmodSongs.Maybe);
 
 		FlxG.camera.pixelPerfectRender = true;
-
 		FlxG.worldBounds.set(-20 * Constants.TILE_SIZE, -1 * Constants.TILE_SIZE, 40 * Constants.TILE_SIZE, (VoxelCalculator.queenBound + 3) * Constants.TILE_SIZE);
+		VoxelCalculator.instance.reset();
 
 		var milfs = new FlxTypedGroup<MoleFriend>();
 
