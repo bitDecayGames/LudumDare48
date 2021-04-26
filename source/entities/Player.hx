@@ -376,7 +376,7 @@ class Player extends Moleness {
 
 	private function updateTail(delta:Float) {
 		if (animation.name != null) {
-			if (animation.name.contains("turn") || animation.name.contains(FALLING)) {
+			if (animation.name.contains("turn") || animation.name.contains(FALLING) || isTransitioningBetweenLayers) {
 				tail.visible = false;
 				return;
 			}
