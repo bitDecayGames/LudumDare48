@@ -52,6 +52,8 @@ class SnakeHead extends FlxSprite {
 		prevDir = curDir;
 
 		onPathComplete = () -> {};
+
+		waitTime = 3;
 	}
 
 	public function onNewSegment(callback:NewSegmentCallback) {
@@ -128,9 +130,11 @@ class SnakeHead extends FlxSprite {
 	override public function update(delta:Float) {
 		super.update(delta);
 
+		#if debug
 		if (FlxG.keys.pressed.P) {
 			waitTime = 2;
 		}
+		#end
 
 		if (waitTime > 0) {
 			lastVelocity.copyFrom(velocity);
@@ -203,6 +207,7 @@ class SnakeHead extends FlxSprite {
 		if (moleToKill != null && moleToKill.health > 0) {
 			FmodManager.PlaySoundOneShot(FmodSFX.SnakeEatMole);
 			moleToKill.kill();
+			waitTime = 0.5;
 		}
 	}
 

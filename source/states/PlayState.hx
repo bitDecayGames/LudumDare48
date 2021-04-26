@@ -1,5 +1,7 @@
 package states;
 
+import flixel.text.FlxText.FlxTextAlign;
+import misc.FlxTextFactory;
 import particles.BloodEmitter;
 import com.bitdecay.analytics.Common;
 import com.bitdecay.analytics.Bitlytics;
@@ -91,6 +93,9 @@ class PlayState extends FlxTransitionableState {
 
 		add(queen);
 		add(bloodEmitter);
+
+		add(FlxTextFactory.make("Save the children!\nAnd find the Queen!", -30, -50, 20, FlxTextAlign.CENTER));
+		add(FlxTextFactory.make(" W \nASD\n\nE to burrow forward\nQ to burrow back", -30, 50, 20, FlxTextAlign.CENTER));
 	}
 
 	var gameOver = false;
