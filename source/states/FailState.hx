@@ -1,5 +1,8 @@
 package states;
 
+import metrics.Metrics;
+import com.bitdecay.metrics.Common;
+import com.bitdecay.analytics.Bitlytics;
 import flixel.addons.ui.FlxUITypedButton;
 import flixel.addons.ui.FlxUICursor;
 import config.Configure;
@@ -48,6 +51,8 @@ class FailState extends FlxUIState {
 		_txtTitle.color = FlxColor.BLACK;
 
 		add(_txtTitle);
+
+		Bitlytics.Instance().Queue(Metrics.DEATH, 1);
 	}
 
 	override public function update(elapsed:Float):Void {

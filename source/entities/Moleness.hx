@@ -1,5 +1,6 @@
 package entities;
 
+import metrics.Metrics;
 import helpers.Constants;
 import flixel.math.FlxPoint;
 import flixel.FlxSprite;
@@ -127,7 +128,7 @@ class Moleness extends FlxSprite {
 
 	public function numMolesFollowingMe(numMoles:Int = 0):Int {
 		if (moleFollowingMe != null) {
-			return moleFollowingMe.numMolesFollowingMe(numMoles++);
+			return moleFollowingMe.numMolesFollowingMe(numMoles) + 1;
 		} else {
 			return numMoles;
 		}
