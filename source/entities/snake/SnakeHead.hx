@@ -101,7 +101,10 @@ class SnakeHead extends FlxSprite {
     override public function update(delta: Float) {
         super.update(delta);
 
-        FlxG.collide(map, this);
+        if (FlxG.overlap(this, target)) {
+            // TODO: Player got eated
+            trace("BOOM YOU EATED");
+        }
 
 		if (path.finished) {
 			path.cancel();

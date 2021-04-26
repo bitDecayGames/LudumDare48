@@ -28,6 +28,10 @@ class Player extends Moleness {
 	private static inline var TURN_RIGHT_TO_LEFT = "turnRightLeft";
 	private static inline var TURN_LEFT_TO_RIGHT = "turnLeftRight";
 
+	private static inline var WALK_IN = "walkIn";
+	private static inline var WALK_OUT = "walkOut";
+
+
 	private static inline var WALK_UP = "walkUp";
 	private static inline var WALK_DOWN = "walkDown";
 	private static inline var TURN_UP_TO_DOWN = "turnUpDown";
@@ -49,6 +53,10 @@ class Player extends Moleness {
 	private static inline var CHOMP_DOWN = "chompDown";
 	private static inline var CHOMP_LEFT = "chompLeft";
 	private static inline var CHOMP_RIGHT = "chompRight";
+
+	// Same frames as the walk animations for these two
+	private static inline var CHOMP_IN = "walkIn";
+	private static inline var CHOMP_OUT = "walkOut";
 
 	private static inline var FALLING = "falling";
 
@@ -92,6 +100,7 @@ class Player extends Moleness {
 	public var emitterStarted = false;
 
 	public var isTransitioningBetweenLayers:Bool = false;
+	public var transitionDir = 0;
 
 	public var fallingSoundId:String = "";
 
@@ -118,6 +127,8 @@ class Player extends Moleness {
 		animation.add(WALK_LEFT, [for (i in row...row + 8) i], framerate, true, true);
 		animation.add(WALK_DOWN, [for (i in 5 * row...5 * row + 8) i], framerate);
 		animation.add(WALK_UP, [for (i in 7 * row...7 * row + 8) i], framerate);
+		animation.add(WALK_IN, [for (i in 8 * row + 8...9 * row) i], framerate);
+		animation.add(WALK_OUT, [for (i in 10 * row + 5...10 * row + 9) i], framerate);
 
 		animation.add(TURN_RIGHT_TO_UP, [row + 9, row + 10].concat([for (i in 10 * row + 1...10 * row + 5) i]), framerate * 2, false);
 		animation.add(TURN_RIGHT_TO_LEFT, [for (i in row + 8...2 * row) i], framerate, false);
@@ -179,6 +190,24 @@ class Player extends Moleness {
 		}
 
 		molesFollowingMe = numMolesFollowingMe();
+
+		if (isTransitioningBetweenLayers) {
+			switch (transitionDir) {
+				case -1:
+					animation.play(WALK_OUT);
+				case 1:
+					animation.play(WALK_IN);
+				default:
+			}
+
+			if (!emitterStarted) {
+				emitterStarted = true;
+				emitter.start(false);
+			} else {
+				emitter.emitting = true;
+			}
+			return;
+		}
 
 		// Move the player to the next block
 		if (targetValid()) {
@@ -295,7 +324,6 @@ class Player extends Moleness {
 				// 	FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
 				// }
 				stopped = true;
-				emitter.emitting = false;
 				isFalling = false;
 			}
 		} else {
@@ -323,18 +351,28 @@ class Player extends Moleness {
 	}
 
 	private function updateEmitter(delta:Float) {
+		var dir = lastDirection;
+		if (isTransitioningBetweenLayers) {
+			dir = NONE;
+		}
+
 		var emitterOffsets = [
 			N => FlxPoint.get(16, 4),
 			S => FlxPoint.get(16, 31),
 			E => FlxPoint.get(30, 16),
 			W => FlxPoint.get(0, 16),
-			NONE => FlxPoint.get(0, 0),
+			NONE => FlxPoint.get(16, 16),
 		];
 
-		emitter.x = x + emitterOffsets.get(lastDirection).x;
-		emitter.y = y + emitterOffsets.get(lastDirection).y;
 
-		emitter.setDigDirection(lastDirection);
+		emitter.x = x + emitterOffsets.get(dir).x;
+		emitter.y = y + emitterOffsets.get(dir).y;
+
+		emitter.setDigDirection(dir);
+
+		if (stopped && !isTransitioningBetweenLayers) {
+			emitter.emitting = false;
+		}
 	}
 
 	private function updateTail(delta:Float) {
