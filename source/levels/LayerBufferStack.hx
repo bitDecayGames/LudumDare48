@@ -59,6 +59,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		var moleFriend = new MoleFriend();
 		moleFriend.x = x;
 		moleFriend.y = y;
+		moleFriend.z = layers[0].worldZ;
 		trace('adding a friend at: (${x}, ${y}))');
 		moleFriends.add(moleFriend);
 	}
@@ -87,14 +88,23 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public function checkForMilfOverlap(player:Player) {
 		var pX = player.x;
 		var pY = player.y;
+		var pZ = player.z;
 		for (m in moleFriends) {
-			if (m != null && !m.isFollowing) {
+			if (m != null && !m.isFollowing && pZ == m.z) {
 				var mX = m.x;
 				var mY = m.y;
 				if (Math.abs(pX - mX) < 5 && Math.abs(pY - mY) < 5) {
+					// TODO: SFX play gained new follower sound effect
 					player.setFollower(m, 1);
 				}
 			}
+		}
+	}
+
+	public function makeMolesInDifferentLayersInvisible() {
+		var main = layers[0];
+		for (m in moleFriends) {
+			m.shouldBeVisible = m.z == main.worldZ;
 		}
 	}
 
@@ -115,7 +125,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		var targetTile = main.getTileTypeFromPoint(bufferTarget);
 
 		// please god, help me
-		var snakeCheck = FlxPoint.get().copyFrom(worldTarget).add(10+16, 10+16);
+		var snakeCheck = FlxPoint.get().copyFrom(worldTarget).add(10 + 16, 10 + 16);
 
 		if (snake.occupies(snakeCheck)) {
 			// TODO: SFX player tried to move into snake? Not sure if we actually want an SFX here because it
@@ -208,7 +218,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			.floor(),
 			main.worldZ + dir,
 		];
-		var allowableDig = isDiggable(VoxelCalculator.instance.get(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2]));
+		var allowableDig = isDiggable(VoxelCalculator.instance.get(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2])); // TODO: MW add && notSnake here
 
 		if (allowableDig) {
 			FmodManager.PlaySoundOneShot(FmodSFX.MoleDig);
@@ -236,6 +246,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				invisibleForeLayer.setTarget(1.0 - i * 0.1, 1 - i * 0.3, 0.0);
 			}
 			setEntireBufferTileTypes(invisibleForeLayer);
+
 			return true;
 		} else {
 			// TODO: SFX tried to dig through rock here

@@ -1,5 +1,6 @@
 package states;
 
+import helpers.TileType;
 import entities.snake.NewSnake;
 import entities.MoleFriend;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -34,9 +35,6 @@ class PlayState extends FlxTransitionableState {
 
 		FlxG.camera.pixelPerfectRender = true;
 
-		// makes sure "MOST" of the mole buddies will be within this rect so collisions can happen
-		FlxG.worldBounds.set(-50 * Constants.TILE_SIZE, -10 * Constants.TILE_SIZE, 100 * Constants.TILE_SIZE, 10000000 * Constants.TILE_SIZE);
-
 		var milfs = new FlxTypedGroup<MoleFriend>();
 		// Buffer is 2 tiles wider and taller than the play field on purpose
 		buffer = new LayerBufferStack(-7, -11, 14, 22, 2, milfs);
@@ -66,6 +64,8 @@ class PlayState extends FlxTransitionableState {
 		buffer.addMoleFriend(-3 * Constants.TILE_SIZE, 0);
 		buffer.addMoleFriend(6 * Constants.TILE_SIZE, 0);
 		buffer.addMoleFriend(-6 * Constants.TILE_SIZE, 0);
+
+		player.z = buffer.layers[0].worldZ;
 	}
 
 	override public function update(elapsed:Float) {
@@ -106,13 +106,21 @@ class PlayState extends FlxTransitionableState {
 				player.transitionDir = depthDir;
 				player.isTransitioningBetweenLayers = buffer.switchLayer(depthDir, player.getPosition(), () -> {
 					player.isTransitioningBetweenLayers = false;
+					// this hopefully makes the mole followers try to follow the player through the hole
+					player.setTarget(new MoveResult(player.getPosition(), TileType.EMPTY_SPACE, false, depthDir));
 				});
+				if (player.isTransitioningBetweenLayers) {
+					// this hopefully makes the mole followers try to follow the player through the hole
+					player.setTarget(new MoveResult(player.getPosition(), TileType.EMPTY_SPACE, false));
+				}
 			}
 		}
 		if (player.hasTarget()) {
 			// check if there are in friends around that should follow us
 			buffer.checkForMilfOverlap(player);
 		}
+
+		buffer.makeMolesInDifferentLayersInvisible();
 	}
 
 	override public function onFocusLost() {
