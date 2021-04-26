@@ -1,5 +1,7 @@
 package entities.snake;
 
+import flixel.tweens.FlxTween;
+import flixel.math.FlxVector;
 import flixel.math.FlxPoint;
 import helpers.Constants;
 import flixel.FlxSprite;
@@ -28,6 +30,7 @@ class NewSnake extends FlxSpriteGroup {
 		head.onNewSegment(function(prevDir, newDir) {
 			addSegment(prevDir, newDir);
 		});
+		head.onSpeedChange = setSpeed;
 		add(segGroup);
 		add(head);
 
@@ -53,6 +56,10 @@ class NewSnake extends FlxSpriteGroup {
 		return false;
 	}
 
+	public function setWait(t:Float) {
+		head.waitTime = t;
+	}
+
 	public function updatePathing() {
 		head.updatePathing(searcher);
 	}
@@ -69,7 +76,20 @@ class NewSnake extends FlxSpriteGroup {
 				segments[i].animation.curAnim.curFrame = frameNum;
 			}
 		}
+
+		seg.alpha = 0;
+		FlxTween.tween(seg, {alpha: 1}, 0.5);
+
 		segGroup.add(seg);
+	}
+
+	public function setSpeed(velocity:FlxVector) {
+		var len = velocity.length;
+		if (segments.length > 0) {
+			for (i in 1...segments.length) {
+				segments[i].animation.curAnim.frameRate = len / 8 * 4;
+			}
+		}
 	}
 
 	public function makePartsVisibleOrNot(currentZ:Int) {

@@ -31,6 +31,10 @@ class SnakeHead extends FlxSprite {
 
     private var onPathComplete:()->Void;
 
+	public var waitTime = 0.0;
+
+	public var onSpeedChange:(FlxVector) -> Void = (v) -> {};
+
 	public function new(p:FlxPoint, dir:Cardinal) {
 		super(p.x, p.y);
 		loadGraphic(AssetPaths.head__png, true, Constants.TILE_SIZE, Constants.TILE_SIZE);
@@ -54,6 +58,9 @@ class SnakeHead extends FlxSprite {
 	}
 
 	public function updatePathing(searcher:SnakeSearch) {
+		if (waitTime > 0) {
+			return;
+		}
 		searcher.updateSearchSpace(this, player);
 		if (generatePath(searcher, player.getPosition(), player.z)) {
             // we found a path to the player, we no longer care about the transitions
@@ -115,16 +122,38 @@ class SnakeHead extends FlxSprite {
 	}
 
 	var targetNode:FlxPoint = FlxPoint.get().copyFrom(Constants.NO_TARGET);
+	var lastVelocity = FlxPoint.get().copyFrom(Constants.NO_TARGET);
 
 	override public function update(delta:Float) {
 		super.update(delta);
+
+		if (FlxG.keys.pressed.P) {
+			waitTime = 2;
+		}
+
+		if (waitTime > 0) {
+			lastVelocity.copyFrom(velocity);
+			waitTime -= delta;
+			path.cancel();
+
+			onSpeedChange(FlxPoint.get());
+			return;
+		}
 
 		if (path.finished) {
 			path.cancel();
 			onPathComplete();
 		}
 
-		curDir = Cardinal.closest(FlxVector.get(velocity.x, velocity.y), true);
+		if (!lastVelocity.equals(Constants.NO_TARGET)) {
+			curDir = Cardinal.closest(FlxVector.get(lastVelocity.x, lastVelocity.y), true);
+		} else {
+			curDir = Cardinal.closest(FlxVector.get(velocity.x, velocity.y), true);
+		}
+
+		onSpeedChange(velocity);
+
+		lastVelocity.copyFrom(Constants.NO_TARGET);
 
 		if (path != null && path.nodes.length > 0) {
 			if (!targetNode.equals(path.nodes[path.nodeIndex])) {
@@ -144,7 +173,9 @@ class SnakeHead extends FlxSprite {
 		prevDir = curDir;
 
 		flipX = curDir == Cardinal.E;
-		if (curDir == Cardinal.N) {
+		if (curDir == Cardinal.NONE) {
+			// don't mess with angle in this case
+		} else if (curDir == Cardinal.N) {
 			angle = 90;
 		} else if (curDir == Cardinal.S) {
 			angle = 270;
