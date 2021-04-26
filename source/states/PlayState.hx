@@ -1,6 +1,6 @@
 package states;
 
-import com.bitdecay.metrics.Common;
+import com.bitdecay.analytics.Common;
 import com.bitdecay.analytics.Bitlytics;
 import states.transitions.Trans;
 import flixel.util.FlxColor;
