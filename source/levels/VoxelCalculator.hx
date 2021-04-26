@@ -3,6 +3,9 @@ package levels;
 import generation.Perlin;
 
 class VoxelCalculator {
+
+	public static final instance:VoxelCalculator = new VoxelCalculator();
+
 	public var perlin:Perlin;
 	public var modified:Map<String, Int>;
 	public var scale:Float = 0.2;
@@ -47,6 +50,19 @@ class VoxelCalculator {
 		} else {
 			return 1;
 		}
+	}
+
+	// Returns a 1D array of the points in the block (to save on memory allocation of embedded arrays)
+	public function getBlock(x:Int, y:Int, z:Int, width:Int, height:Int):Array<Array<Int>> {
+		var block = new Array<Array<Int>>();
+		for (i in 0...height) {
+			block.push(new Array<Int>());
+			for (k in 0...width) {
+				block[i].push(get(x+k, y+i, z));
+			}
+		}
+
+		return block;
 	}
 
 	/**

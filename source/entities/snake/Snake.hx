@@ -15,6 +15,8 @@ class Snake extends FlxSpriteGroup {
     var curvedSegments:Array<CurvedSnakeSegment>;
     public final head:SnakeHead;
 
+    public var searcher:SnakeSearch;
+
     public function new(startPos:FlxVector) {
         super();
         straightSegments = [];
@@ -32,14 +34,12 @@ class Snake extends FlxSpriteGroup {
         add(head);
 
         addSegment(startDir);
-    }
 
-    public function setMap(m: FlxTilemap) {
-        head.setMap(m);
+        searcher = new SnakeSearch();
     }
 
     public function setTarget(t: FlxSprite) {
-        head.setTarget(t);
+        head.setTarget(t, searcher);
     }
 
     private function addSegment(dir: Cardinal) {
