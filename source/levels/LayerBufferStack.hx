@@ -1,5 +1,6 @@
 package levels;
 
+import haxe.macro.Expr.Constant;
 import helpers.TileType;
 import entities.MoveResult;
 import flixel.util.FlxColor;
@@ -8,15 +9,29 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import helpers.Constants;
 import spacial.Cardinal;
 import flixel.tile.FlxTilemap;
+import entities.MoleFriend;
+import entities.Player;
+import states.PlayState;
 
 using extensions.FlxStateExt;
 using zero.flixel.extensions.FlxTilemapExt;
 using Math;
 
+import flixel.math.FlxRandom;
+
 class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
+	private static final rand = new FlxRandom();
+
 	public var layers:Array<LayerBuffer> = new Array<LayerBuffer>();
 	public var invisibleForeLayer:LayerBuffer;
 
+<<<<<<< HEAD
+	public var calculator:VoxelCalculator;
+	public var moleFriends:Array<MoleFriend>;
+	public var playState:PlayState;
+	public var deepestY:Int;
+=======
+>>>>>>> master
 
 	public function new(worldXTile:Int, worldYTile:Int, width:Int, height:Int, padding:Int) {
 		super();
@@ -38,6 +53,46 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		invisibleForeLayer.worldZ = -1;
 		setEntireBufferTileTypes(invisibleForeLayer);
 		add(invisibleForeLayer);
+		moleFriends = new Array<MoleFriend>();
+		deepestY = 10;
+	}
+
+	public function addMoleFriend(x:Int, y:Int) {
+		var moleFriend = new MoleFriend();
+		moleFriend.x = x;
+		moleFriend.y = y;
+		trace('adding a friend at: (${x}, ${y}))');
+		moleFriends.push(moleFriend);
+		playState.add(moleFriend);
+	}
+
+	public function spawnMoleFriend(tileY:Int):Bool {
+		var main = layers[0];
+		if (rand.float(0, 1) > .5) {
+			return false;
+		}
+		var emptys:Array<Int> = [];
+		for (tileX in -main.bufWidth...main.bufWidth) {
+			// had to subtract worldX and worldY so that we normalize, because this method adds them back in and we don't want to add twice
+			if (main.tileIsType(tileX - main.worldX, tileY - main.worldY, TileType.EMPTY_SPACE)
+				&& !main.tileIsType(tileX - main.worldX, tileY + 1 - main.worldY, TileType.EMPTY_SPACE)) {
+				emptys.push(tileX);
+			}
+		}
+		if (emptys.length > 0) {
+			var tileX = emptys[rand.int(0, emptys.length)];
+			addMoleFriend((tileX + 1) * Constants.TILE_SIZE, (tileY + 1) * Constants.TILE_SIZE);
+			return true;
+		}
+		return false;
+	}
+
+	public function makeFriendsFollowPlayer(player:Player) {
+		for (moleFriend in moleFriends) {
+			if (player.x == moleFriend.x && player.y == moleFriend.y && moleFriend.moleIdLikeToFollow == null) {
+				player.setFollower(moleFriend);
+			}
+		}
 	}
 
 	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):MoveResult {
@@ -58,17 +113,21 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 
 		// 2 is rocks for now... can't move into those
 		if (targetTile != TileType.ROCK) {
+			var tileX = ((worldTarget.x - 10) / Constants.TILE_SIZE).floor();
+			var tileY = ((worldTarget.y - 10) / Constants.TILE_SIZE).floor();
 			if (targetTile == TileType.DIRT) {
 				var x = (bufferTarget.x / main.get_tile_width()).floor();
 				var y = (bufferTarget.y / main.get_tile_height()).floor();
-				main.setTile(x, y, TileType.DUG_DIRT);
-				VoxelCalculator.instance.set(((worldTarget.x - 10) / Constants.TILE_SIZE).floor(), ((worldTarget.y - 10) / Constants.TILE_SIZE).floor(), main.worldZ,
-					Constants.AFTER_DIG);
-				// TODO: SFX dug through dirt here
+				main.setTile(x, y, Constants.AFTER_DIG);
+				VoxelCalculator.instance.set(tileX, tileY, main.worldZ, Constants.AFTER_DIG);
 				FmodManager.PlaySoundOneShot(FmodSFX.MoleDig);
 			}
 
 			repositionLayers(dir, worldTarget);
+
+			if (dir == Cardinal.S) {
+				spawnFollower(main.worldY + main.bufHeight + 1);
+			}
 
 			return new MoveResult(worldTarget, targetTile, false);
 		} else {
@@ -193,10 +252,21 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 
 	public function getWorldDataRow(x:Int, y:Int, z:Int, num:Int):Array<Int> {
 		var tiles:Array<Int> = [];
+
 		for (i in 0...num) {
 			tiles.push(VoxelCalculator.instance.get(x + i, y, z));
 		}
 		return tiles;
+	}
+
+	public function spawnFollower(y:Int) {
+		if (y > deepestY) {
+			if (spawnMoleFriend(y)) {
+				deepestY = y + 5;
+			} else {
+				deepestY = y;
+			}
+		}
 	}
 
 	public function getWorldDataColumn(x:Int, y:Int, z:Int, num:Int):Array<Int> {

@@ -49,6 +49,10 @@ class PlayState extends FlxTransitionableState {
 		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE, false));
 
 		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
+
+		buffer.playState = this;
+		buffer.addMoleFriend(0, 0);
+		// buffer.addMoleFriend(3 * Constants.TILE_SIZE, 0);
 	}
 
 	override public function update(elapsed:Float) {
@@ -87,6 +91,9 @@ class PlayState extends FlxTransitionableState {
 					player.isTransitioningBetweenLayers = false;
 				});
 			}
+
+			// check if there are in friends around that should follow us
+			buffer.makeFriendsFollowPlayer(player);
 		}
 	}
 
