@@ -25,13 +25,9 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public var layers:Array<LayerBuffer> = new Array<LayerBuffer>();
 	public var invisibleForeLayer:LayerBuffer;
 
-<<<<<<< HEAD
-	public var calculator:VoxelCalculator;
 	public var moleFriends:Array<MoleFriend>;
 	public var playState:PlayState;
 	public var deepestY:Int;
-=======
->>>>>>> master
 
 	public function new(worldXTile:Int, worldYTile:Int, width:Int, height:Int, padding:Int) {
 		super();
