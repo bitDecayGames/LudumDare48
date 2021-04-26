@@ -145,6 +145,7 @@ class Moleness extends FlxSprite {
 class MoleTarget extends FlxPoint {
 	public var timeToTarget:Float;
 	public var z:Int;
+	public var original:FlxPoint;
 
 	public function new(x:Float, y:Float, timeToTarget:Float, z:Int) {
 		super(x, y);
