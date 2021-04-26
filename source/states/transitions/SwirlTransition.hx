@@ -37,7 +37,7 @@ class SwirlTransition extends FlxSubState {
 		var totalCircles = (FlxG.width).round();
 		var timePerCircle = duration / totalCircles;
 
-		var maxDistance = FlxG.width * 0.8;
+		var maxDistance = Math.max(FlxG.width, FlxG.height) * 0.8;
 		var spacingDegs = 5;
 
 		var totalSwirls = (totalCircles * spacingDegs) / 360;
