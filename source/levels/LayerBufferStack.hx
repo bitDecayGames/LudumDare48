@@ -191,6 +191,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		var allowableDig = isDiggable(VoxelCalculator.instance.get(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2]));
 
 		if (allowableDig) {
+			FmodManager.PlaySoundOneShot(FmodSFX.MoleDig);
 			VoxelCalculator.instance.set(cellToDigInto[0], cellToDigInto[1], cellToDigInto[2], Constants.AFTER_DIG);
 			for (i in 0...layers.length) {
 				var l = layers[i];
