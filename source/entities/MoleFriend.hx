@@ -1,5 +1,6 @@
 package entities;
 
+import flixel.math.FlxRandom;
 import entities.Moleness.MoleTarget;
 import flixel.math.FlxVector;
 import flixel.math.FlxPoint;
@@ -16,6 +17,8 @@ class MoleFriend extends Moleness {
 	// movement
 	var currentTime:Float = 0;
 	var timeToTarget:Float = 0;
+
+	private static var rnd:FlxRandom = new FlxRandom();
 
 	public function new() {
 		super();
@@ -48,6 +51,7 @@ class MoleFriend extends Moleness {
 		this.target.timeToTarget = target.timeToTarget;
 		currentTime = target.timeToTarget;
 		timeToTarget = target.timeToTarget;
+		timeToTarget *= 1.0 + 0.3 * rnd.float(-1.0, 1.0);
 		moveFollower(MoleTarget.fromPoint(getPosition(), target.timeToTarget));
 	}
 

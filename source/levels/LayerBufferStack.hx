@@ -84,9 +84,17 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	}
 
 	public function checkForMilfOverlap(player:Player) {
-		FlxG.overlap(player, moleFriends, (p:Player, m:MoleFriend) -> {
-			player.setFollower(m, 1); // will ignore moles already following
-		});
+		var pX = player.x;
+		var pY = player.y;
+		for (m in moleFriends) {
+			if (m != null && !m.isFollowing) {
+				var mX = m.x;
+				var mY = m.y;
+				if (Math.abs(pX - mX) < 5 && Math.abs(pY - mY) < 5) {
+					player.setFollower(m, 1);
+				}
+			}
+		}
 	}
 
 	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):MoveResult {
