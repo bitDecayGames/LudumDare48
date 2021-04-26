@@ -127,7 +127,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		// please god, help me
 		var snakeCheck = FlxPoint.get().copyFrom(worldTarget).add(10 + 16, 10 + 16);
 
-		if (snake.occupies(snakeCheck)) {
+		if (snake.occupies(snakeCheck, main.worldZ)) {
 			// TODO: SFX player tried to move into snake? Not sure if we actually want an SFX here because it
 			// will play every frame if the player is standing on the snake
 			return null;

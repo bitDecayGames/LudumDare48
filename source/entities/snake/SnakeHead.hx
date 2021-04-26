@@ -111,8 +111,11 @@ class SnakeHead extends FlxSprite {
 			}
 
 			if (FlxG.overlap(this, target)) {
-				// TODO: Player got eated
-				FmodFlxUtilities.TransitionToState(new FailState());
+				var playerTarget = cast(target, Player);
+				if (playerTarget != null && playerTarget.z == z) {
+					// TODO: Player got eated
+					FmodFlxUtilities.TransitionToState(new FailState());
+				}
 			}
 		}
 

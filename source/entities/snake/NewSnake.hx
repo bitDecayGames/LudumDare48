@@ -42,9 +42,9 @@ class NewSnake extends FlxSpriteGroup {
 		}
 	}
 
-	public function occupies(p:FlxPoint):Bool {
+	public function occupies(p:FlxPoint, z:Int):Bool {
 		for (s in segments) {
-			if (s.overlapsPoint(p)) {
+			if (s.z == z && s.overlapsPoint(p)) {
 				return true;
 			}
 		}
