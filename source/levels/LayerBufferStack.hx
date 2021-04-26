@@ -1,5 +1,6 @@
 package levels;
 
+import flixel.FlxG;
 import haxe.macro.Expr.Constant;
 import helpers.TileType;
 import entities.MoveResult;
@@ -25,11 +26,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public var layers:Array<LayerBuffer> = new Array<LayerBuffer>();
 	public var invisibleForeLayer:LayerBuffer;
 
-	public var moleFriends:Array<MoleFriend>;
+	public var moleFriends:FlxTypedGroup<MoleFriend>;
 	public var playState:PlayState;
 	public var deepestY:Int;
 
-	public function new(worldXTile:Int, worldYTile:Int, width:Int, height:Int, padding:Int) {
+	public function new(worldXTile:Int, worldYTile:Int, width:Int, height:Int, padding:Int, moleFriends:FlxTypedGroup<MoleFriend>) {
 		super();
 		for (i in 0...3) {
 			var l = new LayerBuffer(worldXTile, worldYTile, width, height, padding, VoxelCalculator.instance);
@@ -49,7 +50,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		invisibleForeLayer.worldZ = -1;
 		setEntireBufferTileTypes(invisibleForeLayer);
 		add(invisibleForeLayer);
-		moleFriends = new Array<MoleFriend>();
+		this.moleFriends = moleFriends;
 		deepestY = 10;
 	}
 
@@ -58,8 +59,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		moleFriend.x = x;
 		moleFriend.y = y;
 		trace('adding a friend at: (${x}, ${y}))');
-		moleFriends.push(moleFriend);
-		playState.add(moleFriend);
+		moleFriends.add(moleFriend);
 	}
 
 	public function spawnMoleFriend(tileY:Int):Bool {
@@ -83,12 +83,10 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 		return false;
 	}
 
-	public function makeFriendsFollowPlayer(player:Player) {
-		for (moleFriend in moleFriends) {
-			if (player.x == moleFriend.x && player.y == moleFriend.y && moleFriend.moleIdLikeToFollow == null) {
-				player.setFollower(moleFriend);
-			}
-		}
+	public function checkForMilfOverlap(player:Player) {
+		FlxG.overlap(player, moleFriends, (p:Player, m:MoleFriend) -> {
+			player.setFollower(m, 1); // will ignore moles already following
+		});
 	}
 
 	public function movePlayer(dir:Cardinal, playerPos:FlxPoint):MoveResult {

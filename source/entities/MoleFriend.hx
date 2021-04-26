@@ -7,11 +7,11 @@ import helpers.Constants;
 import flixel.util.FlxColor;
 
 class MoleFriend extends Moleness {
-	public var moleIdLikeToFollow:Moleness = null;
-	public var targetList:Array<MoleTarget> = new Array<MoleTarget>();
+	public var isFollowing:Bool = false;
 
 	// Directly used for movement change
 	var target:MoleTarget = null;
+	var original:FlxPoint = null;
 
 	// movement
 	var currentTime:Float = 0;
@@ -19,7 +19,7 @@ class MoleFriend extends Moleness {
 
 	public function new() {
 		super();
-		makeGraphic(Constants.TILE_SIZE, Constants.TILE_SIZE, FlxColor.BROWN);
+		initAnimations();
 	}
 
 	override public function update(delta:Float) {
@@ -30,51 +30,47 @@ class MoleFriend extends Moleness {
 				currentTime -= delta;
 				if (currentTime < 0) {
 					setPosition(target.x, target.y);
-					target.copyFrom(Constants.NO_TARGET);
+					target = null;
 					currentTime = 0;
+					timeToTarget = 0;
 				}
 			}
-		} else if (targetAvailable()) {
-			acquireTarget();
 		}
 	}
 
-	public function acquireTarget():Bool {
-		if (targetAvailable()) {
-			if (target == null) {
-				target = new MoleTarget(0, 0, 0);
-			}
-			var newTarget = targetList.pop();
-			target.x = newTarget.x;
-			target.y = newTarget.y;
-			target.timeToTarget = newTarget.timeToTarget;
-			currentTime = target.timeToTarget;
-			moveFollower(MoleTarget.fromPoint(getPosition(), target.timeToTarget));
-			return true;
+	public function setTarget(target:MoleTarget) {
+		if (this.target == null) {
+			this.target = new MoleTarget(0, 0, 0);
 		}
-		return false;
+		this.original = getPosition();
+		this.target.x = target.x;
+		this.target.y = target.y;
+		this.target.timeToTarget = target.timeToTarget;
+		currentTime = target.timeToTarget;
+		timeToTarget = target.timeToTarget;
+		moveFollower(MoleTarget.fromPoint(getPosition(), target.timeToTarget));
 	}
 
 	public function targetValid():Bool {
 		return target != null;
 	}
 
-	public function targetAvailable():Bool {
-		return targetList.length > 0;
-	}
-
 	public function moveToTarget() {
-		var pos = getPosition();
+		var pos = original;
 		var diff = FlxPoint.get(target.x - pos.x, target.y - y);
 		if (timeToTarget > 0) {
-			var percent = currentTime / timeToTarget;
+			var percent = 1.0 - currentTime / timeToTarget;
 			setPosition(diff.x * percent + pos.x, diff.y * percent + pos.y);
 		} else {
 			trace("Failed to set time to target to valid value greater than 0");
 		}
 	}
 
-	public function follow(_moleIdLikeToFollow:Moleness) {
-		moleIdLikeToFollow = _moleIdLikeToFollow;
+	public override function destroy() {
+		super.destroy();
+		if (moleImFollowing != null && moleFollowingMe != null) {
+			// remove yourself from the chain of following moles
+			moleFollowingMe.moleImFollowing = moleImFollowing;
+		}
 	}
 }

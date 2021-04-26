@@ -18,55 +18,6 @@ using extensions.FlxPointExt;
 using zero.extensions.StringExt;
 
 class Player extends Moleness {
-	private static inline var IDLE_LEFT = "idleLeft";
-	private static inline var IDLE_RIGHT = "idleRight";
-	private static inline var IDLE_UP = "idleUp";
-	private static inline var IDLE_DOWN = "idleDown";
-
-	private static inline var WALK_RIGHT = "walkRight";
-	private static inline var WALK_LEFT = "walkLeft";
-	private static inline var TURN_RIGHT_TO_LEFT = "turnRightLeft";
-	private static inline var TURN_LEFT_TO_RIGHT = "turnLeftRight";
-
-	private static inline var WALK_IN = "walkIn";
-	private static inline var WALK_OUT = "walkOut";
-
-
-	private static inline var WALK_UP = "walkUp";
-	private static inline var WALK_DOWN = "walkDown";
-	private static inline var TURN_UP_TO_DOWN = "turnUpDown";
-	private static inline var TURN_DOWN_TO_UP = "turnDownUp";
-
-	private static inline var TURN_UP_TO_RIGHT = "turnUpRight";
-	private static inline var TURN_UP_TO_LEFT = "turnUpLeft";
-
-	private static inline var TURN_DOWN_TO_RIGHT = "turnDownRight";
-	private static inline var TURN_DOWN_TO_LEFT = "turnDownLeft";
-
-	private static inline var TURN_LEFT_TO_UP = "turnLeftUp";
-	private static inline var TURN_LEFT_TO_DOWN = "turnLeftDown";
-
-	private static inline var TURN_RIGHT_TO_UP = "turnRightUp";
-	private static inline var TURN_RIGHT_TO_DOWN = "turnRightDown";
-
-	private static inline var CHOMP_UP = "chompUp";
-	private static inline var CHOMP_DOWN = "chompDown";
-	private static inline var CHOMP_LEFT = "chompLeft";
-	private static inline var CHOMP_RIGHT = "chompRight";
-
-	// Same frames as the walk animations for these two
-	private static inline var CHOMP_IN = "walkIn";
-	private static inline var CHOMP_OUT = "walkOut";
-
-	private static inline var FALLING = "falling";
-
-	private static inline var TAIL_LEFT = "tailLeft";
-	private static inline var TAIL_RIGHT = "tailRight";
-	private static inline var TAIL_UP = "tailUp";
-	private static inline var TAIL_DOWN = "tailDown";
-
-	public static inline var SLOW = "Slow";
-
 	var speed:Float = 60;
 
 	public var secondsToMoveOneEmptyBlock:Float = 0.3;
@@ -75,7 +26,6 @@ class Player extends Moleness {
 
 	private var totalSecondsToTarget:Float = 0.0;
 	private var curTime:Float = 0.0;
-	var framerate:Int = 10;
 	var moving:Bool = false;
 
 	public var target:FlxPoint = FlxPoint.get().copyFrom(Constants.NO_TARGET);
@@ -95,7 +45,6 @@ class Player extends Moleness {
 
 	var molesFollowingMe:Int = 0;
 
-	public var tail:FlxSprite;
 	public var emitter:DirtEmitter;
 	public var emitterStarted = false;
 
@@ -112,58 +61,7 @@ class Player extends Moleness {
 		secondsToDigOneDirtBlock = 0.2;
 		secondsToFallOneBlock = 0.05;
 		#end
-		makeGraphic(Constants.TILE_SIZE, Constants.TILE_SIZE, FlxColor.BLUE);
-		updateHitbox();
-
-		loadGraphic(AssetPaths.Player__png, true, 32, 32);
-		var row = 12;
-
-		animation.add(IDLE_RIGHT, [for (i in 0...8) i], framerate);
-		animation.add(IDLE_LEFT, [for (i in 0...8) i], framerate, true, true);
-		animation.add(IDLE_UP, [for (i in 9 * row + 9...10 * row) i], framerate, true, true);
-		animation.add(IDLE_DOWN, [for (i in 4 * row + 9...5 * row) i], framerate, true, true);
-
-		animation.add(WALK_RIGHT, [for (i in row...row + 8) i], framerate);
-		animation.add(WALK_LEFT, [for (i in row...row + 8) i], framerate, true, true);
-		animation.add(WALK_DOWN, [for (i in 5 * row...5 * row + 8) i], framerate);
-		animation.add(WALK_UP, [for (i in 7 * row...7 * row + 8) i], framerate);
-		animation.add(WALK_IN, [for (i in 8 * row + 8...9 * row) i], framerate);
-		animation.add(WALK_OUT, [for (i in 10 * row + 5...10 * row + 9) i], framerate);
-
-		animation.add(TURN_RIGHT_TO_UP, [row + 9, row + 10].concat([for (i in 10 * row + 1...10 * row + 5) i]), framerate * 2, false);
-		animation.add(TURN_RIGHT_TO_LEFT, [for (i in row + 8...2 * row) i], framerate, false);
-		animation.add(TURN_RIGHT_TO_DOWN, [row + 9, row + 10].concat([for (i in 7 * row + 9...8 * row) i]), framerate * 2, false);
-
-		animation.add(TURN_LEFT_TO_UP, [2 * row + 9, 2 * row + 10].concat([for (i in 10 * row + 1...10 * row + 5) i]), framerate * 2, false);
-		animation.add(TURN_LEFT_TO_RIGHT, [for (i in 2 * row + 8...3 * row) i], framerate, false);
-		animation.add(TURN_LEFT_TO_DOWN, [2 * row + 8, 2 * row + 9].concat([for (i in 7 * row + 9...8 * row) i]), framerate * 2, false);
-
-		animation.add(TURN_DOWN_TO_LEFT, [7 * row + 11, 7 * row + 10, row + 9, row + 10, row + 11], framerate * 2, false);
-		animation.add(TURN_DOWN_TO_UP, [for (i in 5 * row + 8...6 * row) i], framerate, false);
-		animation.add(TURN_DOWN_TO_RIGHT, [7 * row + 11, 7 * row + 10, 2 * row + 9, 2 * row + 10, 2 * row + 11], framerate * 2, false);
-
-		animation.add(TURN_UP_TO_LEFT, [5 * row + 11, 5 * row + 10, row + 9, row + 10, row + 11], framerate * 2, false);
-		animation.add(TURN_UP_TO_DOWN, [for (i in 7 * row + 8...8 * row) i], framerate, false);
-		animation.add(TURN_UP_TO_RIGHT, [5 * row + 11, 5 * row + 10, 2 * row + 9, 2 * row + 10, 2 * row + 11], framerate * 2, false);
-
-		animation.add(CHOMP_UP, [for (i in 8 * row...8 * row + 8) i], framerate);
-		animation.add(CHOMP_DOWN, [for (i in 6 * row...6 * row + 8) i], framerate);
-		animation.add(CHOMP_RIGHT, [for (i in 2 * row...2 * row + 8) i], framerate);
-		animation.add(CHOMP_LEFT, [for (i in 2 * row...2 * row + 8) i], framerate, true, true);
-
-		animation.add(FALLING, [for (i in 11 * row...11 * row + 9) i], framerate);
-
-		tail = new FlxSprite();
-		tail.loadGraphic(AssetPaths.Player__png, true, 32, 32);
-		tail.animation.add(TAIL_RIGHT, [for (i in 3 * row...3 * row + 8) i], framerate);
-		tail.animation.add(TAIL_RIGHT + SLOW, [for (i in 3 * row...3 * row + 8) i], framerate / 5);
-		tail.animation.add(TAIL_LEFT, [for (i in 3 * row...3 * row + 8) i], framerate, true, true);
-		tail.animation.add(TAIL_LEFT + SLOW, [for (i in 3 * row...3 * row + 8) i], framerate / 5, true, true);
-		tail.animation.add(TAIL_UP, [for (i in 9 * row...9 * row + 8) i], framerate);
-		tail.animation.add(TAIL_UP + SLOW, [for (i in 9 * row...9 * row + 8) i], framerate / 5);
-		tail.animation.add(TAIL_DOWN, [for (i in 4 * row...4 * row + 8) i], framerate);
-		tail.animation.add(TAIL_DOWN + SLOW, [for (i in 4 * row...4 * row + 8) i], framerate / 5);
-
+		initAnimations();
 		emitter = new DirtEmitter();
 	}
 
@@ -194,9 +92,9 @@ class Player extends Moleness {
 		if (isTransitioningBetweenLayers) {
 			switch (transitionDir) {
 				case -1:
-					animation.play(WALK_OUT);
+					animation.play(Moleness.WALK_OUT);
 				case 1:
-					animation.play(WALK_IN);
+					animation.play(Moleness.WALK_IN);
 				default:
 			}
 
@@ -230,13 +128,13 @@ class Player extends Moleness {
 			var falling = isFalling;
 			if (falling) {
 				var startFrame = 0;
-				if (animation.name == WALK_UP || animation.name == CHOMP_UP) {
+				if (animation.name == Moleness.WALK_UP || animation.name == Moleness.CHOMP_UP) {
 					startFrame = 3;
-				} else if (animation.name == WALK_DOWN || animation.name == CHOMP_DOWN) {
+				} else if (animation.name == Moleness.WALK_DOWN || animation.name == Moleness.CHOMP_DOWN) {
 					startFrame = 7;
 				}
 
-				animation.play(FALLING, startFrame);
+				animation.play(Moleness.FALLING, startFrame);
 			}
 
 			if (!falling && travelDir != lastDirection) {
@@ -245,41 +143,41 @@ class Player extends Moleness {
 					case N:
 						switch (travelDir) {
 							case E:
-								animation.play(TURN_UP_TO_RIGHT);
+								animation.play(Moleness.TURN_UP_TO_RIGHT);
 							case S:
-								animation.play(TURN_UP_TO_DOWN);
+								animation.play(Moleness.TURN_UP_TO_DOWN);
 							case W:
-								animation.play(TURN_UP_TO_LEFT);
+								animation.play(Moleness.TURN_UP_TO_LEFT);
 							default:
 						}
 					case E:
 						switch (travelDir) {
 							case S:
-								animation.play(TURN_RIGHT_TO_DOWN);
+								animation.play(Moleness.TURN_RIGHT_TO_DOWN);
 							case W:
-								animation.play(TURN_RIGHT_TO_LEFT);
+								animation.play(Moleness.TURN_RIGHT_TO_LEFT);
 							case N:
-								animation.play(TURN_RIGHT_TO_UP);
+								animation.play(Moleness.TURN_RIGHT_TO_UP);
 							default:
 						}
 					case S:
 						switch (travelDir) {
 							case W:
-								animation.play(TURN_DOWN_TO_LEFT);
+								animation.play(Moleness.TURN_DOWN_TO_LEFT);
 							case N:
-								animation.play(TURN_DOWN_TO_UP);
+								animation.play(Moleness.TURN_DOWN_TO_UP);
 							case E:
-								animation.play(TURN_DOWN_TO_RIGHT);
+								animation.play(Moleness.TURN_DOWN_TO_RIGHT);
 							default:
 						}
 					case W:
 						switch (travelDir) {
 							case N:
-								animation.play(TURN_LEFT_TO_UP);
+								animation.play(Moleness.TURN_LEFT_TO_UP);
 							case E:
-								animation.play(TURN_LEFT_TO_RIGHT);
+								animation.play(Moleness.TURN_LEFT_TO_RIGHT);
 							case S:
-								animation.play(TURN_LEFT_TO_DOWN);
+								animation.play(Moleness.TURN_LEFT_TO_DOWN);
 							default:
 						}
 					default:
@@ -295,13 +193,13 @@ class Player extends Moleness {
 			if (!falling) {
 				switch (lastDirection) {
 					case N:
-						animation.play(targetType == DIRT ? CHOMP_UP : WALK_UP);
+						animation.play(targetType == DIRT ? Moleness.CHOMP_UP : Moleness.WALK_UP);
 					case S:
-						animation.play(targetType == DIRT ? CHOMP_DOWN : WALK_DOWN);
+						animation.play(targetType == DIRT ? Moleness.CHOMP_DOWN : Moleness.WALK_DOWN);
 					case E:
-						animation.play(targetType == DIRT ? CHOMP_RIGHT : WALK_RIGHT);
+						animation.play(targetType == DIRT ? Moleness.CHOMP_RIGHT : Moleness.WALK_RIGHT);
 					case W:
-						animation.play(targetType == DIRT ? CHOMP_LEFT : WALK_LEFT);
+						animation.play(targetType == DIRT ? Moleness.CHOMP_LEFT : Moleness.WALK_LEFT);
 					default:
 				}
 				if (targetType == DIRT) {
@@ -332,13 +230,13 @@ class Player extends Moleness {
 				if (!StringExt.contains(animation.name, "idle")) {
 					switch (lastDirection) {
 						case N:
-							animation.play(IDLE_UP);
+							animation.play(Moleness.IDLE_UP);
 						case S:
-							animation.play(IDLE_DOWN);
+							animation.play(Moleness.IDLE_DOWN);
 						case E:
-							animation.play(IDLE_RIGHT);
+							animation.play(Moleness.IDLE_RIGHT);
 						case W:
-							animation.play(IDLE_LEFT);
+							animation.play(Moleness.IDLE_LEFT);
 						default:
 					}
 				}
@@ -364,7 +262,6 @@ class Player extends Moleness {
 			NONE => FlxPoint.get(16, 16),
 		];
 
-
 		emitter.x = x + emitterOffsets.get(dir).x;
 		emitter.y = y + emitterOffsets.get(dir).y;
 
@@ -377,7 +274,7 @@ class Player extends Moleness {
 
 	private function updateTail(delta:Float) {
 		if (animation.name != null) {
-			if (animation.name.contains("turn") || animation.name.contains(FALLING)) {
+			if (animation.name.contains("turn") || animation.name.contains(Moleness.FALLING)) {
 				tail.visible = false;
 				return;
 			}
@@ -400,20 +297,20 @@ class Player extends Moleness {
 
 		switch (lastDirection) {
 			case N:
-				tailAnim = TAIL_UP;
+				tailAnim = Moleness.TAIL_UP;
 			case S:
-				tailAnim = TAIL_DOWN;
+				tailAnim = Moleness.TAIL_DOWN;
 			case E:
-				tailAnim = TAIL_RIGHT;
+				tailAnim = Moleness.TAIL_RIGHT;
 			case W:
-				tailAnim = TAIL_LEFT;
+				tailAnim = Moleness.TAIL_LEFT;
 			default:
 				// set it to something so we don't explode
 				return;
 		}
 
 		if (stopped && !justStopped) {
-			tailAnim += SLOW;
+			tailAnim += Moleness.SLOW;
 		}
 
 		// trace('starting new tail anim on frame: ${tail.animation.frameIndex}');
@@ -473,5 +370,13 @@ class Player extends Moleness {
 
 	public function targetValid():Bool {
 		return !target.equals(Constants.NO_TARGET);
+	}
+
+	public override function destroy() {
+		super.destroy();
+		if (moleFollowingMe != null) {
+			// break the chain
+			moleFollowingMe.moleImFollowing = null;
+		}
 	}
 }
