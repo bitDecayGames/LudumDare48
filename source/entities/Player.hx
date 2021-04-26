@@ -1,5 +1,6 @@
 package entities;
 
+import metrics.Metrics;
 import entities.Moleness.MoleTarget;
 import flixel.FlxG;
 import input.SimpleController;
@@ -88,6 +89,7 @@ class Player extends Moleness {
 		}
 
 		molesFollowingMe = numMolesFollowingMe();
+		Metrics.reportMolesFollowing(molesFollowingMe);
 
 		if (isTransitioningBetweenLayers) {
 			switch (transitionDir) {

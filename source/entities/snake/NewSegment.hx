@@ -36,7 +36,6 @@ class NewSegment extends FlxSprite {
 		super(x, y);
 		loadGraphic(AssetPaths.snakeSprites__png, true, 32, 32);
 		var data = animData.get(inDir.asLetter() + outDir.asLetter());
-		trace(data);
 		animation.add("frames", frameData.get(data.key), framerate, true, data.flipX, data.flipY);
 		animation.play("frames", false, data.reverse);
 

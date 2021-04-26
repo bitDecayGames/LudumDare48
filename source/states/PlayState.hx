@@ -1,5 +1,6 @@
 package states;
 
+import metrics.Metrics;
 import helpers.TileType;
 import entities.snake.NewSnake;
 import entities.MoleFriend;
@@ -18,6 +19,7 @@ import flixel.FlxG;
 
 using extensions.FlxStateExt;
 using zero.flixel.extensions.FlxTilemapExt;
+using zero.extensions.FloatExt;
 using Math;
 
 class PlayState extends FlxTransitionableState {
@@ -90,6 +92,7 @@ class PlayState extends FlxTransitionableState {
 			snakeNeedsUpdate = true;
 		}
 		if (!player.hasTarget() && !player.isTransitioningBetweenLayers) {
+			Metrics.reportDepth(Std.int(player.y.snap_to_grid(32) / Constants.TILE_SIZE));
 			// check if the player should be falling first (only if not currently transitioning between layers)
 			var result = buffer.fallPlayer(player.getPosition(), snake);
 			if (result != null) {
