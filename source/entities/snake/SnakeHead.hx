@@ -1,5 +1,7 @@
 package entities.snake;
 
+import states.FailState;
+import haxefmod.flixel.FmodFlxUtilities;
 import flixel.math.FlxVector;
 import helpers.Constants;
 import flixel.util.FlxPath;
@@ -113,7 +115,7 @@ class SnakeHead extends FlxSprite {
 
             if (FlxG.overlap(this, target)) {
                 // TODO: Player got eated
-                trace("BOOM YOU EATED");
+                FmodFlxUtilities.TransitionToState(new FailState());
             }
         }
 

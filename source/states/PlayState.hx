@@ -52,7 +52,7 @@ class PlayState extends FlxTransitionableState {
 
 		#if nosnake
 		#else
-		snake = new NewSnake(FlxVector.get(), E);
+		snake = new NewSnake(FlxVector.get(-7*Constants.TILE_SIZE, 0));
 		add(snake);
 		add(snake.searcher.tileset);
 		#end
@@ -93,11 +93,6 @@ class PlayState extends FlxTransitionableState {
 
 			// now check if the player wants to move somewhere in the current plane
 			var dir = player.getIntention();
-			// if (snake.occupies(player.getMidpoint().addPoint(dir.asVector().scale(Constants.TILE_SIZE)))) {
-			// 	// TODO: SFX tried to run into snake. No movement
-			// 	dir = Cardinal.NONE;
-			// }
-			// snake.
 			if (dir != Cardinal.NONE) {
 				result = buffer.movePlayer(dir, player.getPosition(), snake);
 				if (result != null) {

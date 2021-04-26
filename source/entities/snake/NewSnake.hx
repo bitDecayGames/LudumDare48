@@ -17,7 +17,7 @@ class NewSnake extends FlxSpriteGroup {
 
 	var target:FlxSprite;
 
-	public function new(pos:FlxPoint, dir:Cardinal) {
+	public function new(pos:FlxPoint) {
 		super();
 		searcher = new SnakeSearch();
 		head = new SnakeHead(pos, E);
@@ -26,6 +26,20 @@ class NewSnake extends FlxSpriteGroup {
         });
 		add(segGroup);
 		add(head);
+
+		makeOffscreenSnake();
+	}
+
+	private function makeOffscreenSnake() {
+		for (i in 0...15) {
+			var seg = new NewSegment(
+				head.x.snap_to_grid(Constants.TILE_SIZE) - i * Constants.TILE_SIZE,
+				head.y.snap_to_grid(Constants.TILE_SIZE),
+				E,
+				E);
+			segments.push(seg);
+			segGroup.add(seg);
+		}
 	}
 
 	public function occupies(p:FlxPoint):Bool {
