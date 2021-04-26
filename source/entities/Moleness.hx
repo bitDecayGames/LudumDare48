@@ -1,5 +1,6 @@
 package entities;
 
+import spacial.Cardinal;
 import metrics.Metrics;
 import helpers.Constants;
 import flixel.math.FlxPoint;
@@ -146,14 +147,16 @@ class MoleTarget extends FlxPoint {
 	public var timeToTarget:Float;
 	public var z:Int;
 	public var original:FlxPoint;
+	public var dir:Cardinal;
 
-	public function new(x:Float, y:Float, timeToTarget:Float, z:Int) {
+	public function new(x:Float, y:Float, timeToTarget:Float, z:Int, dir:Cardinal = Cardinal.NONE) {
 		super(x, y);
 		this.timeToTarget = timeToTarget;
 		this.z = z;
+		this.dir = dir;
 	}
 
-	public static function fromPoint(p:FlxPoint, timeToTarget:Float, z:Int):MoleTarget {
-		return new MoleTarget(p.x, p.y, timeToTarget, z);
+	public static function fromPoint(p:FlxPoint, timeToTarget:Float, z:Int, dir:Cardinal = Cardinal.NONE):MoleTarget {
+		return new MoleTarget(p.x, p.y, timeToTarget, z, dir);
 	}
 }

@@ -1,5 +1,6 @@
 package entities;
 
+import spacial.Cardinal;
 import flixel.math.FlxRandom;
 import entities.Moleness.MoleTarget;
 import flixel.math.FlxVector;
@@ -21,9 +22,14 @@ class MoleFriend extends Moleness {
 
 	private static var rnd:FlxRandom = new FlxRandom();
 
+	// animation
+	private var lastDir:Cardinal = Cardinal.NONE;
+
 	public function new() {
 		super();
 		initAnimations();
+		scale.set(0.8, 0.8);
+		color.setRGB(200, 200, 200);
 	}
 
 	override public function update(delta:Float) {
@@ -60,7 +66,7 @@ class MoleFriend extends Moleness {
 			target.original = getPosition();
 		}
 		targetBuffer.push(target);
-		moveFollower(MoleTarget.fromPoint(target.original, target.timeToTarget, z));
+		moveFollower(MoleTarget.fromPoint(target.original, target.timeToTarget, z, target.dir));
 		if (!hadCurrentTarget) {
 			acquireTarget();
 		}
@@ -71,7 +77,32 @@ class MoleFriend extends Moleness {
 			timeToTarget = targetBuffer[0].timeToTarget;
 			timeToTarget *= 1.0 + 0.3 * rnd.float(-1.0, 1.0);
 			currentTime = timeToTarget;
+			pickMoleWalkingDir(targetBuffer[0]);
+		} else {
+			pickMoleIdleDir();
 		}
+	}
+
+	private function pickMoleWalkingDir(target:MoleTarget) {
+		var dir = Cardinal.closest(FlxVector.get(target.x - target.original.x, target.y - target.original.y));
+		lastDir = dir;
+		animation.play((switch (dir) {
+			case Cardinal.N: Moleness.WALK_UP;
+			case Cardinal.S: Moleness.WALK_DOWN;
+			case Cardinal.E: Moleness.WALK_RIGHT;
+			case Cardinal.W: Moleness.WALK_LEFT;
+			default: Moleness.WALK_LEFT;
+		}));
+	}
+
+	private function pickMoleIdleDir() {
+		animation.play((switch (lastDir) {
+			case Cardinal.N: Moleness.IDLE_UP;
+			case Cardinal.S: Moleness.IDLE_DOWN;
+			case Cardinal.E: Moleness.IDLE_RIGHT;
+			case Cardinal.W: Moleness.IDLE_LEFT;
+			default: Moleness.IDLE_LEFT;
+		}));
 	}
 
 	private function reachTarget() {

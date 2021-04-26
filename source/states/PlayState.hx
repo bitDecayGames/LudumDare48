@@ -57,7 +57,7 @@ class PlayState extends FlxTransitionableState {
 		add(snake.searcher.tileset);
 		#end
 
-		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE, false));
+		player.setTarget(new MoveResult(player.getPosition(), EMPTY_SPACE, false, Cardinal.W));
 
 		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
 
@@ -115,11 +115,11 @@ class PlayState extends FlxTransitionableState {
 				player.isTransitioningBetweenLayers = buffer.switchLayer(depthDir, player.getPosition(), () -> {
 					player.isTransitioningBetweenLayers = false;
 					// this hopefully makes the mole followers try to follow the player through the hole
-					player.setTarget(new MoveResult(player.getPosition(), TileType.EMPTY_SPACE, false, depthDir));
+					player.setTarget(new MoveResult(player.getPosition(), TileType.EMPTY_SPACE, false, Cardinal.NONE, depthDir));
 				});
 				if (player.isTransitioningBetweenLayers) {
 					// this hopefully makes the mole followers try to follow the player through the hole
-					player.setTarget(new MoveResult(player.getPosition(), TileType.EMPTY_SPACE, false));
+					player.setTarget(new MoveResult(player.getPosition(), TileType.EMPTY_SPACE, false, Cardinal.NONE));
 				}
 			}
 		}
