@@ -19,6 +19,7 @@ class SnakeHead extends FlxSprite {
 	private static final ANIMATION_IDLE = "anim_idle";
 
 	var map:FlxTilemap;
+
 	public var player:Player;
 
 	var prevDir:Cardinal;
@@ -29,7 +30,7 @@ class SnakeHead extends FlxSprite {
 
 	private var newSegmentCallback:NewSegmentCallback;
 
-    private var onPathComplete:()->Void;
+	private var onPathComplete:() -> Void;
 
 	public function new(p:FlxPoint, dir:Cardinal) {
 		super(p.x, p.y);
@@ -46,7 +47,7 @@ class SnakeHead extends FlxSprite {
 		curDir = dir;
 		prevDir = curDir;
 
-        onPathComplete = () -> {};
+		onPathComplete = () -> {};
 	}
 
 	public function onNewSegment(callback:NewSegmentCallback) {
@@ -56,23 +57,23 @@ class SnakeHead extends FlxSprite {
 	public function updatePathing(searcher:SnakeSearch) {
 		searcher.updateSearchSpace(this, player);
 		if (generatePath(searcher, player.getPosition(), player.z)) {
-            // we found a path to the player, we no longer care about the transitions
-            player.layerTransitions.resize(0);
-            onPathComplete = () -> {};
-        } else {
-            if (player.layerTransitions.length == 0) {
-                trace("uhhhh.. we have no way to chase the player");
-            } else {
-                // we didn't find the player, work our way through the transitions to find them
-                var trans = player.layerTransitions[0];
-                generatePath(searcher, trans.location, trans.zFrom);
-                onPathComplete = () -> {
-                    // remove this element when we get there
-                    player.layerTransitions.remove(trans);
-                    z = trans.zTo;
-                }
-            }
-        }
+			// we found a path to the player, we no longer care about the transitions
+			player.layerTransitions.resize(0);
+			onPathComplete = () -> {};
+		} else {
+			if (player.layerTransitions.length == 0) {
+				trace("uhhhh.. we have no way to chase the player");
+			} else {
+				// we didn't find the player, work our way through the transitions to find them
+				var trans = player.layerTransitions[0];
+				generatePath(searcher, trans.location, trans.zFrom);
+				onPathComplete = () -> {
+					// remove this element when we get there
+					player.layerTransitions.remove(trans);
+					z = trans.zTo;
+				}
+			}
+		}
 	}
 
 	public function clearTarget() {
@@ -105,12 +106,12 @@ class SnakeHead extends FlxSprite {
 		// if pathPoints null, cannot find path
 		if (pathPoints != null) {
 			path.start(pathPoints, Constants.SNAKE_SPEED);
-            return true;
+			return true;
 		} else {
 			#if debug
 			trace("could not generate path");
 			#end
-            return false;
+			return false;
 		}
 	}
 
@@ -134,11 +135,12 @@ class SnakeHead extends FlxSprite {
 			}
 
 			if (FlxG.overlap(this, player)) {
-                if (player.z == z) {
-                    FmodManager.PlaySoundOneShot(FmodSFX.SnakeEatMole);
-                    FmodFlxUtilities.TransitionToState(new FailState());
-                }
+				if (player.z == z) {
+					FmodManager.PlaySoundOneShot(FmodSFX.SnakeEatMole);
+					FmodFlxUtilities.TransitionToState(new FailState());
+				}
 			}
+			checkIfKillMoleFollowers();
 		}
 
 		prevDir = curDir;
@@ -162,6 +164,14 @@ class SnakeHead extends FlxSprite {
 			if (alpha < 0.0) {
 				alpha = 0.0;
 			}
+		}
+	}
+
+	private function checkIfKillMoleFollowers() {
+		var moleToKill = player.findFirstMoleCloseToPoint(x, y, z);
+		if (moleToKill != null && moleToKill.health > 0) {
+			FmodManager.PlaySoundOneShot(FmodSFX.SnakeEatMole);
+			moleToKill.kill();
 		}
 	}
 

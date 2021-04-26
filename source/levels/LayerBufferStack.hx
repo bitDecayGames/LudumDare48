@@ -1,5 +1,6 @@
 package levels;
 
+import particles.BloodEmitter;
 import entities.snake.NewSnake;
 import flixel.FlxG;
 import haxe.macro.Expr.Constant;
@@ -30,9 +31,11 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	public var moleFriends:FlxTypedGroup<MoleFriend>;
 	public var playState:PlayState;
 	public var deepestY:Int;
+	public var bloodEmitter:BloodEmitter;
 
-	public function new(worldXTile:Int, worldYTile:Int, width:Int, height:Int, padding:Int, moleFriends:FlxTypedGroup<MoleFriend>) {
+	public function new(worldXTile:Int, worldYTile:Int, width:Int, height:Int, padding:Int, moleFriends:FlxTypedGroup<MoleFriend>, bloodEmitter:BloodEmitter) {
 		super();
+		this.bloodEmitter = bloodEmitter;
 		for (i in 0...3) {
 			var l = new LayerBuffer(worldXTile, worldYTile, width, height, padding, VoxelCalculator.instance);
 			l.worldZ = i;
@@ -56,7 +59,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 	}
 
 	public function addMoleFriend(x:Int, y:Int) {
-		var moleFriend = new MoleFriend();
+		var moleFriend = new MoleFriend(bloodEmitter);
 		moleFriend.x = x;
 		moleFriend.y = y;
 		moleFriend.z = layers[0].worldZ;

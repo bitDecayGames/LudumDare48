@@ -141,6 +141,16 @@ class Moleness extends FlxSprite {
 			moleFollowingMe.setTarget(target);
 		}
 	}
+
+	public function findFirstMoleCloseToPoint(x:Float, y:Float, z:Int):Moleness {
+		if (this.z == z && Math.abs(this.y - y) < 10 && Math.abs(this.x - x) < 10) {
+			return this;
+		} else if (moleFollowingMe != null) {
+			return moleFollowingMe.findFirstMoleCloseToPoint(x, y, z);
+		} else {
+			return null;
+		}
+	}
 }
 
 class MoleTarget extends FlxPoint {

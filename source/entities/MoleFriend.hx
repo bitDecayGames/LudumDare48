@@ -7,12 +7,15 @@ import flixel.math.FlxVector;
 import flixel.math.FlxPoint;
 import helpers.Constants;
 import flixel.util.FlxColor;
+import particles.BloodEmitter;
 
 class MoleFriend extends Moleness {
 	public var isFollowing:Bool = false;
 
 	// Directly used for movement change
 	var targetBuffer:Array<MoleTarget> = new Array<MoleTarget>();
+
+	var bloodEmitter:BloodEmitter;
 
 	// movement
 	var currentTime:Float = 0;
@@ -25,11 +28,13 @@ class MoleFriend extends Moleness {
 	// animation
 	private var lastDir:Cardinal = Cardinal.NONE;
 
-	public function new() {
+	public function new(bloodEmitter:BloodEmitter) {
 		super();
+		health = 10;
 		initAnimations();
 		scale.set(0.8, 0.8);
 		color.setRGB(200, 200, 200);
+		this.bloodEmitter = bloodEmitter;
 	}
 
 	override public function update(delta:Float) {
@@ -129,11 +134,14 @@ class MoleFriend extends Moleness {
 		}
 	}
 
-	public override function destroy() {
-		super.destroy();
+	public override function kill() {
 		if (moleImFollowing != null && moleFollowingMe != null) {
 			// remove yourself from the chain of following moles
 			moleFollowingMe.moleImFollowing = moleImFollowing;
 		}
+		bloodEmitter.doBloodSplatter(x + width / 2.0, y + height / 2.0);
+		health = -1;
+		super.kill();
+		// destroy();
 	}
 }

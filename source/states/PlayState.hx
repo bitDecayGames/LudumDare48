@@ -1,5 +1,6 @@
 package states;
 
+import particles.BloodEmitter;
 import com.bitdecay.metrics.Common;
 import com.bitdecay.analytics.Bitlytics;
 import states.transitions.Trans;
@@ -44,21 +45,23 @@ class PlayState extends FlxTransitionableState {
 		FmodManager.PlaySong(FmodSongs.Maybe);
 
 		FlxG.camera.pixelPerfectRender = true;
-		FlxG.worldBounds.set(-20 * Constants.TILE_SIZE, -1 * Constants.TILE_SIZE, 40 * Constants.TILE_SIZE, (VoxelCalculator.queenBound + 3) * Constants.TILE_SIZE);
+		FlxG.worldBounds.set(-20 * Constants.TILE_SIZE, -1 * Constants.TILE_SIZE, 40 * Constants.TILE_SIZE,
+			(VoxelCalculator.queenBound + 3) * Constants.TILE_SIZE);
 		VoxelCalculator.instance.reset();
 
 		var milfs = new FlxTypedGroup<MoleFriend>();
 
+		var bloodEmitter = new BloodEmitter();
 		// Buffer is 2 tiles wider and taller than the play field on purpose
-		buffer = new LayerBufferStack(-7, -11, 14, 22, 2, milfs);
+		buffer = new LayerBufferStack(-7, -11, 14, 22, 2, milfs, bloodEmitter);
 		add(buffer);
 
 		var queen = new FlxSprite(AssetPaths.queen__png);
-		queen.x = -queen.width/2;
+		queen.x = -queen.width / 2;
 		queen.y = (VoxelCalculator.queenBound + 1.85) * Constants.TILE_SIZE - queen.height;
 		add(milfs);
 
-		player = new Player();
+		player = new Player(bloodEmitter);
 		add(player);
 		add(player.tail);
 		add(player.emitter);
@@ -87,6 +90,7 @@ class PlayState extends FlxTransitionableState {
 		transOut = null;
 
 		add(queen);
+		add(bloodEmitter);
 	}
 
 	var gameOver = false;
@@ -112,7 +116,8 @@ class PlayState extends FlxTransitionableState {
 					var swirlOut = new SwirlTransition(Trans.OUT, () -> {
 						// make sure our music is stopped;
 						FmodManager.StopSongImmediately();
-						FlxG.switchState(new MoleFactsState(new CreditsState(), 'You saved ${player.numMolesFollowingMe()} mole${player.numMolesFollowingMe() != 1 ? "s": ""}!'));
+						FlxG.switchState(new MoleFactsState(new CreditsState(),
+							'You saved ${player.numMolesFollowingMe()} mole${player.numMolesFollowingMe() != 1 ? "s" : ""}!'));
 						Bitlytics.Instance().Queue(Common.GameCompleted, 1);
 						Bitlytics.Instance().ForceFlush();
 					});

@@ -1,5 +1,6 @@
 package entities;
 
+import particles.BloodEmitter;
 import metrics.Metrics;
 import entities.Moleness.MoleTarget;
 import flixel.FlxG;
@@ -48,6 +49,7 @@ class Player extends Moleness {
 
 	public var emitter:DirtEmitter;
 	public var emitterStarted = false;
+	public var bloodEmitter:BloodEmitter;
 
 	public var isTransitioningBetweenLayers:Bool = false;
 	public var transitionDir = 0;
@@ -56,7 +58,7 @@ class Player extends Moleness {
 
 	public var fallingSoundId:String = "";
 
-	public function new() {
+	public function new(bloodEmitter:BloodEmitter) {
 		super();
 
 		#if fast
@@ -66,6 +68,7 @@ class Player extends Moleness {
 		#end
 		initAnimations();
 		emitter = new DirtEmitter();
+		this.bloodEmitter = bloodEmitter;
 	}
 
 	override public function update(delta:Float) {
@@ -75,6 +78,12 @@ class Player extends Moleness {
 
 		updateTail(delta);
 		updateEmitter(delta);
+
+		#if fast
+		if (FlxG.keys.justPressed.P) {
+			bloodEmitter.doBloodSplatter(x, y);
+		}
+		#end
 	}
 
 	private function innerUpdate(delta:Float) {
@@ -138,7 +147,7 @@ class Player extends Moleness {
 					startFrame = 7;
 				}
 
-				if (animation.name != "falling"){
+				if (animation.name != "falling") {
 					fallingSoundId = FmodManager.PlaySoundWithReference(FmodSFX.MoleFall);
 				}
 
@@ -246,7 +255,7 @@ class Player extends Moleness {
 				}
 			}
 		}
-		if(animation.name != "falling" && FmodManager.IsSoundPlaying(fallingSoundId)){
+		if (animation.name != "falling" && FmodManager.IsSoundPlaying(fallingSoundId)) {
 			FmodManager.StopSoundImmediately(fallingSoundId);
 			FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
 		}
