@@ -73,6 +73,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			return new MoveResult(worldTarget, targetTile, false);
 		} else {
 			// TODO: SFX tried to dig through rock here
+			FmodManager.PlaySoundOneShot(FmodSFX.MoleRock);
 		}
 		return null;
 	}
@@ -164,6 +165,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			return true;
 		} else {
 			// TODO: SFX tried to dig through rock here
+			FmodManager.PlaySoundOneShot(FmodSFX.MoleRock);
 		}
 		return false;
 	}
