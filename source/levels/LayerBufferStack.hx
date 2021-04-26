@@ -12,9 +12,11 @@ import flixel.tile.FlxTilemap;
 import entities.MoleFriend;
 import entities.Player;
 import states.PlayState;
+
 using extensions.FlxStateExt;
 using zero.flixel.extensions.FlxTilemapExt;
 using Math;
+
 import flixel.math.FlxRandom;
 
 class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
@@ -64,19 +66,17 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 
 	public function spawnMoleFriend(tileY:Int) {
 		var main = layers[0];
-		trace('trying to spawn a friend');
-		if (rand.float(0, 1) > .99) {
-			trace('not spawning due to probability');
-			return;
-		}
-		trace('bufWidth: ${main.bufWidth}');
+		// if (rand.float(0, 1) > .99) {
+		// 	return;
+		// }
+		trace('trying to spawn a friend at ' + tileY);
 		for (tileX in 0...main.bufWidth) {
-			trace('checking if (${tileX}, ${tileY}) is empty');
-			if (main.tileIsType(tileX, tileY, TileType.EMPTY_SPACE)) {
-				trace('found a place to put a friend');
+			// had to subtract worldX and worldY so that we normalize, because this method adds them back in and we don't want to add twice
+			if (main.tileIsType(tileX - main.worldX, tileY - main.worldY, TileType.EMPTY_SPACE)) {
+				trace('found a place to put a friend ' + tileX + ", " + tileY);
 				addMoleFriend(tileX * Constants.TILE_SIZE, tileY * Constants.TILE_SIZE);
-				break;
-			} 
+				// break;
+			}
 		}
 	}
 
@@ -124,7 +124,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			}
 			invisibleForeLayer.pushData(dir, getNextLevelData(dir, invisibleForeLayer));
 			invisibleForeLayer.setPosition(x, y);
-		
+
 			return new MoveResult(worldTarget, targetTile, false);
 		} else {
 			// TODO: SFX tried to dig through rock here
@@ -232,14 +232,14 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 
 	public function getWorldDataRow(x:Int, y:Int, z:Int, num:Int):Array<Int> {
 		var tiles:Array<Int> = [];
-	
-		
+
 		for (i in 0...num) {
 			tiles.push(calculator.get(x + i, y, z));
 		}
-		if (y > deepestY) {
-			spawnMoleFriend(y);
-		}
+		// if (y - 5 > deepestY) {
+		spawnMoleFriend(y - 5);
+		deepestY = y; // TODO: MW add 10 or so to this so that you have to travel another 10 rows down
+		// }
 		return tiles;
 	}
 
