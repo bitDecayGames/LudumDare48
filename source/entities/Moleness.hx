@@ -119,6 +119,7 @@ class Moleness extends FlxSprite {
 			newFollower.moleImFollowing = this;
 			newFollower.isFollowing = true;
 			newFollower.alpha = 1.0 - (newFollower.numMolesFollowingMe() * 0.3);
+			FmodManager.PlaySoundOneShot(FmodSFX.BabyMoleCollect);
 		}
 	}
 
