@@ -10,7 +10,6 @@ import helpers.Constants;
 using Math;
 
 class LayerBuffer extends FlxTilemap {
-	public var tilemap:FlxTilemap;
 
 	// the world x of the top-left corner of the buffer
 	public var worldX:Int;
@@ -45,25 +44,21 @@ class LayerBuffer extends FlxTilemap {
 	 * @param height main buffer height
 	 * @param padding number of cells on each side as padding
 	**/
-	public function new(width:Int, height:Int, padding:Int, calc:VoxelCalculator) {
+	public function new(worldXTile:Int, worldYTile:Int, width:Int, height:Int, padding:Int, calc:VoxelCalculator) {
 		super();
 		calculator = calc;
 		bufWidth = width + 2 * padding;
 		bufHeight = height + 2 * padding;
 
 		// we added padding, so the world coords of our top left need to take padding into account
-		worldX = -padding;
-		worldY = -padding;
+		worldX = worldXTile-padding;
+		worldY = worldYTile-padding;
 
 		local = [for (i in 0...bufHeight) [for (k in 0...bufWidth) 1]];
-		tilemap = new FlxTilemap();
 		trace('width: ${local.length}   height: ${local[0].length}');
-		
+
 		loadMapFrom2DArray(localWithTerrain(), AssetPaths.tiles2__png, 32, 32);
 		reload();
-
-		tilemap.x = -32;
-		tilemap.y = -32;
 	}
 
 	public override function update(elapsed:Float) {
@@ -131,7 +126,7 @@ class LayerBuffer extends FlxTilemap {
 		// See: https://web.archive.org/web/20100823062711/http://www.saltgames.com/?p=184
 
 		var TILE_SHEET_WIDTH = 16;
-		
+
 		if (Tile == TileType.DIRT) {
 			// reglar dirt is always just dirt
 			return 1;
@@ -143,7 +138,7 @@ class LayerBuffer extends FlxTilemap {
 		if (Tile == TileType.EMPTY_SPACE) tileIndex += TILE_SHEET_WIDTH * 1;
 		if (Tile == TileType.DUG_DIRT) tileIndex += TILE_SHEET_WIDTH * 2;
 		if (Tile == TileType.ROCK) tileIndex += TILE_SHEET_WIDTH * 3;
-		
+
 		// figure out what tile types to compare against
 		var tileTypesToCheck = new Array<Int>();
 		if (Tile == TileType.EMPTY_SPACE || Tile == TileType.DUG_DIRT) {
@@ -171,6 +166,8 @@ class LayerBuffer extends FlxTilemap {
 				pushOntoRight(data);
 			case W:
 				pushOntoLeft(data);
+			case NONE:
+				// nothing to do
 			default:
 				throw('cannot request level data for direction ${dir}');
 		}

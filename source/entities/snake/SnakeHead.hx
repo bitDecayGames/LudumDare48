@@ -83,6 +83,10 @@ class SnakeHead extends FlxSprite {
 			FlxTilemapDiagonalPolicy.NONE
 		);
 
+        #if debug
+        trace('attempting pathfind from ${start} to ${end}');
+        #end
+
         // if pathPoints null, cannot find path
 		if (pathPoints != null) {
 			path.start(pathPoints, Constants.SNAKE_SPEED);
