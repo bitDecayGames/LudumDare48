@@ -1,5 +1,6 @@
 package entities.snake;
 
+import flixel.math.FlxPoint;
 import haxe.macro.Expr.Constant;
 import flixel.util.FlxSort;
 import flixel.group.FlxSpriteGroup;
@@ -26,7 +27,7 @@ class Snake extends FlxSpriteGroup {
         curvedSegments = [startCrvSeg];
 
         var startDir = Cardinal.E;
-        head = new SnakeHead(startDir);
+        head = new SnakeHead(FlxPoint.get(), startDir);
         head.setPosition(startPos.x, startPos.y);
         head.onNewSegment(function(prevDir, newDir) {
             addSegment(newDir);

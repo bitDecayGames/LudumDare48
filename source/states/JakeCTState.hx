@@ -38,7 +38,7 @@ class JakeCTState extends FlxTransitionableState {
 		goal.y = map.height - Constants.TILE_SIZE;
 		add(goal);
 
-		snake.setMap(map);
+		// snake.setMap(map);
 		snake.setTarget(goal);
 	}
 
