@@ -1,5 +1,11 @@
 package states;
 
+import com.bitdecay.metrics.Common;
+import com.bitdecay.analytics.Bitlytics;
+import states.transitions.Trans;
+import flixel.util.FlxColor;
+import haxe.Timer;
+import states.transitions.SwirlTransition;
 import levels.VoxelCalculator;
 import flixel.FlxSprite;
 import metrics.Metrics;
@@ -47,7 +53,7 @@ class PlayState extends FlxTransitionableState {
 
 		var queen = new FlxSprite(AssetPaths.queen__png);
 		queen.x = -queen.width/2;
-		queen.y = (VoxelCalculator.queenBound + 1.5) * Constants.TILE_SIZE - queen.height;
+		queen.y = (VoxelCalculator.queenBound + 1.85) * Constants.TILE_SIZE - queen.height;
 
 		add(queen);
 		add(milfs);
@@ -77,7 +83,11 @@ class PlayState extends FlxTransitionableState {
 		buffer.addMoleFriend(-6 * Constants.TILE_SIZE, 0);
 
 		player.z = buffer.layers[0].worldZ;
+
+		transOut = null;
 	}
+
+	var gameOver = false;
 
 	override public function update(elapsed:Float) {
 		super.update(elapsed);
@@ -92,6 +102,21 @@ class PlayState extends FlxTransitionableState {
 				if (result != null) {
 					player.setTarget(result);
 				}
+			}
+
+			if (!gameOver) {
+				gameOver = true;
+				trace("kicking off the swirl");
+				Timer.delay(() -> {
+					var swirlOut = new SwirlTransition(Trans.OUT, () -> {
+						// make sure our music is stopped;
+						FmodManager.StopSongImmediately();
+						FlxG.switchState(new MoleFactsState(new CreditsState(), 'You saved ${player.numMolesFollowingMe()} mole${player.numMolesFollowingMe() != 1 ? "s": ""}!'));
+						Bitlytics.Instance().Queue(Common.GameCompleted, 1);
+						Bitlytics.Instance().ForceFlush();
+					});
+					openSubState(swirlOut);
+				}, 1000);
 			}
 			return;
 		}
