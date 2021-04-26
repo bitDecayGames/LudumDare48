@@ -18,7 +18,7 @@ class Snake extends FlxSpriteGroup {
 
     public var searcher:SnakeSearch;
 
-    public function new(startPos:FlxVector) {
+    public function new(startPos:FlxVector, player:Player) {
         super();
         straightSegments = [];
         // HACK put one curved segment off screen to start
@@ -32,15 +32,12 @@ class Snake extends FlxSpriteGroup {
         head.onNewSegment(function(prevDir, newDir) {
             addSegment(newDir);
         });
+        head.player = player;
         add(head);
 
         addSegment(startDir);
 
         searcher = new SnakeSearch();
-    }
-
-    public function setTarget(t: FlxSprite) {
-        head.setTarget(t, searcher);
     }
 
     private function addSegment(dir: Cardinal) {

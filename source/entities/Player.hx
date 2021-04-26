@@ -52,6 +52,8 @@ class Player extends Moleness {
 	public var isTransitioningBetweenLayers:Bool = false;
 	public var transitionDir = 0;
 
+	public var layerTransitions = new Array<LevelTransition>();
+
 	public var fallingSoundId:String = "";
 
 	public function new() {
@@ -348,7 +350,11 @@ class Player extends Moleness {
 			// fallingSoundId = FmodManager.PlaySoundWithReference(FmodSFX.MoleFall);
 		}
 		isFalling = t.isFalling;
+
 		if (t.changeInDepth != 0) {
+			var newTrans = new LevelTransition(z, z + t.changeInDepth, t.target);
+			trace(newTrans);
+			layerTransitions.push(newTrans);
 			z += t.changeInDepth;
 		}
 
@@ -385,5 +391,17 @@ class Player extends Moleness {
 			// break the chain
 			moleFollowingMe.moleImFollowing = null;
 		}
+	}
+}
+
+class LevelTransition {
+	public var zFrom:Int;
+	public var zTo:Int;
+	public var location:FlxPoint;
+
+	public function new(from:Int, to:Int, point:FlxPoint) {
+		zFrom = from;
+		zTo = to;
+		location = point;
 	}
 }
