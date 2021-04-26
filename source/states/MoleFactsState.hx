@@ -1,5 +1,6 @@
 package states;
 
+import flixel.math.FlxRandom;
 import haxe.Timer;
 import states.transitions.Trans;
 import states.transitions.SwirlTransition;
@@ -84,6 +85,10 @@ class MoleFactsState extends FlxUIState {
 
 	private function setMoleFact() {
 		var moleFacts = Configure.getMoleFacts();
+		if (moleFactsIndex < 0) {
+			var rnd = new FlxRandom();
+			moleFactsIndex = rnd.int(0, moleFacts.length);
+		}
 		if (moleFactsIndex < 0 || moleFactsIndex >= moleFacts.length) {
 			moleFactsIndex = 0;
 		}

@@ -346,8 +346,8 @@ class Player extends Moleness {
 
 		// Using 32, there are tiny gaps between rat and tail
 		var tailOffsets = [
-			N => FlxPoint.get(0, 31),
-			S => FlxPoint.get(0, -30),
+			N => FlxPoint.get(0, 32),
+			S => FlxPoint.get(0, -31),
 			E => FlxPoint.get(-30, 0),
 			W => FlxPoint.get(30, 0),
 			NONE => FlxPoint.get(0, 0),
@@ -377,7 +377,6 @@ class Player extends Moleness {
 			tailAnim += SLOW;
 		}
 
-		trace('starting new tail anim on frame: ${tail.animation.frameIndex}');
 		tail.animation.play(tailAnim, false, false, tail.animation.frameIndex % 8);
 	}
 
