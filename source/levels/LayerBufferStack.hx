@@ -118,7 +118,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 			if (targetTile == TileType.DIRT) {
 				var x = (bufferTarget.x / main.get_tile_width()).floor();
 				var y = (bufferTarget.y / main.get_tile_height()).floor();
-				main.setTile(x, y, TileType.DUG_DIRT);
+				main.setTile(x, y, Constants.AFTER_DIG);
 				VoxelCalculator.instance.set(tileX, tileY, main.worldZ, Constants.AFTER_DIG);
 				FmodManager.PlaySoundOneShot(FmodSFX.MoleDig);
 			}
