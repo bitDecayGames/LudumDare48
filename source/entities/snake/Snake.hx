@@ -9,6 +9,8 @@ import helpers.Constants;
 import spacial.Cardinal;
 import flixel.math.FlxVector;
 
+using zero.extensions.FloatExt;
+
 class Snake extends FlxSpriteGroup {
     var straightSegments:Array<StraightSnakeSegment>;
     var activeStraightSegment:StraightSnakeSegment;
@@ -43,10 +45,10 @@ class Snake extends FlxSpriteGroup {
     }
 
     private function addSegment(dir: Cardinal) {
-        var strSeg = new StraightSnakeSegment(dir);
+        var strSegVec = head.getPosition();
 
         if (activeStraightSegment != null) {
-            var crvSeg = CurvedSnakeSegment.create(activeStraightSegment.direction, strSeg.direction);
+            var crvSeg = CurvedSnakeSegment.create(activeStraightSegment.direction, dir);
             crvSeg.setPosition(head.x, head.y);
             curvedSegments.push(crvSeg);
             add(crvSeg);
@@ -62,12 +64,13 @@ class Snake extends FlxSpriteGroup {
             } else if (dir.vertical()) {
                 strSegVec.y += crvSeg.height;
             } else {
-                throw 'direction ${strSeg.direction} unsupported';
+                throw 'direction ${dir} unsupported';
             }
-
-            strSeg.setPosition(strSegVec.x, strSegVec.y);
         }
 
+        strSegVec.x = strSegVec.x.snap_to_grid(Constants.TILE_SIZE);
+        strSegVec.y = strSegVec.y.snap_to_grid(Constants.TILE_SIZE);
+        var strSeg = new StraightSnakeSegment(dir, head, strSegVec);
         activeStraightSegment = strSeg;
         straightSegments.push(strSeg);
 		add(strSeg);

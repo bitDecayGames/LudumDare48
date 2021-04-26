@@ -31,6 +31,7 @@ class SnakeHead extends FlxSprite {
         animation.play(ANIMATION_IDLE);
 
         path = new FlxPath();
+        path.cancel();
 
         newSegmentCallback = function(prevDir: Cardinal, newDir: Cardinal) {};
 
@@ -57,14 +58,6 @@ class SnakeHead extends FlxSprite {
     private var count = 0;
 
     private function generatePath(searcher:SnakeSearch) {
-        // XXX: Stuff hella-breaks if we call this every time the player moves. This slows it down.
-        count--;
-        if (count > 0) {
-            return;
-        } else {
-            count = interval;
-        }
-
         path.cancel();
 
         if (target == null) {
@@ -90,6 +83,11 @@ class SnakeHead extends FlxSprite {
 
         // if pathPoints null, cannot find path
 		if (pathPoints != null) {
+            if (!path.finished) {
+                // make sure we don't do crazy movements to start this path.
+                // Continue to our next point, THEN do the new path
+                pathPoints.unshift(path.nodes[path.nodeIndex]);
+            }
 			path.start(pathPoints, Constants.SNAKE_SPEED);
 		} else {
             #if debug
@@ -131,7 +129,7 @@ class SnakeHead extends FlxSprite {
         super.draw();
 
         #if debug
-        if (!path.finished)
+        if (path != null && path.nodes.length > 0 && !path.finished)
         {
             drawDebug();
         }

@@ -42,7 +42,7 @@ class PlayState extends FlxTransitionableState {
 
 		buffer.repositionLayers(Cardinal.NONE, player.getPosition());
 
-		snake = new Snake(FlxVector.get());
+		snake = new Snake(FlxVector.get(-9 * Constants.TILE_SIZE));
 		add(snake);
 		add(snake.searcher.tileset);
 
@@ -51,7 +51,7 @@ class PlayState extends FlxTransitionableState {
 		camera.follow(player, FlxCameraFollowStyle.TOPDOWN_TIGHT);
 
 		buffer.playState = this;
-		buffer.addMoleFriend(0, 0);
+		// buffer.addMoleFriend(0, 0);
 		// buffer.addMoleFriend(3 * Constants.TILE_SIZE, 0);
 	}
 

@@ -1,5 +1,6 @@
 package entities.snake;
 
+import flixel.math.FlxPoint;
 import flixel.addons.display.FlxTiledSprite;
 import helpers.Constants;
 import spacial.Cardinal;
@@ -13,6 +14,9 @@ class StraightSnakeSegment extends FlxTiledSprite {
     public static final ALL_DIRECTIONS = [Cardinal.N, Cardinal.S, Cardinal.W, Cardinal.E];
     private static final rand = new FlxRandom();
 
+    var head:SnakeHead;
+
+    // wait to grow to let head get ahead first
     var trashLen = Constants.TILE_SIZE * 1.0;
 
     public static function randomDir(curDir: Cardinal) {
@@ -27,7 +31,7 @@ class StraightSnakeSegment extends FlxTiledSprite {
 
     private var stopMovement = false;
 
-    public function new(dir:Cardinal) {
+    public function new(dir:Cardinal, head:SnakeHead, startPos:FlxPoint) {
         super(
             getAssetsPath(dir),
             0,
@@ -36,8 +40,14 @@ class StraightSnakeSegment extends FlxTiledSprite {
             dir.vertical()
         );
 
+        x = startPos.x;
+        y = startPos.y;
+
         direction = dir;
         directionVector = dir.asVector();
+
+        this.head = head;
+
     }
 
     private function getAssetsPath(dir: Cardinal) {
@@ -71,11 +81,11 @@ class StraightSnakeSegment extends FlxTiledSprite {
         height = height.snap_to_grid(Constants.TILE_SIZE);
     }
 
-    public override function setPosition(X:Float = 0, Y:Float = 0) {
-        super.setPosition(X, Y);
-        x = x.snap_to_grid(Constants.TILE_SIZE);
-        y = y.snap_to_grid(Constants.TILE_SIZE);
-    }
+    // public override function setPosition(X:Float = 0, Y:Float = 0) {
+    //     super.setPosition(X, Y);
+    //     x = x.snap_to_grid(Constants.TILE_SIZE);
+    //     y = y.snap_to_grid(Constants.TILE_SIZE);
+    // }
 
     override public function update(delta:Float) {
         super.update(delta);
