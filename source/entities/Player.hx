@@ -136,6 +136,10 @@ class Player extends Moleness {
 					startFrame = 7;
 				}
 
+				if (animation.name != "falling"){
+					fallingSoundId = FmodManager.PlaySoundWithReference(FmodSFX.MoleFall);
+				}
+
 				animation.play(Moleness.FALLING, startFrame);
 			}
 
@@ -219,10 +223,6 @@ class Player extends Moleness {
 				setPosition(Math.round(target.x), Math.round(target.y));
 				target.copyFrom(Constants.NO_TARGET);
 				justStopped = !stopped;
-				// if(justStopped && FmodManager.IsSoundPlaying(fallingSoundId)){
-				// 	FmodManager.StopSoundImmediately(fallingSoundId);
-				// 	FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
-				// }
 				stopped = true;
 				isFalling = false;
 			}
@@ -242,12 +242,14 @@ class Player extends Moleness {
 						default:
 					}
 				}
-				// if(FmodManager.IsSoundPlaying(fallingSoundId)){
-				// 	FmodManager.StopSoundImmediately(fallingSoundId);
-				// 	FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
-				// }
 			}
 		}
+		if(animation.name != "falling" && FmodManager.IsSoundPlaying(fallingSoundId)){
+			FmodManager.StopSoundImmediately(fallingSoundId);
+			FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
+			trace("Stopped in the movement check");
+		}
+		trace("Animation: " + animation.name);
 	}
 
 	private function updateEmitter(delta:Float) {
