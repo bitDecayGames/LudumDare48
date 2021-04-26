@@ -54,8 +54,6 @@ class PlayState extends FlxTransitionableState {
 		var queen = new FlxSprite(AssetPaths.queen__png);
 		queen.x = -queen.width/2;
 		queen.y = (VoxelCalculator.queenBound + 1.85) * Constants.TILE_SIZE - queen.height;
-
-		add(queen);
 		add(milfs);
 
 		player = new Player();
@@ -85,6 +83,8 @@ class PlayState extends FlxTransitionableState {
 		player.z = buffer.layers[0].worldZ;
 
 		transOut = null;
+
+		add(queen);
 	}
 
 	var gameOver = false;
@@ -116,7 +116,7 @@ class PlayState extends FlxTransitionableState {
 						Bitlytics.Instance().ForceFlush();
 					});
 					openSubState(swirlOut);
-				}, 1000);
+				}, 3000);
 			}
 			return;
 		}
