@@ -1,7 +1,7 @@
 package states;
 
 import particles.BloodEmitter;
-import com.bitdecay.metrics.Common;
+import com.bitdecay.analytics.Common;
 import com.bitdecay.analytics.Bitlytics;
 import states.transitions.Trans;
 import flixel.util.FlxColor;
@@ -112,6 +112,7 @@ class PlayState extends FlxTransitionableState {
 
 			if (!gameOver) {
 				gameOver = true;
+				FmodManager.StopSong();
 				Timer.delay(() -> {
 					var swirlOut = new SwirlTransition(Trans.OUT, () -> {
 						// make sure our music is stopped;

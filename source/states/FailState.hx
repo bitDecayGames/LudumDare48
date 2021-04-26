@@ -1,7 +1,7 @@
 package states;
 
 import metrics.Metrics;
-import com.bitdecay.metrics.Common;
+import com.bitdecay.analytics.Common;
 import com.bitdecay.analytics.Bitlytics;
 import flixel.addons.ui.FlxUITypedButton;
 import flixel.addons.ui.FlxUICursor;

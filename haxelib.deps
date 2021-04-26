@@ -6,7 +6,7 @@ openfl 9.0.2
 
 # bitDecayGames deps
 bitdecaybtree git https://github.com/bitDecayGames/BehaviorTree.git
-bitlytics git https://github.com/bitDecayGames/Bitlytics.git
+bitlytics git https://github.com/bitDecayGames/Bitlytics.git 9d4d5d809af5692462b8279f2ac42e4558c547ee
 flixelutils git https://github.com/bitDecayGames/flixel-utils.git
 textpop git https://github.com/bitDecayGames/text-pop.git
 
