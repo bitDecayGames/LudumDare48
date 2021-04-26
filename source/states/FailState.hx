@@ -53,6 +53,7 @@ class FailState extends FlxUIState {
 		add(_txtTitle);
 
 		Bitlytics.Instance().Queue(Metrics.DEATH, 1);
+		Bitlytics.Instance().ForceFlush();
 	}
 
 	override public function update(elapsed:Float):Void {

@@ -1,5 +1,6 @@
 package states;
 
+import misc.FlxTextFactory;
 import flixel.math.FlxRandom;
 import haxe.Timer;
 import states.transitions.Trans;
@@ -24,10 +25,12 @@ class MoleFactsState extends FlxUIState {
 	var goTo:FlxState;
 
 	var text:FlxText;
+	var customFact:String;
 
-	public function new(goTo:FlxState) {
+	public function new(goTo:FlxState, customFact:String = "") {
 		super();
 		this.goTo = goTo;
+		this.customFact = customFact;
 	}
 
 	override public function create():Void {
@@ -56,12 +59,16 @@ class MoleFactsState extends FlxUIState {
 		this.handleFocus();
 		transOut = null;
 
-		text = new FlxText();
-		text.setPosition(15, 35);
-		text.size = 20;
-		text.alignment = FlxTextAlign.LEFT;
-		text.color = FlxColor.BLACK;
+		var yOff = 35.0;
+		if (customFact != "") {
+			customFact += "\nalso...\n";
+			var custom = FlxTextFactory.make(customFact, 15, yOff, 20, FlxTextAlign.LEFT, FlxColor.BLACK);
+			add(custom);
 
+			yOff += custom.height;
+		}
+
+		text = FlxTextFactory.make("", 15, yOff, 20, FlxTextAlign.LEFT, FlxColor.BLACK);
 		setMoleFact();
 		add(text);
 	}

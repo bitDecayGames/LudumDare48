@@ -151,7 +151,7 @@ class LayerBufferStack extends FlxTypedGroup<LayerBuffer> {
 				spawnFollower(main.worldY + main.bufHeight + 1);
 			}
 
-			return new MoveResult(worldTarget, targetTile, false);
+			return new MoveResult(worldTarget, targetTile, false, dir);
 		} else {
 			// TODO: SFX tried to dig through rock here
 			FmodManager.PlaySoundOneShot(FmodSFX.MoleRock);

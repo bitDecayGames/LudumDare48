@@ -25,7 +25,7 @@ class SwirlTransition extends FlxSubState {
 	 *  @param color		a color to show in place of black
 	 *  @param duration		how long the transition should take to complete
 	 */
-	public function new(dir:Trans, onFinish:Void->Void, color:Int = 0xff000000, duration:Float = 2) {
+	public function new(dir:Trans, onFinish:Void->Void, color:Int = 0xff000000, duration:Float = 0.75) {
 		super();
 
 		var s:FlxSprite = new FlxSprite();
@@ -37,7 +37,7 @@ class SwirlTransition extends FlxSubState {
 		var totalCircles = (FlxG.width).round();
 		var timePerCircle = duration / totalCircles;
 
-		var maxDistance = FlxG.width * 0.8;
+		var maxDistance = Math.max(FlxG.width, FlxG.height) * 0.8;
 		var spacingDegs = 5;
 
 		var totalSwirls = (totalCircles * spacingDegs) / 360;
