@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <objects serializationModel="Studio.02.00.00">
-	<object class="AudioFile" id="{14c96da9-6e44-49cb-8163-f7d853aa4e6a}">
+	<object class="AudioFile" id="{f3c2d363-a4b9-4e77-9fe3-fb02ff91da3e}">
 		<property name="assetPath">
-			<value>dig2.ogg</value>
+			<value>hit_rock.ogg</value>
 		</property>
 		<property name="frequencyInKHz">
 			<value>48</value>

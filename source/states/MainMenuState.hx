@@ -118,12 +118,6 @@ class MainMenuState extends FlxUIState {
 		FmodManager.StopSong();
 		FmodManager.PlaySoundOneShot(FmodSFX.MenuSelect);
 
-		var test2 = _ui.getAsset("play_button");
-		test2.visible = false;
-
-		var test3 = _ui.getAsset("credits_button");
-		test3.visible = false;
-
 		cursor.visible = false;
 
 		Timer.delay(() -> {

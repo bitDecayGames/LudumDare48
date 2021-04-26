@@ -92,6 +92,8 @@ class Player extends Moleness {
 
 	public var isTransitioningBetweenLayers:Bool = false;
 
+	public var fallingSoundId:String = "";
+
 	public function new() {
 		super();
 
@@ -287,6 +289,10 @@ class Player extends Moleness {
 				setPosition(Math.round(target.x), Math.round(target.y));
 				target.copyFrom(Constants.NO_TARGET);
 				justStopped = !stopped;
+				// if(justStopped && FmodManager.IsSoundPlaying(fallingSoundId)){
+				// 	FmodManager.StopSoundImmediately(fallingSoundId);
+				// 	FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
+				// }
 				stopped = true;
 				emitter.emitting = false;
 				isFalling = false;
@@ -307,6 +313,10 @@ class Player extends Moleness {
 						default:
 					}
 				}
+				// if(FmodManager.IsSoundPlaying(fallingSoundId)){
+				// 	FmodManager.StopSoundImmediately(fallingSoundId);
+				// 	FmodManager.PlaySoundOneShot(FmodSFX.MoleFallLand);
+				// }
 			}
 		}
 	}
@@ -394,6 +404,9 @@ class Player extends Moleness {
 	public function setTarget(t:MoveResult) {
 		target.copyFrom(t.target);
 		originalPosition = getPosition();
+		if(!isFalling && t.isFalling){
+			// fallingSoundId = FmodManager.PlaySoundWithReference(FmodSFX.MoleFall);
+		}
 		isFalling = t.isFalling;
 
 		var tmp = FlxVector.get();
