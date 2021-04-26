@@ -1,6 +1,8 @@
 # Build files
 /export
 
+profiling/
+
 # haxefmod integration
 fmod/CachedHaxeConstantsOutputLocation
 

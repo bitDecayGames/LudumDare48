@@ -14,8 +14,11 @@ class Metrics {
 
 	public static function reportDepth(d:Int) {
 		if (d > maxDepth) {
-			Bitlytics.Instance().Queue(MAX_DEPTH, d);
 			maxDepth = d;
+			if (maxDepth % 10 == 0) {
+				// only report in increments of 10 to save payload size;
+				Bitlytics.Instance().Queue(MAX_DEPTH, d);
+			}
 		}
 	}
 

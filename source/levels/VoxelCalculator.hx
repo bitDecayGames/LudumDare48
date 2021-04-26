@@ -4,10 +4,18 @@ import generation.Perlin;
 
 class VoxelCalculator {
 
+	public static var xShift = 0;
+	public static var yShift = 8;
+	public static var zShift = 16;
+
+	public static var xFlag = 0x0000FF;
+	public static var yFlag = 0x00FF00;
+	public static var zFlag = 0xFF0000;
+
 	public static final instance:VoxelCalculator = new VoxelCalculator();
 
 	public var perlin:Perlin;
-	public var modified:Map<String, Int>;
+	public var modified:Map<Int, Int>;
 	public var scale:Float = 0.2;
 	public static inline var leftBound:Int = -10;
 	public static inline var rightBound:Int = 10;
@@ -24,7 +32,7 @@ class VoxelCalculator {
 
 	public function new() {
 		perlin = new Perlin();
-		modified = new Map<String, Int>();
+		modified = new Map<Int, Int>();
 	}
 
 	/**
@@ -95,7 +103,11 @@ class VoxelCalculator {
 		return this;
 	}
 
-	private function getKey(x:Int, y:Int, z:Int):String {
-		return "" + x + "," + y + "," + z;
+	private function getKey(x:Int, y:Int, z:Int):Int {
+		// XXX major hack to prevent negative numbers from causing issues with this method
+		// x and z can only be ~-10 and -3 respectively, so add some amount to force them into positive space
+		x += 128;
+		z += 128;
+		return (x << xShift & xFlag) + (y << yShift & yFlag) + (z << zShift & zFlag);
 	}
 }
