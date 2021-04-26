@@ -35,6 +35,10 @@ class VoxelCalculator {
 		modified = new Map<Int, Int>();
 	}
 
+	public function reset() {
+		modified = new Map<Int, Int>();
+	}
+
 	/**
 	 * Get the type of voxel at a given world x,y,z
 	 * @param x

@@ -44,6 +44,8 @@ class PlayState extends FlxTransitionableState {
 		FmodManager.PlaySong(FmodSongs.Maybe);
 
 		FlxG.camera.pixelPerfectRender = true;
+		FlxG.worldBounds.set(-20 * Constants.TILE_SIZE, -1 * Constants.TILE_SIZE, 40 * Constants.TILE_SIZE, (VoxelCalculator.queenBound + 3) * Constants.TILE_SIZE);
+		VoxelCalculator.instance.reset();
 
 		var milfs = new FlxTypedGroup<MoleFriend>();
 
@@ -106,7 +108,6 @@ class PlayState extends FlxTransitionableState {
 
 			if (!gameOver) {
 				gameOver = true;
-				trace("kicking off the swirl");
 				Timer.delay(() -> {
 					var swirlOut = new SwirlTransition(Trans.OUT, () -> {
 						// make sure our music is stopped;
