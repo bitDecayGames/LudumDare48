@@ -78,7 +78,10 @@ class NewSnake extends FlxSpriteGroup {
 		}
 
 		seg.alpha = 0;
-		FlxTween.tween(seg, {alpha: 1}, 0.5);
+		if (head.z == player.z) {
+			// fade it in because it's on the right page
+			FlxTween.tween(seg, {alpha: 1}, 0.5);
+		}
 
 		segGroup.add(seg);
 	}
